@@ -1,6 +1,6 @@
 {
   "name": "node-norm",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Norm is data access layer",
   "main": "lib/index.js",
   "scripts": {
@@ -9,8 +9,10 @@
   "author": "Ganesha <reekoheek@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "co": "^4.6.0",
     "lodash": "^3.10.1",
     "node-uuid": "^1.4.3"
+  },
+  "devDependencies": {
+    "co": "^4.6.0"
   }
 }
