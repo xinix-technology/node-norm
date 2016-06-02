@@ -1,0 +1,5 @@
+{
+  "strict": true,
+  "esnext": true,
+  "node": true
+}
