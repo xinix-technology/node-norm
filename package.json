@@ -8,6 +8,10 @@
   },
   "author": "Ganesha <reekoheek@gmail.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/xinix-technology/node-norm.git"
+  },
   "dependencies": {
     "fs-promise": "^0.5.0",
     "lodash": "^3.10.1",
