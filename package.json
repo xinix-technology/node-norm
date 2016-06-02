@@ -1,8 +1,8 @@
 {
   "name": "node-norm",
-  "version": "0.1.1",
-  "description": "Norm is data access layer",
-  "main": "lib/index.js",
+  "version": "0.1.2",
+  "description": "Norm is Not ORM though data access layer",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
