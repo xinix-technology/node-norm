@@ -1,14 +1,14 @@
 'use strict';
 
+const inspect = require('./utils/inspect');
+
 class Cursor {
   constructor(collection, criteria) {
-    Object.defineProperties(this, {
-      collection: { enumerable: false, writable: false, configurable: false, value: collection },
-      criteria: { enumerable: true, writable: true, configurable: true, value: criteria },
-      limit: { enumerable: true, writable: true, configurable: true, value: -1 },
-      skip: { enumerable: true, writable: true, configurable: true, value: 0 },
-      sort: { enumerable: true, writable: true, configurable: true, value: {} },
-    });
+    this.collection = collection;
+    this.criteria = criteria;
+    this.limit = -1;
+    this.skip = 0;
+    this.sort = {};
   }
 
   fetch() {
@@ -35,6 +35,10 @@ class Cursor {
   setSort(sort) {
     this.sort = sort;
     return this;
+  }
+
+  inspect() {
+    return inspect(this, ['criteria', 'limit', 'skip', 'sort']);
   }
 }
 

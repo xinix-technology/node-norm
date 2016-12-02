@@ -13,6 +13,11 @@
 
 const Model = require('./model');
 const Cursor = require('./cursor');
+const Filter = require('./filter');
+const schema = require('./schema');
+const _ = require('lodash');
+const inspect = require('./utils/inspect');
+const compose = require('koa-compose');
 
 /**
  * @class `Collection`
@@ -28,6 +33,9 @@ class Collection {
   constructor(connection, id) {
     this.connection = connection;
     this.id = id;
+    this.fields = {};
+    this.observers = { save: [], filter: [], remove: [], search: [], attach: [] };
+    this.composedObservers = {};
   }
 
   /**
@@ -48,10 +56,80 @@ class Collection {
    * @return {Promise}
    */
   save(model, options) {
-    return this.connection.persist(this.id, model.dump())
-      .then(function(modified) {
-        model.sync(modified);
-      });
+    options = _.defaults(options || {}, {
+      filter: true,
+      observer: true
+    });
+
+
+    let context = {
+      collection: this,
+      model: model,
+      options: options,
+    };
+
+
+    let saving = function() {
+      console.log('core-saving');
+      let promise = options.filter ? this.filter(model) : Promise.resolve();
+
+      return promise.then(function() {
+          console.log('core-after-filter');
+          return this.connection.persist(this.id, model.dump());
+        }.bind(this))
+        .then(function(modified) {
+          console.log('core-sync');
+          model.sync(modified);
+        });
+    }.bind(this);
+
+    if (options.observer) {
+      return this.applyObserve('save', context, saving);
+    } else {
+      return saving(context);
+    }
+  }
+
+  observe(observer) {
+    [ 'save', 'filter', 'remove', 'search', 'attach' ].forEach(function(method) {
+      if (observer[method]) {
+        this.observers[method].push(observer[method].bind(this));
+      }
+    }.bind(this));
+  }
+
+  applyObserve(name, context, callback) {
+    if (!this.composedObservers[name]) {
+      this.composedObservers[name] = compose(this.observers[name]);
+    }
+    var fn = this.composedObservers[name];
+    return new Promise(function(resolve, reject) {
+      fn(context, function() {
+        try {
+          if (callback) {
+            // Promise.resolve(callback()).then(function() {
+            //   console.log('---', name);
+            //   // resolve();
+            // }, reject);
+          } else {
+            // resolve();
+          }
+        } catch(e) {
+          reject(e);
+        }
+        console.log('xxx')
+      }).then(resolve, reject);
+    });
+  }
+
+  filter(model, key) {
+    return this.applyObserve('filter', {
+      collection: this,
+      model: model,
+      key: key,
+    }, function() {
+      (new Filter(this)).run(model, key);
+    }.bind(this));
   }
 
   /**
@@ -125,6 +203,19 @@ class Collection {
           return this.attach(row);
         }.bind(this));
       }.bind(this));
+  }
+
+  addField(fieldOrMeta) {
+    var field = schema.prepare(fieldOrMeta, this);
+    this.fields[field.name] = field;
+
+    if (!this.firstField) {
+      this.firstField = field.name;
+    }
+  }
+
+  inspect() {
+    return inspect(this, ['id', 'connection', 'fields']);
   }
 }
 

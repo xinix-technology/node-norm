@@ -8,7 +8,7 @@ class Disk extends Memory {
   constructor(repository, id, options) {
     super(repository, id, options);
 
-    this.file = this.options.file;
+    this.file = this.options.file || 'data/data.json';
   }
 
   ensureData() {

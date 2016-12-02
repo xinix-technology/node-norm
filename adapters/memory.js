@@ -5,10 +5,17 @@ const Connection = require('../connection');
 
 class Memory extends Connection {
 
-  constructor(repository, id, options) {
-    super(repository, id);
+  get data() {
+    return this.options.data;
+  }
 
-    this.options = options || {};
+  set data(data) {
+    this.options.data = data;
+  }
+
+  constructor(repository, id, options) {
+    super(repository, id, options);
+
     this.data = this.options.data || {};
   }
 

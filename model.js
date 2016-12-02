@@ -1,14 +1,13 @@
 'use strict';
 
 const _ = require('lodash');
+const inspect = require('./utils/inspect');
 
 class Model {
   constructor(collection, attributes) {
-    Object.defineProperties(this, {
-      collection: { enumerable: false, writable: false, configurable: false, value: collection },
-      attributes: { enumerable: true, writable: true, configurable: true, value: attributes },
-      oldAttributes: { enumerable: false, writable: true, configurable: false, value: {} },
-    });
+    this.collection = collection;
+    this.attributes = {};
+    this.oldAttributes = {};
 
     this.reset();
     this.sync(attributes);
@@ -70,6 +69,18 @@ class Model {
     return this;
   }
 
+  get(key) {
+    return this.attributes[key] || null;
+  }
+
+  isNew() {
+    return this.state === Model.STATE_DETACHED;
+  }
+
+  isRemoved() {
+    return this.state === Model.STATE_REMOVED;
+  }
+
   toJSON() {
     var obj = {
       '$id': this.id,
@@ -78,6 +89,10 @@ class Model {
       obj[i] = this.attributes[i];
     }
     return obj;
+  }
+
+  inspect() {
+    return inspect(this, ['id', 'attributes', 'state']);
   }
 }
 
