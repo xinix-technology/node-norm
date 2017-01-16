@@ -18,11 +18,12 @@ class Memory extends Connection {
 
     if (model.id) {
       let row = data[model.id];
-      if (row) {
-        data[model.id] = Object.assign(data[model.id], model.row);
+      if (!row) {
+        throw new Error(`Stale data with id: ${model.id}`);
       }
 
-      return;
+      data[model.id] = row = Object.assign(row, model.row);
+      return row;
     }
 
     let row = Object.assign({ id: uuid.v4() }, model.row);
