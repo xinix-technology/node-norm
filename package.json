@@ -1,6 +1,6 @@
 {
   "name": "node-norm",
-  "version": "0.1.2",
+  "version": "0.3.0",
   "description": "Norm is Not ORM though data access layer",
   "main": "index.js",
   "scripts": {
@@ -13,12 +13,14 @@
     "url": "git://github.com/xinix-technology/node-norm.git"
   },
   "dependencies": {
-    "fs-promise": "^0.5.0",
+    "fs-promise": "^1.0.0",
     "koa-compose": "^3.0.0",
-    "lodash": "^3.10.1",
-    "node-uuid": "^1.4.3"
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
-    "co": "^4.6.0"
+    "eslint": "^3.13.1",
+    "eslint-config-standard": "^6.2.1",
+    "eslint-plugin-promise": "^3.4.0",
+    "eslint-plugin-standard": "^2.0.1"
   }
 }

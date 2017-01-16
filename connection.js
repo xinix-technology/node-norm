@@ -1,29 +1,40 @@
-'use strict';
-
-const inspect = require('./utils/inspect');
+const Collection = require('./collection');
 
 class Connection {
-  static generateId() {
-    Connection.generatedId = Connection.generatedId || 0;
-    return `connection-${Connection.generatedId++}`;
+  constructor ({ name, schemas }) {
+    this.name = name;
+    this.schemas = schemas;
+
+    this.cachedCollections = {};
   }
 
-  constructor(repository, id, options) {
-    this.repository = repository;
-    this.id = id || Connection.generateId();
-    this.options = options || {};
+  factory (name) {
+    if (name in this.cachedCollections === false) {
+      const connection = this;
+      const schema = this.schemas.find(schema => schema.name === name);
+
+      this.cachedCollections[name] = new Collection({ connection, schema });
+    }
+
+    return this.cachedCollections[name].clone();
   }
 
-  persist() {
-    throw new Error('Please override persist');
+  static create (options) {
+    const Adapter = Connection.adapter(options.adapter);
+
+    return new Adapter(options);
   }
 
-  fetch() {
-    throw new Error('Please override fetch');
-  }
+  static adapter (name) {
+    if (typeof name === 'function') {
+      return name;
+    }
 
-  inspect() {
-    return inspect(this, ['id']);
+    if (name.indexOf('-') > -1) {
+      return require(name);
+    }
+
+    return require(`./adapters/${name}`);
   }
 }
 

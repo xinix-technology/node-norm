@@ -1,61 +1,28 @@
-'use strict';
-
 const Memory = require('./memory');
 const fs = require('fs-promise');
-const path = require('path');
 
 class Disk extends Memory {
-  constructor(repository, id, options) {
-    super(repository, id, options);
+  constructor (options) {
+    super(options);
 
-    this.file = this.options.file || 'data/data.json';
+    this.file = options.file || './.tmp/db.json';
+
+    try {
+      fs.ensureFileSync(this.file);
+      this.data = JSON.parse(fs.readFileSync(this.file));
+    } catch (err) {}
   }
 
-  ensureData() {
-    if (!this._ensured) {
-      var file = this.file;
-      return fs.ensureFile(file)
-        .then(() => fs.readFile(file))
-        .then(buffer => JSON.parse(buffer))
-        .catch(err => {})
-        .then(function(data) {
-          this._ensured = true;
-          this.data = data || {};
-        }.bind(this));
-    } else {
-      return Promise.resolve();
-    }
+  async persist (collection) {
+    const row = await super.persist(...arguments);
+
+    this.write();
+
+    return row;
   }
 
-  persist(collectionId, row) {
-    var superPersist = super.persist.bind(this);
-    return this.ensureData()
-      .then(function() {
-        return superPersist(collectionId, row);
-      })
-      .then(function(row) {
-        return fs.writeFile(this.file, JSON.stringify(this.data, null, 2))
-          .then(() => row);
-      }.bind(this));
-  }
-
-  remove(cursor) {
-    var superRemove = super.remove.bind(this);
-    return this.ensureData()
-      .then(function() {
-        return superRemove(cursor);
-      })
-      .then(function(row) {
-        return fs.writeFile(this.file, JSON.stringify(this.data, null, 2));
-      }.bind(this));
-  }
-
-  fetch(cursor) {
-    var superFetch = super.fetch.bind(this);
-    return this.ensureData()
-      .then(function() {
-        return superFetch(cursor);
-      });
+  write () {
+    fs.writeFile(this.file, JSON.stringify(this.data, null, 2));
   }
 }
 
