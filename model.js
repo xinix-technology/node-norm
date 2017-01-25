@@ -13,7 +13,24 @@ class Model {
     return this.row.id;
   }
 
-  async save () {
+  set (key, value) {
+    if (arguments.length === 1) {
+      const object = key;
+      Object.keys(object).forEach(k => {
+        this.set(k, object[k]);
+      });
+
+      return this;
+    }
+
+    this.row[key] = value;
+  }
+
+  async save ({ filter = true } = {}) {
+    if (filter) {
+      this.row = await this.schema.filter(this.row);
+    }
+
     this.row = await this.connection.persist(this);
   }
 

@@ -2,7 +2,7 @@
   "name": "node-norm",
   "version": "0.3.0",
   "description": "Norm is Not ORM though data access layer",
-  "main": "index.js",
+  "main": "manager.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

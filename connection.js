@@ -1,7 +1,8 @@
 const Collection = require('./collection');
+const Schema = require('./schema');
 
 class Connection {
-  constructor ({ name, schemas }) {
+  constructor ({ name, schemas = [] }) {
     this.name = name;
     this.schemas = schemas;
 
@@ -11,7 +12,7 @@ class Connection {
   factory (name) {
     if (name in this.cachedCollections === false) {
       const connection = this;
-      const schema = this.schemas.find(schema => schema.name === name);
+      const schema = new Schema(this.schemas.find(schema => schema.name === name) || { name });
 
       this.cachedCollections[name] = new Collection({ connection, schema });
     }
