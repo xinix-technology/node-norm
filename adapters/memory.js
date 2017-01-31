@@ -8,28 +8,53 @@ class Memory extends Connection {
     this.data = {};
   }
 
-  async fetch (collection) {
-    const data = this.data[collection.name] || [];
-    return await data[collection._offset];
-  }
+  query (query) {
+    const data = this.data[query.collection] || [];
 
-  persist (model) {
-    const data = this.data[model.name] = this.data[model.name] || [];
-
-    if (model.id) {
-      let row = data[model.id];
-      if (!row) {
-        throw new Error(`Stale data with id: ${model.id}`);
-      }
-
-      data[model.id] = row = Object.assign(row, model.row);
-      return row;
+    if (!query.criteria) {
+      return data;
     }
 
-    let row = Object.assign({ id: uuid.v4() }, model.row);
-    data.push(row);
+    if (query.criteria.id) {
+      const row = data.find(row => row.id === query.criteria.id);
+      return row ? [ row ] : [];
+    }
 
-    return row;
+    return data.filter(row => {
+      console.log('row', row);
+      return row;
+    });
+  }
+
+  persist (query) {
+    const data = this.data[query.collection] = this.data[query.collection] || [];
+
+    if (query.inserts.length) {
+      return query.inserts.map(row => {
+        row = Object.assign({ id: uuid.v4() }, row);
+        data.push(row);
+        return row;
+      });
+    }
+
+    const result = this.query(query).map(row => {
+      return Object.assign(row, query._set);
+    });
+
+    console.log('>', data);
+
+    return result;
+  }
+
+  remove (query) {
+    const data = this.data[query.collection] = this.data[query.collection] || [];
+
+    this.query(query).forEach(row => {
+      const key = data.indexOf(row);
+      if (key >= 0) {
+        data.splice(key, 1);
+      }
+    });
   }
 }
 

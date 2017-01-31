@@ -1,4 +1,5 @@
 const Connection = require('./connection');
+const Query = require('./query');
 
 class Manager {
   constructor ({ connections = [] } = {}) {
@@ -6,14 +7,12 @@ class Manager {
     this.cachedConnections = {};
   }
 
-  factory (name) {
-    const { connection, collection } = this.extractName(name);
-
-    return this.getConnection(connection).factory(collection);
-  }
-
-  getConnection (name) {
-    name = name || this.connections[0].name;
+  getConnectionByName (name) {
+    if (name && name.indexOf('.') >= 0) {
+      [ name ] = name.split('.');
+    } else {
+      name = this.connections[0].name;
+    }
 
     if (!this.cachedConnections[name]) {
       const options = this.connections.find(connection => connection.name === name);
@@ -23,17 +22,9 @@ class Manager {
     return this.cachedConnections[name];
   }
 
-  extractName (name) {
-    if (this.connections.length === 0) {
-      throw new Error('Connection not available');
-    }
-
-    let [ connection, collection ] = name.split('.');
-    if (!collection) {
-      collection = connection;
-      connection = this.connections[0].name;
-    }
-    return { connection, collection };
+  find (name, criteria) {
+    const manager = this;
+    return new Query({ manager, name, criteria });
   }
 }
 

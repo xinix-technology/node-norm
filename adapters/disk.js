@@ -13,12 +13,20 @@ class Disk extends Memory {
     } catch (err) {}
   }
 
-  async persist (collection) {
-    const row = await super.persist(...arguments);
+  async persist (query) {
+    const result = await super.persist(query);
 
     this.write();
 
-    return row;
+    return result;
+  }
+
+  async remove (query) {
+    const result = await super.remove(query);
+
+    this.write();
+
+    return result;
   }
 
   write () {
