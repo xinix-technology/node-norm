@@ -10,8 +10,10 @@ class Manager {
   getConnectionByName (name) {
     if (name && name.indexOf('.') >= 0) {
       [ name ] = name.split('.');
-    } else {
+    } else if (this.connections && this.connections.length) {
       name = this.connections[0].name;
+    } else {
+      throw new Error(`Cannot default connection`);
     }
 
     if (!this.cachedConnections[name]) {
