@@ -11,19 +11,38 @@ class Memory extends Connection {
   query (query) {
     const data = this.data[query.collection] || [];
 
-    if (!query.criteria) {
-      return data;
-    }
-
-    if (query.criteria.id) {
+    if (query.criteria && query.criteria.id) {
       const row = data.find(row => row.id === query.criteria.id);
       return row ? [ row ] : [];
     }
 
-    return data.filter(row => {
-      console.log('row', row);
-      return row;
+    let rows = data;
+    if (query.criteria) {
+      rows = data.filter(row => this.matchCriteria(query.criteria, row));
+    }
+
+    return rows.sort((a, b) => {
+      let k;
+      for (k in query._sort) {
+        let x = a[k] > b[k];
+        let y = query._sort[k] ? x : !x;
+        if (y) return true;
+      }
     });
+  }
+
+  matchCriteria (criteria, row) {
+    if (!criteria) {
+      return true;
+    }
+
+    for (let i in criteria) {
+      if (criteria[i] !== row[i]) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   persist (query) {

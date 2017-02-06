@@ -7,6 +7,7 @@ class Query {
     this._criteria = criteria;
     this._limit = -1;
     this._skip = 0;
+    this._sort = {};
   }
 
   get connection () {
@@ -31,6 +32,12 @@ class Query {
 
   insert (row) {
     this.inserts.push(row);
+
+    return this;
+  }
+
+  sort (sort) {
+    this._sort = sort;
 
     return this;
   }
