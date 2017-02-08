@@ -60,8 +60,6 @@ class Memory extends Connection {
       return Object.assign(row, query._set);
     });
 
-    console.log('>', data);
-
     return result;
   }
 
