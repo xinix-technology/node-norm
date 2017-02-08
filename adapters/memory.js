@@ -63,6 +63,10 @@ class Memory extends Connection {
     return result;
   }
 
+  truncate (query) {
+    this.data[query.collection] = [];
+  }
+
   remove (query) {
     const data = this.data[query.collection] = this.data[query.collection] || [];
 

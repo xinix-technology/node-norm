@@ -29,8 +29,19 @@ class Disk extends Memory {
     return result;
   }
 
+  async truncate (query) {
+    const result = await super.truncate(query);
+
+    this.write();
+
+    return result;
+  }
+
   write () {
-    fs.writeFile(this.file, JSON.stringify(this.data, null, 2));
+    clearTimeout(this._writing);
+    this._writing = setTimeout(() => {
+      fs.writeFile(this.file, JSON.stringify(this.data, null, 2));
+    }, 500);
   }
 }
 

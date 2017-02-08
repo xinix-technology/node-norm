@@ -68,6 +68,10 @@ class Query {
     return await this.connection.persist(this);
   }
 
+  async truncate () {
+    return await this.connection.truncate(this);
+  }
+
   async all () {
     return await this.connection.query(this);
   }
