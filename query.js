@@ -1,43 +1,40 @@
 class Query {
-  constructor ({ manager, name, criteria }) {
+  constructor ({ manager, schema, criteria = {} }) {
     this.manager = manager;
-    this.name = name;
-    this.inserts = [];
-    this._set = {};
+    this.schema = schema;
     this._criteria = criteria;
+    this._inserts = [];
+    this._sets = {};
     this._limit = -1;
     this._skip = 0;
-    this._sort = {};
+    this._sorts = {};
+    this._method = '';
   }
 
-  get connection () {
-    return this.manager.getConnectionByName(this.name);
-  }
-
-  get collection () {
-    return this.name.indexOf('.') === -1 ? this.name : this.name.split('.')[1];
-  }
-
-  get criteria () {
-    if (!this._criteria) {
-      return;
+  find (criteria) {
+    if (!criteria) {
+      this._criteria = undefined;
+    } else if (typeof criteria === 'object') {
+      this._criteria = criteria;
+    } else {
+      this._criteria = { id: criteria };
     }
-
-    if (typeof this._criteria !== 'object') {
-      return { id: this._criteria };
-    }
-
-    return this._criteria;
-  }
-
-  insert (row) {
-    this.inserts.push(row);
 
     return this;
   }
 
-  sort (sort) {
-    this._sort = sort;
+  get connection () {
+    return this.schema.connection;
+  }
+
+  insert (row) {
+    this._inserts.push(row);
+
+    return this;
+  }
+
+  sort (sorts) {
+    this._sorts = sorts;
 
     return this;
   }
@@ -55,30 +52,46 @@ class Query {
   }
 
   set (set) {
-    this._set = set;
+    this._sets = set;
 
     return this;
   }
 
+  attach (row) {
+    return this.schema.attach(row);
+  }
+
   async delete () {
-    return await this.connection.remove(this);
+    this._method = 'delete';
+    return await this.connection.persist(this);
   }
 
   async save () {
+    this._method = this._inserts.length ? 'insert' : 'update';
+    return await this.connection.persist(this);
+  }
+
+  async drop () {
+    this._method = 'drop';
     return await this.connection.persist(this);
   }
 
   async truncate () {
-    return await this.connection.truncate(this);
+    this._method = 'truncate';
+    return await this.connection.persist(this);
   }
 
   async all () {
-    return await this.connection.query(this);
+    let models = [];
+    await this.connection.load(this, row => models.push(this.attach(row)));
+    return models;
   }
 
   async single () {
-    const [ row ] = await this.limit(1).connection.query(this);
-    return row;
+    this.limit(1);
+    let model;
+    await this.connection.load(this, row => (model = this.attach(row)));
+    return model;
   }
 }
 

@@ -8,27 +8,40 @@ class Memory extends Connection {
     this.data = {};
   }
 
-  query (query) {
-    const data = this.data[query.collection] || [];
+  load (query, callback = () => {}) {
+    let data = this.data[query.schema.name] || [];
 
-    if (query.criteria && query.criteria.id) {
-      const row = data.find(row => row.id === query.criteria.id);
-      return row ? [ row ] : [];
-    }
+    let { _criteria, _sorts } = query;
 
-    let rows = data;
-    if (query.criteria) {
-      rows = data.filter(row => this.matchCriteria(query.criteria, row));
-    }
-
-    return rows.sort((a, b) => {
-      let k;
-      for (k in query._sort) {
-        let x = a[k] > b[k];
-        let y = query._sort[k] ? x : !x;
-        if (y) return true;
+    if (_criteria.id) {
+      const row = data.find(row => row.id === _criteria.id);
+      if (row) {
+        callback(row);
+        return [ row ];
       }
-    });
+
+      return [];
+    }
+
+    data = data.filter(row => this.matchCriteria(_criteria, row))
+      .sort((a, b) => {
+        let k;
+        for (k in _sorts) {
+          let x = a[k] > b[k];
+          let y = _sorts[k] ? x : !x;
+          if (y) return true;
+        }
+      });
+
+    if (query._skip < 0) {
+      return data;
+    }
+
+    if (query._limit < 0) {
+      return data.slice(query._skip);
+    }
+
+    return data.slice(query._skip, query._skip + query._limit);
   }
 
   matchCriteria (criteria, row) {
@@ -45,37 +58,35 @@ class Memory extends Connection {
     return true;
   }
 
-  persist (query) {
-    const data = this.data[query.collection] = this.data[query.collection] || [];
+  persist (query, callback = () => {}) {
+    const data = this.data[query.schema.name] = this.data[query.schema.name] || [];
 
-    if (query.inserts.length) {
-      return query.inserts.map(row => {
-        row = Object.assign({ id: uuid.v4() }, row);
-        data.push(row);
-        return row;
-      });
+    switch (query._method) {
+      case 'insert':
+        return query._inserts.map(row => {
+          row = Object.assign({ id: uuid.v4() }, row);
+          data.push(row);
+          callback(row);
+          return row;
+        });
+      case 'update':
+        this.query(query).forEach(row => Object.assign(row, query._sets));
+        break;
+      case 'drop':
+        delete this.data[query.schema.name];
+        break;
+      case 'truncate':
+        this.data[query.schema.name] = [];
+        break;
+      case 'remove':
+        this.query(query).forEach(row => {
+          const key = data.indexOf(row);
+          if (key >= 0) {
+            data.splice(key, 1);
+          }
+        });
+        break;
     }
-
-    const result = this.query(query).map(row => {
-      return Object.assign(row, query._set);
-    });
-
-    return result;
-  }
-
-  truncate (query) {
-    this.data[query.collection] = [];
-  }
-
-  remove (query) {
-    const data = this.data[query.collection] = this.data[query.collection] || [];
-
-    this.query(query).forEach(row => {
-      const key = data.indexOf(row);
-      if (key >= 0) {
-        data.splice(key, 1);
-      }
-    });
   }
 }
 

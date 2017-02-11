@@ -1,28 +1,37 @@
-// const Collection = require('./collection');
-// const Schema = require('./schema');
+const Query = require('./query');
+const Schema = require('./schema');
 
 class Connection {
-  constructor ({ name, schemas = [] }) {
+  constructor ({ manager, name, schemas = [] }) {
+    this.manager = manager;
     this.name = name;
-    this.schemas = schemas;
+    this.schemas = {};
+
+    schemas.forEach(schema => this.put(schema));
   }
 
-  static create (options) {
-    const Adapter = Connection.adapter(options.adapter);
-
-    return new Adapter(options);
+  put ({ name, fields }) {
+    let connection = this;
+    this.schemas[name] = new Schema({ connection, name, fields });
+    return this;
   }
 
-  static adapter (name) {
-    if (typeof name === 'function') {
-      return name;
+  get (name) {
+    let schema = this.schemas[name];
+    if (!schema) {
+      return this.put({ name }).get(name);
     }
+    return schema;
+  }
 
-    if (name.indexOf('-') > -1) {
-      return require(name);
-    }
+  factory (name, criteria) {
+    let manager = this.manager;
+    let schema = this.get(name);
+    return new Query({ manager, schema, criteria });
+  }
 
-    return require(`./adapters/${name}`);
+  initialize () {
+    // do nothing
   }
 }
 

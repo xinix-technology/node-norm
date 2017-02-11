@@ -1,10 +1,10 @@
 # node-norm
 
-node-norm is Javascript port of [Norm](https://github.com/xinix-technology/norm) - The data access or ORM-like or NOSQL interface to common database server. 
+node-norm is intermediate layer to access data source (database, file, else?).
 
 ## Features
 
-- Adaptive persistence, currently memory, you can extend easily by creating new adapters,
+- Adaptive persistence, you can easily extend by creating new adapters,
 - Multiple connections to work with,
 - NoSQL-like approaches,
 - Data fixtures.
@@ -13,9 +13,19 @@ node-norm is Javascript port of [Norm](https://github.com/xinix-technology/norm)
 
 ```javascript
 
-var norm = require('norm');
+const manager = require('node-norm')();
 
-var friend = norm.Factory('Friend').newInstance();
+(async () => {
+  let friend = { first_name: 'John', last_name: 'Doe' };
+
+  await manager.find('friend').insert(friend).save();
+
+  console.log('Great, we have new friend');
+
+  await manager.find('friend').single();
+})();
+
+const friend = norm.Factory('Friend').newInstance();
 friend
     .set({
         'first_name': 'John',
@@ -23,7 +33,6 @@ friend
     })
     .save()
         .then(function() {
-            console.log('Great, we have new friend');
         });
 
 norm.Factory('Friend')
@@ -43,7 +52,7 @@ const norm = require('norm');
 const factory = norm.Factory('Friend');
 
 co(function *() {
-    var friend = factory.newInstance();
+    const friend = factory.newInstance();
     friend.set({
         'first_name': 'John',
         'last_name': 'Doe',
@@ -52,7 +61,7 @@ co(function *() {
 
     console.log('Great, we have new friend');
 
-    var oldFriends = yield factory.find({'age!gte': 50}).fetch();
+    const oldFriends = yield factory.find({'age!gte': 50}).fetch();
 
     console.log(`We have ${oldFriends.length} friends`);
 });
@@ -71,6 +80,6 @@ TBD
 
 For now node-norm only support server side with Node.JS
 
-## Running test on node.js 
+## Running test on node.js
 
 TBD

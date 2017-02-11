@@ -2,6 +2,7 @@ const Filter = require('../filter');
 
 class NField {
   constructor (name) {
+    this.kind = 'string';
     this.name = name;
     this.filters = [];
   }

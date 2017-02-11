@@ -13,24 +13,8 @@ class Disk extends Memory {
     } catch (err) {}
   }
 
-  async persist (query) {
-    const result = await super.persist(query);
-
-    this.write();
-
-    return result;
-  }
-
-  async remove (query) {
-    const result = await super.remove(query);
-
-    this.write();
-
-    return result;
-  }
-
-  async truncate (query) {
-    const result = await super.truncate(query);
+  async persist (...args) {
+    const result = await super.persist(...args);
 
     this.write();
 
