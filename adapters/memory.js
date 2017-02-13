@@ -68,7 +68,7 @@ class Memory extends Connection {
           return row;
         });
       case 'update':
-        this.query(query).forEach(row => Object.assign(row, query._sets));
+        this.load(query).forEach(row => Object.assign(row, query._sets));
         break;
       case 'drop':
         delete this.data[query.schema.name];
@@ -76,8 +76,8 @@ class Memory extends Connection {
       case 'truncate':
         this.data[query.schema.name] = [];
         break;
-      case 'remove':
-        this.query(query).forEach(row => {
+      case 'delete':
+        this.load(query).forEach(row => {
           const key = data.indexOf(row);
           if (key >= 0) {
             data.splice(key, 1);
