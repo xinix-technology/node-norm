@@ -13,73 +13,76 @@ node-norm is intermediate layer to access data source (database, file, else?).
 
 ```javascript
 
-const manager = require('node-norm')();
+const manager = require('node-norm');
 
 (async () => {
   let friend = { first_name: 'John', last_name: 'Doe' };
 
-  await manager.find('friend').insert(friend).save();
+  await manager.factory('friend').insert(friend).save();
 
   console.log('Great, we have new friend');
 
-  await manager.find('friend').single();
+  let newFriend = await manager.factory('friend').single();
 })();
-
-const friend = norm.Factory('Friend').newInstance();
-friend
-    .set({
-        'first_name': 'John',
-        'last_name': 'Doe',
-    })
-    .save()
-        .then(function() {
-        });
-
-norm.Factory('Friend')
-    .find({ 'age!gte': 50 })
-    .fetch()
-        .then(function(oldFriends) {
-            console.log('We have ' + oldFriends.length + ' friends');
-        });
 ```
 
-if you work with co generator, the code is better ;)
+## Classes
 
-```javascript
-// jshint esnext: true
+### Manager
 
-const norm = require('norm');
-const factory = norm.Factory('Friend');
+Manager manages multiple connections into single application context.
 
-co(function *() {
-    const friend = factory.newInstance();
-    friend.set({
-        'first_name': 'John',
-        'last_name': 'Doe',
-    });
-    yield friend.save();
+#### #initialize()
 
-    console.log('Great, we have new friend');
+Initializes all connections
 
-    const oldFriends = yield factory.find({'age!gte': 50}).fetch();
+#### #put({ /*string*/ name = ':auto', /*string*/ adapter = 'memory', /*boolean*/ main = false, /*array*/ schemas = [], ...})
 
-    console.log(`We have ${oldFriends.length} friends`);
-});
+Puts new connection to manager
 
-```
+#### #get(/*string*/ name = '')
 
-## Data fixtures
+Gets connection from manager by its name. When name is not specified, the result is the main connection.
 
-TBD
+#### #factory(/*string*/ schemaName, /*object*/ criteria = {})
 
-## Something we've missed from Norm
+Create new query by its schema name
 
-- Schema, will be implemented soon ;)
+### Connection
 
-## Running test on browser
+Connection is single connection to data source
 
-For now node-norm only support server side with Node.JS
+#### #put()
+#### #get()
+#### #factory()
+#### #initialize()
 
-## Running test on node.js
+### Schema
 
-TBD
+You may see schema is a single table or collection.
+
+#### #attach()
+#### #filter()
+
+### Field
+
+Field defines single property of schema. The `id` property does not have to be added as field and will be implicitly added.
+
+#### #filter()
+
+### Query
+
+To load or persist data to data source, query object works as context of single request.
+
+#### #find()
+#### #insert()
+#### #set()
+#### #save()
+#### #skip()
+#### #limit()
+#### #sort()
+#### #delete()
+#### #truncate()
+#### #drop()
+#### #all()
+#### #single()

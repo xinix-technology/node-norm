@@ -1,4 +1,4 @@
-// const FilterError = require('./errors/filter');
+const FilterError = require('./errors/filter');
 const Model = require('./model');
 
 class Schema {
@@ -14,27 +14,24 @@ class Schema {
     return new M(this, row);
   }
 
-  // async filter (row) {
-  //   const error = new FilterError();
-  //
-  //   await Promise.all(this.fieldNames.map(async name => {
-  //     const field = this.fields[name];
-  //
-  //     try {
-  //       row[name] = await field.doFilter(row[name]);
-  //     } catch (err) {
-  //       err.field = field;
-  //
-  //       error.add(err);
-  //     }
-  //   }));
-  //
-  //   if (!error.empty()) {
-  //     throw error;
-  //   }
-  //
-  //   return row;
-  // }
+  async filter (row) {
+    const error = new FilterError();
+
+    await Promise.all(this.fields.map(async field => {
+      try {
+        row[field.name] = await field.doFilter(row[field.name]);
+      } catch (err) {
+        err.field = field;
+        error.add(err);
+      }
+    }));
+
+    if (!error.empty()) {
+      throw error;
+    }
+
+    return row;
+  }
 }
 
 module.exports = Schema;

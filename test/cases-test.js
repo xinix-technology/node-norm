@@ -52,5 +52,21 @@ describe('cases', () => {
       assert.strictEqual(user.username, 'user');
       assert.strictEqual(user.password, 'userPassword');
     });
+
+    it('transaction commit', async () => {
+      let manager = new Manager();
+
+      let tx = await manager.begin();
+
+      tx.factory('user').insert({ username: 'john', password: 'doe' }).save();
+
+      let user = await tx.factory('user').single();
+      assert(user);
+
+      let { data } = manager.get();
+      assert.strictEqual(data.length, 1);
+
+      tx.commit();
+    });
   });
 });

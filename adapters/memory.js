@@ -15,15 +15,9 @@ class Memory extends Connection {
 
     if (_criteria.id) {
       const row = data.find(row => row.id === _criteria.id);
-      if (row) {
-        callback(row);
-        return [ row ];
-      }
-
-      return [];
-    }
-
-    data = data.filter(row => this.matchCriteria(_criteria, row))
+      data = row ? [ row ] : [];
+    } else {
+      data = data.filter(row => this.matchCriteria(_criteria, row))
       .sort((a, b) => {
         let k;
         for (k in _sorts) {
@@ -33,15 +27,19 @@ class Memory extends Connection {
         }
       });
 
-    if (query._skip < 0) {
-      return data;
+      if (query._skip < 0) {
+        return data;
+      } else if (query._limit < 0) {
+        data = data.slice(query._skip);
+      } else {
+        data = data.slice(query._skip, query._skip + query._limit);
+      }
     }
 
-    if (query._limit < 0) {
-      return data.slice(query._skip);
-    }
-
-    return data.slice(query._skip, query._skip + query._limit);
+    return data.map(row => {
+      callback(row);
+      return row;
+    });
   }
 
   matchCriteria (criteria, row) {

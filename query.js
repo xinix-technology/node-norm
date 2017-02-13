@@ -11,6 +11,10 @@ class Query {
     this._method = '';
   }
 
+  get connection () {
+    return this.schema.connection;
+  }
+
   find (criteria) {
     if (!criteria) {
       this._criteria = undefined;
@@ -21,10 +25,6 @@ class Query {
     }
 
     return this;
-  }
-
-  get connection () {
-    return this.schema.connection;
   }
 
   insert (row) {
@@ -68,7 +68,9 @@ class Query {
 
   async save () {
     this._method = this._inserts.length ? 'insert' : 'update';
-    return await this.connection.persist(this);
+    let rows = [];
+    await this.connection.persist(this, row => rows.push(this.attach(row)));
+    return rows;
   }
 
   async drop () {
