@@ -2,13 +2,15 @@ class Query {
   constructor ({ manager, schema, criteria = {} }) {
     this.manager = manager;
     this.schema = schema;
-    this._criteria = criteria;
+    this._criteria = {};
     this._inserts = [];
     this._sets = {};
     this._limit = -1;
     this._skip = 0;
     this._sorts = {};
     this._method = '';
+
+    this.find(criteria);
   }
 
   get connection () {
