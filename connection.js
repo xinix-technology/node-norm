@@ -10,9 +10,9 @@ class Connection {
     schemas.forEach(schema => this.put(schema));
   }
 
-  put ({ name, fields }) {
+  put ({ name, fields, modelClass }) {
     let connection = this;
-    this.schemas[name] = new Schema({ connection, name, fields });
+    this.schemas[name] = new Schema({ connection, name, fields, modelClass });
     return this;
   }
 

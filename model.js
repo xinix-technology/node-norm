@@ -5,11 +5,12 @@ class Model {
   }
 
   set (key, value) {
-    if (key[0] === '$') {
+    if (key.startsWith('$')) {
       Object.defineProperty(this, key, {
         enumerable: false,
         writable: true,
         configurable: true,
+        value,
       });
     } else {
       this[key] = value;
