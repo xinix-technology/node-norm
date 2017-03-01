@@ -1,3 +1,6 @@
+const Pool = require('./pool');
+const Transaction = require('./transaction');
+
 class Manager {
   static adapter (name = 'memory') {
     if (typeof name === 'function') {
@@ -12,51 +15,43 @@ class Manager {
   }
 
   constructor ({ connections = [] } = {}) {
-    this.connectionNames = [];
-    this.connections = {};
+    this.pools = {};
+    this.main = '';
+    this.tx = new Transaction({ manager: this, autocommit: true });
 
-    connections.forEach(connection => this.put(connection));
+    connections.forEach(connection => this.putPool(connection));
   }
 
   async initialize () {
-    await Promise.all(this.connectionNames.map(name => this.get(name).initialize()));
+    await Promise.all(Object.keys(this.pools).map(name => this.getPool(name).initialize()));
   }
 
-  put (config) {
-    let { name = ':auto', adapter, main } = config;
-    config = Object.assign({ name, manager: this }, config);
-    let Adapter = Manager.adapter(adapter);
-    let connection = new Adapter(config);
+  putPool (config) {
+    config = Object.assign({ name: ':auto' }, config, { adapter: Manager.adapter(config.adapter) });
 
+    let { main, name } = config;
     this.main = main ? name : (this.main || name);
-    this.connections[name] = connection;
-    if (this.connectionNames.indexOf(name) === -1) {
-      this.connectionNames.push(name);
-    }
+    this.pools[name] = new Pool(config);
 
     return this;
   }
 
-  get (name) {
-    if (!name) {
-      if (this.main in this.connections) {
-        return this.connections[this.main];
-      } else {
-        return this.put({}).get();
-      }
+  getPool (name) {
+    if (this.main === '') {
+      this.putPool({});
     }
 
-    return this.connections[name];
+    name = `${name || this.main}`;
+
+    if (!this.pools[name]) {
+      throw new Error(`Pool '${name}' not found`);
+    }
+
+    return this.pools[name];
   }
 
   factory (name, criteria) {
-    let [ connectionName, collectionName ] = name.split('.');
-    if (!collectionName) {
-      collectionName = connectionName;
-      connectionName = undefined;
-    }
-
-    return this.get(connectionName).factory(collectionName, criteria);
+    return this.tx.factory(name, criteria);
   }
 }
 

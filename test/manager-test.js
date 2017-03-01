@@ -13,7 +13,7 @@ describe('Manager', () => {
 
       assert(manager instanceof Manager, 'manager instanceof Manager');
 
-      assert.strictEqual(Object.keys(manager.connections).length, 0);
+      assert.strictEqual(Object.keys(manager.pools).length, 0);
     });
 
     it('create instance with connection when arg connections specified', () => {
@@ -23,11 +23,9 @@ describe('Manager', () => {
 
       let manager = new Manager({ connections });
 
-      assert.strictEqual(Object.keys(manager.connections).length, 1);
+      assert.strictEqual(Object.keys(manager.pools).length, 1);
 
-      let connection = manager.connections.one;
-
-      assert(connection instanceof Memory, 'connection instanceof Memory');
+      let connection = manager.pools.one;
       assert.strictEqual(connection.name, 'one');
     });
   });
@@ -36,11 +34,11 @@ describe('Manager', () => {
     it('add new connection', () => {
       let manager = new Manager();
 
-      assert.strictEqual(Object.keys(manager.connections).length, 0);
+      assert.strictEqual(Object.keys(manager.pools).length, 0);
 
-      manager.put({ name: 'one' });
+      manager.putPool({ name: 'one' });
 
-      assert.strictEqual(Object.keys(manager.connections).length, 1);
+      assert.strictEqual(Object.keys(manager.pools).length, 1);
     });
 
     it('set main connection to connection config with truthy main property', () => {
@@ -55,7 +53,7 @@ describe('Manager', () => {
     });
   });
 
-  describe('#get()', () => {
+  describe('#getPool()', () => {
     it('get main connection when no arg specified', () => {
       let manager = new Manager({
         connections: [
@@ -64,8 +62,7 @@ describe('Manager', () => {
         ],
       });
 
-      assert(manager.get() instanceof Connection);
-      assert.strictEqual(manager.get().name, 'bar');
+      assert.strictEqual(manager.getPool().name, 'bar');
     });
   });
 

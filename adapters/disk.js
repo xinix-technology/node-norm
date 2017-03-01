@@ -13,15 +13,37 @@ class Disk extends Memory {
     } catch (err) {}
   }
 
-  async persist (...args) {
-    const result = await super.persist(...args);
-
-    this.write();
-
+  async insert (query, callback = () => {}) {
+    let result = await super.persist(query, callback);
+    this._write();
     return result;
   }
 
-  write () {
+  async update (query) {
+    let result = await super.persist(query);
+    this._write();
+    return result;
+  }
+
+  async drop (query) {
+    let result = await super.persist(query);
+    this._write();
+    return result;
+  }
+
+  async truncate (query) {
+    let result = await super.persist(query);
+    this._write();
+    return result;
+  }
+
+  async delete (query) {
+    let result = await super.persist(query);
+    this._write();
+    return result;
+  }
+
+  _write () {
     clearTimeout(this._writing);
     this._writing = setTimeout(() => {
       fs.writeFile(this.file, JSON.stringify(this.data, null, 2));

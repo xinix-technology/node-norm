@@ -2,6 +2,7 @@ class Filter extends Error {
   constructor () {
     super();
 
+    this.status = 400;
     this.children = [];
   }
 

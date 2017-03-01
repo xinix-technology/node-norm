@@ -12,13 +12,19 @@ class Model {
         configurable: true,
         value,
       });
-    } else {
+    } else if (value !== undefined) {
       this[key] = value;
     }
   }
 
   sync (row) {
-    Object.assign(this, row);
+    for (let key in row) {
+      if (row[key] === undefined) {
+        continue;
+      }
+
+      this[key] = row[key];
+    }
   }
 }
 
