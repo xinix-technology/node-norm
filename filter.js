@@ -1,16 +1,35 @@
 const filters = {
-  required (value, field = {}) {
-    if (value === '' || value === undefined || value === null) {
-      throw new Error(`Field ${field.name || 'unknown'} is required`);
-    }
+  required () {
+    return (value, field = {}) => {
+      if (value === undefined || value === null) {
+        throw new Error(`Field ${field.name || 'unknown'} is required`);
+      }
 
-    return value;
+      return value;
+    };
+  },
+
+  default (defaultValue) {
+    return (value, field = {}) => {
+      if (value === undefined || value === null) {
+        return defaultValue;
+      }
+
+      return value;
+    };
   },
 };
 
 class Filter {
-  static get (name) {
-    return filters[name];
+  static get (signature) {
+    if (typeof signature === 'string') {
+      signature = signature.split(':');
+    }
+    let [ fn, ...args ] = signature;
+    if (!filters[fn]) {
+      throw new Error(`Filter ${signature} not found`);
+    }
+    return filters[fn](...args);
   }
 
   static set (name, filter) {

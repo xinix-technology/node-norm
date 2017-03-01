@@ -98,9 +98,6 @@ class Query {
     let models = [];
     const connection = await this.getConnection();
     await connection.load(this, row => models.push(this.attach(row)));
-    // console.log('be', connection)
-    // let x = await connection.release();
-    // console.log('..', x);
     return models;
   }
 
