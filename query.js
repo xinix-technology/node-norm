@@ -11,8 +11,8 @@ class Query {
     this._sorts = {};
   }
 
-  async getConnection () {
-    return await this.tx.getConnection(this.schema.connection);
+  getConnection () {
+    return this.tx.getConnection(this.schema.connection);
   }
 
   find (criteria = {}) {
@@ -61,7 +61,8 @@ class Query {
 
   async delete () {
     const connection = await this.getConnection();
-    return await connection.delete(this);
+    let result = await connection.delete(this);
+    return result;
   }
 
   async save ({ filter = true } = {}) {
@@ -70,7 +71,7 @@ class Query {
 
     if (this._inserts.length) {
       if (filter) {
-        await Promise.all(this._inserts.map(async row => await this.schema.filter(row, { tx })));
+        await Promise.all(this._inserts.map(row => this.schema.filter(row, { tx })));
       }
 
       let rows = [];
@@ -82,19 +83,21 @@ class Query {
         await this.schema.filter(this._sets, { tx, partial });
       }
 
-      let affected = (await connection.update(this)).map(row => this.attach(row));
+      let affected = await connection.update(this);
       return { affected };
     }
   }
 
   async drop () {
     const connection = await this.getConnection();
-    return await connection.drop(this);
+    let result = await connection.drop(this);
+    return result;
   }
 
   async truncate () {
     const connection = await this.getConnection();
-    return await connection.truncate(this);
+    let result = await connection.truncate(this);
+    return result;
   }
 
   async all () {
