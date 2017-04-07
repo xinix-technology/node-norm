@@ -66,9 +66,11 @@ class Query {
 
   async save ({ filter = true } = {}) {
     const connection = await this.getConnection();
+    let { tx } = this;
+
     if (this._inserts.length) {
       if (filter) {
-        await Promise.all(this._inserts.map(async row => await this.schema.filter(row)));
+        await Promise.all(this._inserts.map(async row => await this.schema.filter(row, { tx })));
       }
 
       let rows = [];
@@ -76,10 +78,11 @@ class Query {
       return { inserted, rows };
     } else {
       if (filter) {
-        await this.schema.filter(this._sets, true);
+        let partial = true;
+        await this.schema.filter(this._sets, { tx, partial });
       }
 
-      let affected = await connection.update(this);
+      let affected = (await connection.update(this)).map(row => this.attach(row));
       return { affected };
     }
   }

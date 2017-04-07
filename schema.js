@@ -2,19 +2,29 @@ const FilterError = require('./errors/filter');
 const Model = require('./model');
 
 class Schema {
-  constructor ({ name, connection, fields = [], modelClass = Model }) {
+  constructor ({ name, pool, connection, fields = [], modelClass = Model }) {
     this.name = name;
+    this.pool = pool;
     this.connection = connection;
     this.fields = fields;
     this.modelClass = modelClass;
   }
 
-  attach (row) {
+  attach (row = {}) {
     let M = this.modelClass;
+
+    this.fields.forEach(field => {
+      if (row[field.name] === undefined || row[field.name] === null) {
+        row[field.name] = null;
+      } else {
+        row[field.name] = field.attach(row[field.name]);
+      }
+    });
+
     return new M(this, row);
   }
 
-  async filter (row, partial = false) {
+  async filter (row, { tx, partial = false }) {
     const error = new FilterError();
 
     if (!row) {
@@ -27,7 +37,8 @@ class Schema {
         if (partial && row[field.name] === undefined) {
           return;
         }
-        row[field.name] = await field.doFilter(row[field.name]);
+
+        row[field.name] = await field.doFilter(row[field.name], { tx, row });
       } catch (err) {
         err.field = field;
         error.add(err);

@@ -1,11 +1,11 @@
 const NField = require('./nfield');
 
-class NBoolean extends NField {
-  constructor (name) {
-    super(name);
+module.exports = class NBoolean extends NField {
+  attach (value) {
+    if (value === 'false' || value === '0' || value === '') {
+      return false;
+    }
 
-    this.kind = 'boolean';
+    return Boolean(value);
   }
-}
-
-module.exports = NBoolean;
+};

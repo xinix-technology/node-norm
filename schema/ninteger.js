@@ -1,11 +1,7 @@
 const NField = require('./nfield');
 
-class NInteger extends NField {
-  constructor (name) {
-    super(name);
-
-    this.kind = 'integer';
+module.exports = class NInteger extends NField {
+  attach (value) {
+    return parseInt(value, 10);
   }
-}
-
-module.exports = NInteger;
+};

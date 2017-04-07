@@ -8,6 +8,10 @@ class Memory extends Connection {
     return (data[this.name] = data[this.name] || {});
   }
 
+  set data (d) {
+    data[this.name] = d || {};
+  }
+
   load (query, callback = () => {}) {
     let data = this.data[query.schema.name] || [];
 

@@ -1,38 +1,51 @@
-const filters = {
-  required () {
-    return (value, field = {}) => {
-      if (value === undefined || value === null) {
-        throw new Error(`Field ${field.name || 'unknown'} is required`);
-      }
-
-      return value;
-    };
-  },
-
-  default (defaultValue) {
-    return (value, field = {}) => {
-      if (value === undefined || value === null) {
-        return defaultValue;
-      }
-
-      return value;
-    };
-  },
-};
+const filters = {};
 
 class Filter {
   static get (signature) {
-    if (typeof signature === 'string') {
-      signature = signature.split(':');
+    let signatureType = typeof signature;
+    let err = new Error(`Unimplemented get filter by ${signatureType}`);
+    let fn = '';
+    let args = [];
+    switch (signatureType) {
+      case 'string':
+        signature = signature.split(':');
+        [ fn, ...args ] = signature;
+        args = args.join(':').split(',');
+        break;
+      case 'object':
+        if (!Array.isArray(signature)) {
+          throw err;
+        } else {
+          signatureType = 'array';
+          [ fn, ...args ] = signature;
+        }
+        break;
+      case 'function':
+        return signature;
+      default:
+        throw err;
     }
-    let [ fn, ...args ] = signature;
+
+    if (fn in filters === false) {
+      try {
+        filters[fn] = require('./filters/' + fn);
+      } catch (err) {
+        filters[fn] = null;
+      }
+    }
+
     if (!filters[fn]) {
-      throw new Error(`Filter ${signature} not found`);
+      let normalizedSignature = 'unknown';
+      try {
+        normalizedSignature = JSON.stringify(signature);
+      } catch (err) {};
+      throw new Error(`Filter ${fn} not found <${signatureType}(${normalizedSignature})>`);
     }
+
     return filters[fn](...args);
   }
 
-  static set (name, filter) {
+  static register (name, filter) {
     filters[name] = filter;
   }
 }
