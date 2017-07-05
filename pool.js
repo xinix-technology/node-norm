@@ -8,23 +8,22 @@ class Pool {
     this.schemas = {};
 
     const Adapter = adapter;
+
     Object.defineProperty(this, 'pool', {
       enumerable: false,
       writable: false,
       configurable: false,
       value: genericPool.createPool({
         create () {
-          // console.log('pool:create', name);
           return new Adapter(config);
         },
-
         destroy () {
           // console.log('pool:destroy', name);
         },
       }, { min, max }),
     });
 
-    schemas.map(schema => this.putSchema(schema));
+    schemas.map(colOptions => this.putSchema(colOptions));
   }
 
   putSchema ({ name, fields, modelClass }) {
@@ -60,6 +59,10 @@ class Pool {
     // );
 
     return this.pool.acquire(...args);
+  }
+
+  release (...args) {
+    return this.pool.release(...args);
   }
 
   drain (...args) {

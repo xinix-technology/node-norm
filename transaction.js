@@ -1,10 +1,10 @@
-// const uuid = require('uuid');
+const uuid = require('uuid');
 const Query = require('./query');
+const Factory = require('async-factory');
+const factory = new Factory();
 
-let ID = 0;
 function nextId () {
-  // return uuid.v4();
-  return ID++;
+  return `tx-${uuid.v4()}`;
 }
 
 class Transaction {
@@ -13,7 +13,6 @@ class Transaction {
     this.manager = manager;
     this.autocommit = autocommit;
     this.connections = {};
-    this._locks = {};
   }
 
   factory (name, criteria) {
@@ -23,43 +22,50 @@ class Transaction {
   }
 
   getSchema (name) {
-    let { connection, collection } = this.parseName(name);
-    return this.manager.getPool(connection).getSchema(collection);
+    let { connection, schema } = this.parseName(name);
+    return this.manager.getPool(connection).getSchema(schema);
   }
 
-  async getConnection (name) {
+  async acquire (name) {
     let pool = this.manager.getPool(name);
-    let resolvedName = pool.name;
-    // console.log('t1', this.id, resolvedName, this.connections[resolvedName]);
-    if (!this.connections[resolvedName]) {
-      if (this._locks[resolvedName]) {
-        await this._locks[resolvedName];
-        if (this.connections[resolvedName]) {
-          return this.connections[resolvedName];
-        }
-      }
-      this._locks[resolvedName] = new Promise(async (resolve, reject) => {
-        try {
-          this.connections[resolvedName] = await pool.acquire();
-          delete this._locks[resolvedName];
-          resolve();
-        } catch (err) {
-          reject(err);
-        }
-      });
-      await this._locks[resolvedName];
+    name = name || pool.name;
+
+    if (!this.connections[name]) {
+      let id = `tx-${this.id}-${name}`;
+      let fn = () => pool.acquire();
+      this.connections[name] = await factory.singleton(id, fn);
     }
-    // console.log('t2', this.id, resolvedName, this.connections[resolvedName]);
-    return this.connections[resolvedName];
+
+    return this.connections[name];
+  }
+
+  async release () {
+    await Promise.all(Object.keys(this.connections).map(name => {
+      return this.manager.getPool(name).release(this.connections[name]);
+    }));
+
+    this.connections = {};
   }
 
   parseName (name) {
-    let [ connection, collection ] = name.split('.');
-    if (!collection) {
-      collection = connection;
+    let [ connection, schema ] = name.split('.');
+    if (!schema) {
+      schema = connection;
       connection = undefined;
     }
-    return { connection, collection };
+    return { connection, schema };
+  }
+
+  async rollback () {
+    console.log('rollback', this.connections);
+
+    await this.release();
+  }
+
+  async commit () {
+    console.log('commit', this.connections);
+
+    await this.release();
   }
 }
 

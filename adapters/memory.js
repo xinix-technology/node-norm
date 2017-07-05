@@ -17,8 +17,8 @@ class Memory extends Connection {
 
     let { _criteria, _sorts } = query;
 
-    if (_criteria && _criteria.id) {
-      const row = data.find(row => row.id === _criteria.id);
+    if (_criteria && typeof _criteria !== 'object') {
+      const row = data.find(row => row.id === _criteria);
       data = row ? [ row ] : [];
     } else {
       data = data.filter(row => this.matchCriteria(_criteria, row))

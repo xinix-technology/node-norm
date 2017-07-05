@@ -2,10 +2,8 @@ const FilterError = require('./errors/filter');
 const Model = require('./model');
 
 class Schema {
-  constructor ({ name, pool, connection, fields = [], modelClass = Model }) {
+  constructor ({ name, fields = [], modelClass = Model }) {
     this.name = name;
-    this.pool = pool;
-    this.connection = connection;
     this.fields = fields;
     this.modelClass = modelClass;
   }

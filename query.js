@@ -1,26 +1,19 @@
 class Query {
-  constructor ({ tx, schema, criteria }) {
-    this.tx = tx;
-    this.schema = schema;
+  constructor ({ session, schema, criteria }) {
+    this.session = session;
+    this.schema = this.session.getSchema(schema);
+
     this.find(criteria);
 
     this._inserts = [];
     this._sets = {};
     this._limit = -1;
     this._skip = 0;
-    this._sorts = {};
-  }
-
-  getConnection () {
-    return this.tx.getConnection(this.schema.connection);
+    this._sorts = undefined;
   }
 
   find (criteria = {}) {
-    if (typeof criteria === 'object') {
-      this._criteria = criteria;
-    } else {
-      this._criteria = { id: criteria };
-    }
+    this._criteria = criteria;
 
     return this;
   }
@@ -55,32 +48,28 @@ class Query {
     return this;
   }
 
-  attach (row) {
-    return this.schema.attach(row);
-  }
-
   async delete () {
-    const connection = await this.getConnection();
+    const connection = await this.session.acquire(this.schema.connection);
     let result = await connection.delete(this);
     return result;
   }
 
   async save ({ filter = true } = {}) {
-    const connection = await this.getConnection();
-    let { tx } = this;
+    const connection = await this.session.acquire(this.schema.connection);
+    let { session } = this;
 
     if (this._inserts.length) {
       if (filter) {
-        await Promise.all(this._inserts.map(row => this.schema.filter(row, { tx })));
+        await Promise.all(this._inserts.map(row => this.schema.filter(row, { session })));
       }
 
       let rows = [];
-      let inserted = await connection.insert(this, row => rows.push(this.attach(row)));
+      let inserted = await connection.insert(this, row => rows.push(this.schema.attach(row)));
       return { inserted, rows };
     } else {
       if (filter) {
         let partial = true;
-        await this.schema.filter(this._sets, { tx, partial });
+        await this.schema.filter(this._sets, { session, partial });
       }
 
       let affected = await connection.update(this);
@@ -89,29 +78,29 @@ class Query {
   }
 
   async drop () {
-    const connection = await this.getConnection();
+    const connection = await this.session.acquire(this.schema.connection);
     let result = await connection.drop(this);
     return result;
   }
 
   async truncate () {
-    const connection = await this.getConnection();
+    const connection = await this.session.acquire(this.schema.connection);
     let result = await connection.truncate(this);
     return result;
   }
 
   async all () {
     let models = [];
-    const connection = await this.getConnection();
-    await connection.load(this, row => models.push(this.attach(row)));
+    const connection = await this.session.acquire(this.schema.connection);
+    await connection.load(this, row => models.push(this.schema.attach(row)));
     return models;
   }
 
   async single () {
     this.limit(1);
     let model;
-    const connection = await this.getConnection();
-    await connection.load(this, row => (model = this.attach(row)));
+    const connection = await this.session.acquire(this.schema.connection);
+    await connection.load(this, row => (model = this.schema.attach(row)));
     return model;
   }
 }

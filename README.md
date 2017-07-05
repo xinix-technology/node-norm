@@ -13,16 +13,52 @@ node-norm is intermediate layer to access data source (database, file, else?).
 
 ```javascript
 
-const manager = require('node-norm');
+const Manager = require('node-norm');
+const manager = new Manager({
+  connections: [
+    {
+      name: 'foo',
+      adapter: 'file',
+      schemas: [
+        {
+          name: 'friend',
+        }
+      ],
+    },
+  ],
+})
 
 (async () => {
-  let friend = { first_name: 'John', last_name: 'Doe' };
+  let session = await manager.open();
 
-  await manager.factory('friend').insert(friend).save();
+  try {
+    let friend = { first_name: 'John', last_name: 'Doe' };
+    await session.factory('foo.friend').insert(friend).save(); // same as
+    await session.factory('friend').insert(friend).save(); // same as
+    await session.factory(['foo', 'friend']).insert(friend).save();
 
-  console.log('Great, we have new friend');
+    console.log('Great, we have new friend');
 
-  let newFriend = await manager.factory('friend').single();
+    let newFriend = await session.factory('friend').single();
+
+    await session.close();
+  } catch (err) {
+    console.error(err);
+  }
+
+  await session.dispose();
+
+
+  // or
+
+  manager.runSession((session) => {
+    let friend = { first_name: 'John', last_name: 'Doe' };
+    await session.factory('friend').insert(friend).save();
+
+    console.log('Great, we have new friend');
+
+    let newFriend = await session.factory('friend').single();
+  });
 })();
 ```
 

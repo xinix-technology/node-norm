@@ -13,7 +13,8 @@
     "url": "git://github.com/xinix-technology/node-norm.git"
   },
   "dependencies": {
-    "fs-promise": "^1.0.0",
+    "async-factory": "^1.0.0",
+    "fs-extra": "^3.0.1",
     "generic-pool": "^3.1.7",
     "koa-compose": "^3.0.0",
     "uuid": "^3.0.1"

@@ -1,5 +1,5 @@
 const Pool = require('./pool');
-const Transaction = require('./transaction');
+const Session = require('./session');
 
 class Manager {
   static adapter (name = 'memory') {
@@ -17,7 +17,6 @@ class Manager {
   constructor ({ connections = [] } = {}) {
     this.pools = {};
     this.main = '';
-    this.tx = new Transaction({ manager: this, autocommit: true });
 
     connections.forEach(connection => this.putPool(connection));
   }
@@ -50,8 +49,21 @@ class Manager {
     return this.pools[name];
   }
 
-  factory (name, criteria) {
-    return this.tx.factory(name, criteria);
+  async runSession (fn, { autocommit } = {}) {
+    const session = this.openSession({ autocommit });
+    try {
+      const result = await fn(session);
+      await session.close();
+      await session.dispose();
+      return result;
+    } catch (err) {
+      await session.dispose();
+      throw err;
+    }
+  }
+
+  async openSession ({ autocommit } = {}) {
+    return new Session({ manager: this, autocommit });
   }
 }
 

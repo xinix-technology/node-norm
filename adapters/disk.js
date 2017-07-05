@@ -1,5 +1,5 @@
 const Memory = require('./memory');
-const fs = require('fs-promise');
+const fs = require('fs-extra');
 
 class Disk extends Memory {
   constructor (options) {
