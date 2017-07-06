@@ -22,7 +22,7 @@ class Schema {
     return new M(this, row);
   }
 
-  async filter (row, { tx, partial = false }) {
+  async filter (row, { session, partial = false }) {
     const error = new FilterError();
 
     if (!row) {
@@ -36,7 +36,7 @@ class Schema {
           return;
         }
 
-        row[field.name] = await field.doFilter(row[field.name], { tx, row });
+        row[field.name] = await field.doFilter(row[field.name], { session, row });
       } catch (err) {
         err.field = field;
         error.add(err);

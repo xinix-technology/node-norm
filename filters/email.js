@@ -9,6 +9,11 @@ module.exports = function email () {
     let err = new Error(`Field ${name} must be valid email`);
 
     const parts = value.split('@');
+
+    if (parts.length !== 2) {
+      throw err;
+    }
+
     const domain = parts.pop();
     let user = parts.join('@');
 

@@ -4,7 +4,7 @@ const connectionFactory = new Factory();
 const uuid = require('uuid');
 
 function nextId () {
-  return `session-${uuid.v4()}`;
+  return `session:${uuid.v4()}`;
 }
 
 class Session {

@@ -13,7 +13,7 @@ class Query {
   }
 
   find (criteria = {}) {
-    this._criteria = criteria;
+    this._criteria = typeof criteria === 'object' ? criteria : { id: criteria };
 
     return this;
   }

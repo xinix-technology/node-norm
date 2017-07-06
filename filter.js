@@ -48,6 +48,10 @@ class Filter {
   static register (name, filter) {
     filters[name] = filter;
   }
+
+  static put (name, filter) {
+    filters[name] = filter;
+  }
 }
 
 module.exports = Filter;

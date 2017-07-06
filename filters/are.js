@@ -1,5 +1,5 @@
 module.exports = function (schema) {
-  return async function (value = null, { tx, field: { name } }) {
+  return async function (value = null, { session, field: { name } }) {
     if (value === null) {
       return value;
     }
@@ -11,8 +11,8 @@ module.exports = function (schema) {
     }
 
     try {
-      let schemaO = tx.getSchema(schema);
-      await Promise.all(value.map(async row => await schemaO.filter(row, { tx })));
+      let schemaO = session.getSchema(schema);
+      await Promise.all(value.map(async row => await schemaO.filter(row, { session })));
       value = value.map(row => schemaO.attach(row));
     } catch (err) {
       console.error(`Caught error at nested model, ${err.stack}`);
