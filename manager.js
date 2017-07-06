@@ -62,7 +62,7 @@ class Manager {
     }
   }
 
-  async openSession ({ autocommit } = {}) {
+  openSession ({ autocommit } = {}) {
     return new Session({ manager: this, autocommit });
   }
 }
