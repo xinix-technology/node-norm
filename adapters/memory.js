@@ -1,15 +1,11 @@
 const Connection = require('../connection');
 const uuid = require('uuid');
 
-const data = {};
-
 class Memory extends Connection {
-  get data () {
-    return (data[this.name] = data[this.name] || {});
-  }
+  constructor (options) {
+    super(options);
 
-  set data (d) {
-    data[this.name] = d || {};
+    this.data = options.data || {};
   }
 
   load (query, callback = () => {}) {

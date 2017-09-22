@@ -3,8 +3,6 @@
 const assert = require('assert');
 const Manager = require('../manager');
 const Query = require('../query');
-const Connection = require('../connection');
-const Memory = require('../adapters/memory');
 
 describe('Manager', () => {
   describe('contructor', () => {
@@ -85,8 +83,8 @@ describe('Manager', () => {
   describe('#factory()', () => {
     it('return query instance', () => {
       let manager = new Manager();
-
-      let query = manager.factory('user');
+      let session = manager.openSession();
+      let query = session.factory('user');
       assert(query instanceof Query);
     });
   });

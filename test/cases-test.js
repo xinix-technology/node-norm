@@ -7,48 +7,54 @@ const Model = require('../model');
 describe('cases', () => {
   describe('single database crud', () => {
     it('insert multiple rows', async () => {
-      let manager = new Manager();
-      let { inserted, rows } = await manager.factory('user')
-        .insert({ username: 'admin', password: 'adminPassword' })
-        .insert({ username: 'user', password: 'userPassword' })
-        .save();
+      let data = {};
+      let manager = createManager(data);
+      await manager.runSession(async session => {
+        let { inserted, rows } = await session.factory('user')
+          .insert({ username: 'admin', password: 'adminPassword' })
+          .insert({ username: 'user', password: 'userPassword' })
+          .save();
 
-      assert.strictEqual(inserted, 2);
-      assert(rows[0] instanceof Model);
+        assert.strictEqual(inserted, 2);
+        assert(rows[0] instanceof Model);
 
-      let { data } = await manager.tx.getConnection();
-      assert(data.user);
-      assert.strictEqual(data.user.length, 2);
-      assert.strictEqual(data.user[0].username, 'admin');
-      assert.strictEqual(data.user[1].password, 'userPassword');
+        assert(data.user);
+        assert.strictEqual(data.user.length, 2);
+        assert.strictEqual(data.user[0].username, 'admin');
+        assert.strictEqual(data.user[1].password, 'userPassword');
+      });
     });
 
     it('find all rows', async () => {
-      let manager = new Manager();
+      let data = {};
+      let manager = createManager(data);
+      await manager.runSession(async session => {
+        await session.factory('user')
+          .insert({ username: 'admin', password: 'adminPassword' })
+          .insert({ username: 'user', password: 'userPassword' })
+          .save();
 
-      await manager.factory('user')
-        .insert({ username: 'admin', password: 'adminPassword' })
-        .insert({ username: 'user', password: 'userPassword' })
-        .save();
+        let [ user1, user2 ] = await session.factory('user').all();
 
-      let [ user1, user2 ] = await manager.factory('user').all();
-
-      assert.strictEqual(user1.username, 'admin');
-      assert.strictEqual(user2.password, 'userPassword');
+        assert.strictEqual(user1.username, 'admin');
+        assert.strictEqual(user2.password, 'userPassword');
+      });
     });
 
     it('find single row', async () => {
-      let manager = new Manager();
+      let data = {};
+      let manager = createManager(data);
+      await manager.runSession(async session => {
+        await session.factory('user')
+          .insert({ username: 'admin', password: 'adminPassword' })
+          .insert({ username: 'user', password: 'userPassword' })
+          .save();
 
-      await manager.factory('user')
-        .insert({ username: 'admin', password: 'adminPassword' })
-        .insert({ username: 'user', password: 'userPassword' })
-        .save();
+        let user = await session.factory('user', { username: 'user' }).single();
 
-      let user = await manager.factory('user', { username: 'user' }).single();
-
-      assert.strictEqual(user.username, 'user');
-      assert.strictEqual(user.password, 'userPassword');
+        assert.strictEqual(user.username, 'user');
+        assert.strictEqual(user.password, 'userPassword');
+      });
     });
 
     it.skip('transaction scope', async () => {
@@ -92,4 +98,15 @@ describe('cases', () => {
       await tx1.commit();
     });
   });
+
+  function createManager (data) {
+    return new Manager({
+      connections: [
+        {
+          adapter: 'memory',
+          data,
+        },
+      ],
+    });
+  }
 });

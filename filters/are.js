@@ -12,7 +12,7 @@ module.exports = function (schema) {
 
     try {
       let schemaO = session.getSchema(schema);
-      await Promise.all(value.map(async row => await schemaO.filter(row, { session })));
+      await Promise.all(value.map(row => schemaO.filter(row, { session })));
       value = value.map(row => schemaO.attach(row));
     } catch (err) {
       console.error(`Caught error at nested model, ${err.stack}`);

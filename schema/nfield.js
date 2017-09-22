@@ -15,15 +15,15 @@ class NField {
     return this;
   }
 
-  async doFilter (value, { session, row }) {
+  doFilter (value, { session, row }) {
     // when value is string, trim first before filtering
     if (typeof value === 'string') {
       value = value.trim();
     }
 
     let field = this;
-    return await this.filters.reduce(
-      async (promise, filter) => await filter(await promise, { session, row, field }),
+    return this.filters.reduce(
+      async (promise, filter) => filter(await promise, { session, row, field }),
       Promise.resolve(value)
     );
   }

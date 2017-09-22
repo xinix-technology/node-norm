@@ -17,8 +17,8 @@ const Manager = require('node-norm');
 const manager = new Manager({
   connections: [
     {
-      name: 'foo',
-      adapter: 'file',
+      name: 'default',
+      adapter: 'disk',
       schemas: [
         {
           name: 'friend',
@@ -29,7 +29,7 @@ const manager = new Manager({
 })
 
 (async () => {
-  let session = await manager.open();
+  let session = manager.openSession();
 
   try {
     let friend = { first_name: 'John', last_name: 'Doe' };
