@@ -17,15 +17,25 @@ class Memory extends Connection {
       const row = data.find(row => row.id === _criteria.id);
       data = row ? [ row ] : [];
     } else {
-      data = data.filter(row => this.matchCriteria(_criteria, row))
-        .sort((a, b) => {
-          let k;
-          for (k in _sorts) {
-            let x = a[k] > b[k];
-            let y = _sorts[k] ? x : !x;
-            if (y) return true;
-          }
+      data = data.filter(row => this.matchCriteria(_criteria, row));
+
+      if (_sorts) {
+        let sortFields = Object.keys(_sorts);
+
+        data = data.sort((a, b) => {
+          let score = 0;
+          sortFields.forEach((field, index) => {
+            let sortV = _sorts[field];
+            let fieldScore = Math.pow(2, sortFields.length - index - 1) * sortV;
+            if (a[field] < b[field]) {
+              score -= fieldScore;
+            } else if (a[field] > b[field]) {
+              score += fieldScore;
+            }
+          });
+          return score;
         });
+      }
 
       if (query._skip < 0) {
         return data;

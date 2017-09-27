@@ -1,10 +1,27 @@
-/* globals describe it */
-
 const assert = require('assert');
 const Manager = require('../manager');
-const Query = require('../query');
+const Memory = require('../adapters/memory');
+const sinon = require('sinon');
 
 describe('Manager', () => {
+  describe('.adapter()', () => {
+    it('get adapter class constructor by its name', () => {
+      let Adapter = Manager.adapter();
+      assert.equal(Adapter, Memory);
+
+      Adapter = Manager.adapter('memory');
+      assert.equal(Adapter, Memory);
+
+      assert.throws(() => {
+        Adapter = Manager.adapter('other-adapter');
+      });
+
+      class Foo {}
+      Adapter = Manager.adapter(Foo);
+      assert.equal(Adapter, Foo);
+    });
+  });
+
   describe('contructor', () => {
     it('create instance without connection when no arg specified', () => {
       let manager = new Manager();
@@ -62,6 +79,12 @@ describe('Manager', () => {
 
       assert.strictEqual(manager.getPool().name, 'bar');
     });
+
+    it('throw error when pool not exist', () => {
+      let manager = new Manager();
+
+      assert.throws(() => manager.getPool('foo'));
+    });
   });
 
   describe('#main', () => {
@@ -80,12 +103,27 @@ describe('Manager', () => {
     });
   });
 
-  describe('#factory()', () => {
-    it('return query instance', () => {
-      let manager = new Manager();
-      let session = manager.openSession();
-      let query = session.factory('user');
-      assert(query instanceof Query);
+  describe('#runSession()', () => {
+    it('throw error and dispose session when error caught', async () => {
+      const manager = new Manager();
+      let session = {
+        dispose: sinon.spy(),
+      };
+
+      let stub = sinon.stub(manager, 'openSession');
+      stub.returns(session);
+
+      try {
+        await manager.runSession(() => {
+          throw new Error('generated-error');
+        });
+      } catch (err) {
+        assert.equal(err.message, 'generated-error');
+      }
+
+      assert(session.dispose.called);
+
+      stub.restore();
     });
   });
 });

@@ -21,10 +21,6 @@ class Manager {
     connections.forEach(connection => this.putPool(connection));
   }
 
-  async initialize () {
-    await Promise.all(Object.keys(this.pools).map(name => this.getPool(name).initialize()));
-  }
-
   putPool (config) {
     config = Object.assign({ name: ':auto' }, config, { adapter: Manager.adapter(config.adapter) });
 
