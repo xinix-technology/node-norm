@@ -2,6 +2,10 @@
 
 node-norm is intermediate layer to access data source (database, file, else?).
 
+```sh
+npm i node-norm
+```
+
 ## Features
 
 - Adaptive persistence, you can easily extend by creating new adapters,
@@ -66,21 +70,21 @@ const manager = new Manager({
 
 ### Manager
 
-Manager manages multiple connections into single application context.
+Manager manages multiple connections and sessions into single application context.
 
-#### #initialize()
+#### #openSession()
 
-Initializes all connections
+Create new session
 
-#### #put({ /*string*/ name = ':auto', /*string*/ adapter = 'memory', /*boolean*/ main = false, /*array*/ schemas = [], ...})
+#### #runSession(fn)
 
-Puts new connection to manager
+Run session by function
 
-#### #get(/*string*/ name = '')
+### Session
 
-Gets connection from manager by its name. When name is not specified, the result is the main connection.
+Session manages single connection context
 
-#### #factory(/*string*/ schemaName, /*object*/ criteria = {})
+#### #factory(schemaName, criteria = {})
 
 Create new query by its schema name
 
