@@ -1,17 +1,14 @@
 const Pool = require('./pool');
 const Session = require('./session');
+const Connection = require('./connection');
 
 class Manager {
-  static adapter (name = 'memory') {
-    if (typeof name === 'function') {
-      return name;
+  static adapter (ctr = require(`./adapters/memory`)) {
+    if (typeof ctr === 'function') {
+      return ctr;
     }
 
-    if (name.indexOf('-') > -1) {
-      return require(name);
-    }
-
-    return require(`./adapters/${name}`);
+    throw new Error('Adapter must be a constructor');
   }
 
   constructor ({ connections = [] } = {}) {
@@ -61,6 +58,11 @@ class Manager {
   openSession ({ autocommit } = {}) {
     return new Session({ manager: this, autocommit });
   }
+}
+
+if (typeof window !== 'undefined') {
+  Manager.Connection = Connection;
+  window.Norm = Manager;
 }
 
 module.exports = Manager;

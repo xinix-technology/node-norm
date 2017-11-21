@@ -5,11 +5,11 @@ const sinon = require('sinon');
 
 describe('Manager', () => {
   describe('.adapter()', () => {
-    it('get adapter class constructor by its name', () => {
+    it('validate adapter', () => {
       let Adapter = Manager.adapter();
       assert.equal(Adapter, Memory);
 
-      Adapter = Manager.adapter('memory');
+      Adapter = Manager.adapter(require('../adapters/memory'));
       assert.equal(Adapter, Memory);
 
       assert.throws(() => {

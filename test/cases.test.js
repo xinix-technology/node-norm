@@ -200,7 +200,6 @@ describe('cases', () => {
     return new Manager({
       connections: [
         {
-          adapter: 'memory',
           data,
         },
       ],

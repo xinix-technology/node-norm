@@ -259,7 +259,6 @@ describe('criteria', () => {
     return new Manager({
       connections: [
         {
-          adapter: 'memory',
           data,
         },
       ],
