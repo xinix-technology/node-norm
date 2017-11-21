@@ -114,6 +114,22 @@ Field defines single property of schema. The `id` property does not have to be a
 
 To load or persist data to data source, query object works as context of single request.
 
+### Operators
+
+- or
+- and
+- eq
+- ne
+- gt
+- gte
+- lt
+- lte
+- in
+- nin
+- regex
+- like
+- where: use function as determinator
+
 #### #find()
 #### #insert()
 #### #set()
