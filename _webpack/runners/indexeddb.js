@@ -2,7 +2,7 @@ const assert = require('assert');
 const Manager = require('node-norm');
 
 module.exports = async function () {
-  console.group('IndexedDB runner');
+  console.group('IndexedDB runner'); // eslint-disable-line no-console
 
   const adapter = require('node-norm/adapters/indexeddb');
   const dbname = 'db';
@@ -73,5 +73,5 @@ module.exports = async function () {
     console.error('Caught err', err);
   }
 
-  console.groupEnd();
+  console.groupEnd(); // eslint-disable-line no-console
 };

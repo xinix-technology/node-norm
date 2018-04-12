@@ -3,3 +3,5 @@
 .vscode
 coverage
 dist
+.DS_Store
+.nyc_output

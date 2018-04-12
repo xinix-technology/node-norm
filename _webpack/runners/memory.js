@@ -2,7 +2,7 @@ const assert = require('assert');
 const Manager = require('node-norm');
 
 module.exports = async function () {
-  console.group('Memory runner (default)');
+  console.group('Memory runner (default)'); // eslint-disable-line no-console
 
   let manager = new Manager({
     connections: [
@@ -31,5 +31,5 @@ module.exports = async function () {
     assert.equal(users.length, 4);
   });
 
-  console.groupEnd();
+  console.groupEnd(); // eslint-disable-line no-console
 };

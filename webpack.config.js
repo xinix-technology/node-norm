@@ -15,7 +15,7 @@ module.exports = function (env = 'dev') {
     },
     output: {
       path: getBasePath(env),
-      filename: `[name]${env === 'dev' ? '' : '.min' }.js`,
+      filename: `[name]${env === 'dev' ? '' : '.min'}.js`,
     },
     devtool: 'source-map',
     plugins: getPlugins(env),

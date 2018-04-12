@@ -96,13 +96,6 @@ class Query {
     return models;
   }
 
-  async count () {
-    let models = [];
-    const connection = await this.session.acquire(this.schema.connection);
-    await connection.count(this, row => models.push(this.schema.attach(row)));
-    return models[0].count;
-  }
-
   async single () {
     this.limit(1);
     let model;

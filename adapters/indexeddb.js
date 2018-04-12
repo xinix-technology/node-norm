@@ -25,7 +25,9 @@ class IndexedDB extends Memory {
       let db = await getDB(this);
       let store = db.transaction(query.schema.name).objectStore(query.schema.name);
 
-      let { _criteria, _sorts } = query;
+      let { _criteria } = query;
+      // TODO: implement sorting?
+      // let { _criteria, _sorts } = query;
 
       let rows = await new Promise((resolve, reject) => {
         let rows = [];
