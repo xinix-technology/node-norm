@@ -15,7 +15,7 @@ npm i node-norm
 
 ## How to work with it
 
-```javascript
+```js
 
 const Manager = require('node-norm');
 const manager = new Manager({
@@ -73,19 +73,27 @@ and implement this methods:
 
 ### Mandatory methods
 
-`#load(query, callback = () => {})`
-`#insert(query, callback = () => {})`
-`#update(query)`
-`#drop(query)`
-`#truncate(query)`
-`#delete(query)`
-`#count(query, useSkipAndLimit)`
+`#load (query, callback = () => {})`
+
+`#insert (query, callback = () => {})`
+
+`#update (query)`
+
+`#drop (query)`
+
+`#truncate (query)`
+
+`#delete (query)`
+
+`#count (query, useSkipAndLimit)`
 
 ### Optional methods
 
-`#_begin()`
-`#_commit()`
-`#_rollback()`
+`#_begin ()`
+
+`#_commit ()`
+
+`#_rollback ()`
 
 ## Classes
 
@@ -93,11 +101,12 @@ and implement this methods:
 
 Manager manages multiple connections and sessions into single application context.
 
-#### #openSession()
+`#openSession ()`
+
 
 Create new session
 
-#### #runSession(fn)
+`#runSession (fn)`
 
 Run session by function
 
@@ -105,34 +114,39 @@ Run session by function
 
 Session manages single connection context
 
-#### #factory(schemaName, criteria = {})
+`#factory (schemaName, criteria = {})`
 
 Create new query by its schema name
 
-#### #begin()
-#### #commit()
-#### #rollback()
+`#begin ()`
+
+`#commit ()`
+
+`#rollback ()`
 
 ### Connection
 
 Connection is single connection to data source
 
-#### #begin()
-#### #commit()
-#### #rollback()
+`#begin ()`
+
+`#commit ()`
+
+`#rollback ()`
 
 ### Schema
 
 You may see schema is a single table or collection.
 
-#### #attach()
-#### #filter()
+`#attach ()`
+
+`#filter ()`
 
 ### Field
 
 Field defines single property of schema. The `id` property does not have to be added as field and will be implicitly added.
 
-#### #filter()
+`#filter ()`
 
 ### Query
 
@@ -154,16 +168,28 @@ To load or persist data to data source, query object works as context of single 
 - like
 - where: use function as determinator
 
-#### #find()
-#### #insert()
-#### #set()
-#### #save()
-#### #skip()
-#### #limit()
-#### #sort()
-#### #delete()
-#### #truncate()
-#### #drop()
-#### #all()
-#### #single()
-#### #count(useSkipAndLimit = false)
+`#find ()`
+
+`#insert ()`
+
+`#set ()`
+
+`#save ()`
+
+`#skip ()`
+
+`#limit ()`
+
+`#sort ()`
+
+`#delete ()`
+
+`#truncate ()`
+
+`#drop ()`
+
+`#all ()`
+
+`#single ()`
+
+`#count (useSkipAndLimit = false)`
