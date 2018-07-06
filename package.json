@@ -2,41 +2,44 @@
   "name": "node-norm",
   "version": "0.6.2",
   "description": "Norm is Not ORM though data access layer",
-  "main": "manager.js",
+  "main": "index.js",
   "scripts": {
     "test": "npx mocha --recursive",
     "lint": "eslint .",
     "coverage": "npx nyc --reporter=lcov npm test",
     "dev:browser": "webpack-dev-server",
-    "build": "webpack"
+    "build": "webpack",
+    "precommit": "npm run lint && npm test",
+    "prepush": "npm run lint && npm test"
   },
   "author": "Ganesha <reekoheek@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/xinix-technology/node-norm.git"
+    "url": "https://github.com/xinix-technology/node-norm.git"
   },
   "dependencies": {
     "async-factory": "^1.0.0",
-    "fs-extra": "^5.0.0",
+    "fs-extra": "^6.0.1",
     "generic-pool": "^3.4.2",
-    "koa-compose": "^4.0.0",
-    "uuid": "^3.2.1"
+    "koa-compose": "^4.1.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-eslint": "^8.2.2",
-    "babel-loader": "^7.1.4",
-    "eslint": "^4.19.1",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^8.2.5",
+    "babel-loader": "^7.1.5",
+    "eslint": "^5.0.1",
     "eslint-config-standard": "^11.0.0",
     "eslint-config-xinix": "^1.0.4",
-    "eslint-plugin-import": "^2.10.0",
+    "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-node": "^6.0.1",
-    "eslint-plugin-promise": "^3.7.0",
-    "eslint-plugin-standard": "^3.0.1",
+    "eslint-plugin-promise": "^3.8.0",
+    "eslint-plugin-standard": "^3.1.0",
     "html-webpack-plugin": "^3.2.0",
-    "sinon": "^4.5.0",
-    "webpack": "^4.5.0",
-    "webpack-dev-server": "^3.1.3"
+    "husky": "^0.14.3",
+    "sinon": "^6.1.2",
+    "webpack": "^4.15.1",
+    "webpack-dev-server": "^3.1.4"
   }
 }

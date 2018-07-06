@@ -194,6 +194,41 @@ describe('cases', () => {
         assert.strictEqual(user.password, 'userPassword');
       });
     });
+
+    it('count all rows', async () => {
+      let data = {
+        user: [
+          { username: 'foo', password: '1' },
+          { username: 'bar', password: '2' },
+          { username: 'baz', password: '1' },
+        ],
+      };
+
+      let manager = createManager(data);
+      await manager.runSession(async session => {
+        let count = await session.factory('user').skip(1).limit(1).count();
+        assert.equal(count, 3);
+
+        count = await session.factory('user', { password: '1' }).skip(1).limit(1).count();
+        assert.equal(count, 2);
+      });
+    });
+
+    it('count respect skip and limit', async () => {
+      let data = {
+        user: [
+          { username: 'foo', password: '1' },
+          { username: 'bar', password: '2' },
+          { username: 'baz', password: '1' },
+        ],
+      };
+
+      let manager = createManager(data);
+      await manager.runSession(async session => {
+        let count = await session.factory('user').skip(1).limit(1).count(true);
+        assert.equal(count, 1);
+      });
+    });
   });
 
   function createManager (data) {

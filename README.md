@@ -142,3 +142,4 @@ To load or persist data to data source, query object works as context of single 
 #### #drop()
 #### #all()
 #### #single()
+#### #count(useSkipAndLimit = false)

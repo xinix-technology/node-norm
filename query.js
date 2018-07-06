@@ -1,3 +1,4 @@
+const assert = require('assert');
 class Query {
   constructor ({ session, schema, criteria }) {
     this.session = session;
@@ -96,11 +97,10 @@ class Query {
     return models;
   }
 
-  async count () {
-    let models = [];
+  async count (useSkipAndLimit = false) {
     const connection = await this.session.acquire(this.schema.connection);
-    await connection.count(this, row => models.push(this.schema.attach(row)));
-    return models[0].count;
+    assert(typeof connection.count === 'function', 'Connection does not implement method count');
+    return connection.count(this, useSkipAndLimit);
   }
 
   async single () {

@@ -194,6 +194,24 @@ class Memory extends Connection {
       }
     });
   }
+
+  async count (query, useSkipAndLimit) {
+    let { _limit, _skip } = query;
+
+    if (!useSkipAndLimit) {
+      query._skip = 0;
+      query._limit = -1;
+    }
+
+    let count = 0;
+
+    await this.load(query, () => count++);
+
+    query._skip = _skip;
+    query._limit = _limit;
+
+    return count;
+  }
 }
 
 module.exports = Memory;

@@ -1,6 +1,5 @@
 const Pool = require('./pool');
 const Session = require('./session');
-const Connection = require('./connection');
 
 class Manager {
   static adapter (ctr = require(`./adapters/memory`)) {
@@ -58,11 +57,6 @@ class Manager {
   openSession ({ autocommit } = {}) {
     return new Session({ manager: this, autocommit });
   }
-}
-
-if (typeof window !== 'undefined') {
-  Manager.Connection = Connection;
-  window.Norm = Manager;
 }
 
 module.exports = Manager;
