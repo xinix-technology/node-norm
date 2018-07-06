@@ -17,7 +17,7 @@ class Memory extends Connection {
       const row = data.find(row => row.id === _criteria.id);
       data = row ? [ row ] : [];
     } else {
-      data = data.filter(row => this.matchCriteria(_criteria, row));
+      data = data.filter(row => this._matchCriteria(_criteria, row));
 
       if (_sorts) {
         let sortFields = Object.keys(_sorts);
@@ -50,100 +50,6 @@ class Memory extends Connection {
       callback(row);
       return row;
     });
-  }
-
-  matchCriteria (criteria, row) {
-    if (!criteria) {
-      return true;
-    }
-
-    for (let key in criteria) {
-      let critValue = criteria[key];
-      let [ nkey, op = 'eq' ] = key.split('!');
-      let rowValue = row[nkey];
-      switch (op) {
-        case 'or':
-          let valid = false;
-          for (let subCriteria of critValue) {
-            let match = this.matchCriteria(subCriteria, row);
-            if (match) {
-              valid = true;
-              break;
-            }
-          }
-          if (!valid) {
-            return false;
-          }
-          break;
-        case 'and':
-          for (let subCriteria of critValue) {
-            if (!this.matchCriteria(subCriteria, row)) {
-              return false;
-            }
-          }
-          break;
-        case 'eq':
-          if (critValue !== rowValue) {
-            return false;
-          }
-          break;
-        case 'ne':
-          if (critValue === rowValue) {
-            return false;
-          }
-          break;
-        case 'gt':
-          if (!(rowValue > critValue)) {
-            return false;
-          }
-          break;
-        case 'gte':
-          if (!(rowValue >= critValue)) {
-            return false;
-          }
-          break;
-        case 'lt':
-          if (!(rowValue < critValue)) {
-            return false;
-          }
-          break;
-        case 'lte':
-          if (!(rowValue <= critValue)) {
-            return false;
-          }
-          break;
-        case 'in':
-          if (critValue.indexOf(rowValue) === -1) {
-            return false;
-          }
-          break;
-        case 'nin':
-          if (critValue.indexOf(rowValue) !== -1) {
-            return false;
-          }
-          break;
-        case 'like':
-          let re = new RegExp(critValue);
-          if (!rowValue.match(re)) {
-            return false;
-          }
-          break;
-        case 'regex':
-          if (!rowValue.match(critValue)) {
-            return false;
-          }
-          break;
-        case 'where':
-          if (!critValue(rowValue, row)) {
-            return false;
-          }
-          break;
-        default:
-          throw new Error(`Operator '${op}' is not implemented yet!`);
-      }
-    }
-
-    return true;
   }
 
   insert (query, callback = () => {}) {
@@ -211,6 +117,100 @@ class Memory extends Connection {
     query._limit = _limit;
 
     return count;
+  }
+
+  _matchCriteria (criteria, row) {
+    if (!criteria) {
+      return true;
+    }
+
+    for (let key in criteria) {
+      let critValue = criteria[key];
+      let [ nkey, op = 'eq' ] = key.split('!');
+      let rowValue = row[nkey];
+      switch (op) {
+        case 'or':
+          let valid = false;
+          for (let subCriteria of critValue) {
+            let match = this._matchCriteria(subCriteria, row);
+            if (match) {
+              valid = true;
+              break;
+            }
+          }
+          if (!valid) {
+            return false;
+          }
+          break;
+        case 'and':
+          for (let subCriteria of critValue) {
+            if (!this._matchCriteria(subCriteria, row)) {
+              return false;
+            }
+          }
+          break;
+        case 'eq':
+          if (critValue !== rowValue) {
+            return false;
+          }
+          break;
+        case 'ne':
+          if (critValue === rowValue) {
+            return false;
+          }
+          break;
+        case 'gt':
+          if (!(rowValue > critValue)) {
+            return false;
+          }
+          break;
+        case 'gte':
+          if (!(rowValue >= critValue)) {
+            return false;
+          }
+          break;
+        case 'lt':
+          if (!(rowValue < critValue)) {
+            return false;
+          }
+          break;
+        case 'lte':
+          if (!(rowValue <= critValue)) {
+            return false;
+          }
+          break;
+        case 'in':
+          if (critValue.indexOf(rowValue) === -1) {
+            return false;
+          }
+          break;
+        case 'nin':
+          if (critValue.indexOf(rowValue) !== -1) {
+            return false;
+          }
+          break;
+        case 'like':
+          let re = new RegExp(critValue);
+          if (!rowValue.match(re)) {
+            return false;
+          }
+          break;
+        case 'regex':
+          if (!rowValue.match(critValue)) {
+            return false;
+          }
+          break;
+        case 'where':
+          if (!critValue(rowValue, row)) {
+            return false;
+          }
+          break;
+        default:
+          throw new Error(`Operator '${op}' is not implemented yet!`);
+      }
+    }
+
+    return true;
   }
 }
 

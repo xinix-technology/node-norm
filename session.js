@@ -60,23 +60,36 @@ class Session {
   }
 
   async dispose () {
-    await Promise.all(Object.keys(this.connections).map(async name => {
-      let connection = this.connections[name];
-      if (connection.tx) {
-        await connection.rollback();
-      }
-      return this.getPool(name).release(connection);
+    await this.rollback();
+    await Promise.all(Object.keys(this.connections).map(name => {
+      return this.getPool(name).release(this.connections[name]);
     }));
 
     this.connections = {};
   }
 
-  async close () {
+  close () {
+    return this.commit();
+  }
+
+  async commit () {
     await Promise.all(Object.keys(this.connections).map(async name => {
       let connection = this.connections[name];
-      if (connection.tx) {
-        await connection.commit();
-      }
+      await connection.commit();
+    }));
+  }
+
+  async rollback () {
+    await Promise.all(Object.keys(this.connections).map(async name => {
+      let connection = this.connections[name];
+      await connection.rollback();
+    }));
+  }
+
+  async begin () {
+    await Promise.all(Object.keys(this.connections).map(async name => {
+      let connection = this.connections[name];
+      await connection.begin();
     }));
   }
 }

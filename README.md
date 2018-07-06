@@ -66,6 +66,27 @@ const manager = new Manager({
 })();
 ```
 
+## Implement new adapter
+
+Create connection class extends from `Connection` (`require('node-norm/connection')`)
+and implement this methods:
+
+### Mandatory methods
+
+`#load(query, callback = () => {})`
+`#insert(query, callback = () => {})`
+`#update(query)`
+`#drop(query)`
+`#truncate(query)`
+`#delete(query)`
+`#count(query, useSkipAndLimit)`
+
+### Optional methods
+
+`#_begin()`
+`#_commit()`
+`#_rollback()`
+
 ## Classes
 
 ### Manager
@@ -88,14 +109,17 @@ Session manages single connection context
 
 Create new query by its schema name
 
+#### #begin()
+#### #commit()
+#### #rollback()
+
 ### Connection
 
 Connection is single connection to data source
 
-#### #put()
-#### #get()
-#### #factory()
-#### #initialize()
+#### #begin()
+#### #commit()
+#### #rollback()
 
 ### Schema
 

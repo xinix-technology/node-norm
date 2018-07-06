@@ -36,7 +36,7 @@ class IndexedDB extends Memory {
           let cursor = evt.target.result;
           if (cursor) {
             let row = cursor.value;
-            if (this.matchCriteria(_criteria, row)) {
+            if (this._matchCriteria(_criteria, row)) {
               rows.push(row);
             }
             cursor.continue();
