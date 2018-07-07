@@ -1,24 +1,23 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const webpack = require('webpack');
 
-module.exports = function (env = 'dev') {
-  console.error('env=', env);
-
+module.exports = function (env, { mode = 'development' }) {
   return {
-    context: getContext(env),
+    mode,
+    context: __dirname,
     entry: {
       norm: './manager.js',
       'adapters/indexeddb': './adapters/indexeddb.js',
       index: './_webpack/index.js',
     },
     output: {
-      path: getBasePath(env),
-      filename: `[name]${env === 'dev' ? '' : '.min'}.js`,
+      path: getBasePath(),
+      filename: `[name]${mode === 'development' ? '' : '.min'}.js`,
     },
     devtool: 'source-map',
-    plugins: getPlugins(env),
+    plugins: [
+      new HtmlWebpackPlugin(),
+    ],
     resolve: {
       alias: {
         'node-norm': __dirname,
@@ -29,12 +28,12 @@ module.exports = function (env = 'dev') {
         {
           test: /\.js$/,
           exclude: /node_modules/,
-          use: getBabelLoader(env),
+          use: getBabelLoader(),
         },
       ],
     },
     devServer: {
-      contentBase: getBasePath(env),
+      contentBase: getBasePath(),
       compress: true,
       // port: 8080,
       hot: false,
@@ -42,7 +41,7 @@ module.exports = function (env = 'dev') {
   };
 };
 
-function getBabelLoader ({ mode }) {
+function getBabelLoader () {
   let plugins = [
     // require.resolve('babel-plugin-syntax-dynamic-import'),
     // require.resolve('babel-plugin-transform-async-to-generator'),
@@ -69,33 +68,6 @@ function getBabelLoader ({ mode }) {
   };
 }
 
-function getPlugins (env) {
-  let plugins = [
-    new HtmlWebpackPlugin(),
-  ];
-
-  plugins.push(new webpack.optimize.CommonsChunkPlugin({
-    names: ['adapters/indexeddb', 'norm'],
-    minChunks: 2,
-  }));
-
-  if (env !== 'dev') {
-    plugins.push(
-      new UglifyJsPlugin({
-        cache: true,
-        parallel: true,
-        sourceMap: true,
-      })
-    );
-  }
-
-  return plugins;
-}
-
-function getContext (env) {
-  return path.join(__dirname);
-}
-
-function getBasePath ({ mode }) {
+function getBasePath () {
   return path.join(__dirname, 'dist');
 }
