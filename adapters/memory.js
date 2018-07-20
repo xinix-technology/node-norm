@@ -1,5 +1,5 @@
 const Connection = require('../connection');
-const uuid = require('uuid');
+const uuidv4 = require('uuid/v4');
 
 class Memory extends Connection {
   constructor (options) {
@@ -56,7 +56,7 @@ class Memory extends Connection {
     const data = this.data[query.schema.name] = this.data[query.schema.name] || [];
 
     return query._inserts.reduce((inserted, row) => {
-      row = Object.assign({ id: uuid.v4() }, row);
+      row = Object.assign({ id: uuidv4() }, row);
       data.push(row);
       callback(row);
       inserted++;

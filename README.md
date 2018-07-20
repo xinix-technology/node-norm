@@ -101,8 +101,9 @@ and implement this methods:
 
 Manager manages multiple connections and sessions into single application context.
 
-`#openSession ()`
+`Manager ({ connections = [] } = {})`
 
+`#openSession ()`
 
 Create new session
 
@@ -113,6 +114,8 @@ Run session by function
 ### Session
 
 Session manages single connection context
+
+`Session ({ manager, autocommit = true })`
 
 `#factory (schemaName, criteria = {})`
 
@@ -128,6 +131,8 @@ Create new query by its schema name
 
 Connection is single connection to data source
 
+`Connection ({ name })`
+
 `#begin ()`
 
 `#commit ()`
@@ -138,6 +143,8 @@ Connection is single connection to data source
 
 You may see schema is a single table or collection.
 
+`Schema ({ name, fields = [], modelClass = Model })`
+
 `#attach ()`
 
 `#filter ()`
@@ -145,6 +152,8 @@ You may see schema is a single table or collection.
 ### Field
 
 Field defines single property of schema. The `id` property does not have to be added as field and will be implicitly added.
+
+`Field (name, ...filters)`
 
 `#filter ()`
 

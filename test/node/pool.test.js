@@ -1,9 +1,5 @@
-/* globals describe it */
-
 const assert = require('assert');
-const Manager = require('../manager');
-const Pool = require('../pool');
-const Schema = require('../schema');
+const { Manager, Pool, Schema } = require('../..');
 
 describe('Pool', () => {
   describe('constructor', () => {

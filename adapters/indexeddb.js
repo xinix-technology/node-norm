@@ -1,3 +1,5 @@
+// const debug = require('debug')('node-norm:adapters:indexeddb');
+
 if (typeof window === 'undefined') {
   throw new Error('IndexedDB adapter only works at browser');
 }
@@ -21,75 +23,55 @@ class IndexedDB extends Memory {
   }
 
   async load (query, callback = () => {}) {
-    try {
-      let db = await getDB(this);
-      let store = db.transaction(query.schema.name).objectStore(query.schema.name);
+    let { _criteria } = query;
+    let store = await this.__getStore(query.schema.name);
 
-      let { _criteria } = query;
-      // TODO: implement sorting?
-      // let { _criteria, _sorts } = query;
+    // TODO: implement sorting?
+    // let { _criteria, _sorts } = query;
 
-      let rows = await new Promise((resolve, reject) => {
-        let rows = [];
-        let req = store.openCursor();
-        req.onsuccess = evt => {
-          let cursor = evt.target.result;
-          if (cursor) {
-            let row = cursor.value;
-            if (this._matchCriteria(_criteria, row)) {
-              rows.push(row);
-            }
-            cursor.continue();
-          } else {
-            resolve(rows);
-          }
-        };
+    let rows = await new Promise((resolve, reject) => {
+      let rows = [];
+      let req = store.openCursor();
+      req.onsuccess = evt => {
+        let cursor = evt.target.result;
+        if (!cursor) {
+          return resolve(rows);
+        }
 
-        req.onerror = function (err) {
-          reject(err);
-        };
-      });
+        let row = cursor.value;
+        if (this._matchCriteria(_criteria, row)) {
+          rows.push(row);
+        }
+        cursor.continue();
+      };
 
-      rows.forEach(row => {
-        callback(row);
-      });
+      req.onerror = function (err) {
+        reject(err);
+      };
+    });
 
-      return rows;
-    } catch (err) {
-      console.error('err', err);
-      throw err;
-    }
+    rows.forEach(row => callback(row));
   }
 
   async insert (query, callback = () => {}) {
-    let db = await getDB(this);
-    let store = db.transaction(query.schema.name, 'readwrite').objectStore(query.schema.name);
+    let store = await this.__getStore(query.schema.name);
 
     let inserted = 0;
 
-    await Promise.all(query._inserts.map(row => {
-      return new Promise((resolve, reject) => {
-        let req = store.put(row);
-        req.onsuccess = function (evt) {
-          row.id = evt.target.result;
-          callback(row);
-          inserted++;
-          resolve();
-        };
-        req.onerror = function (err) {
-          reject(err);
-        };
-      });
+    await Promise.all(query._inserts.map(async row => {
+      row.id = await this.__promised(store.add(row));
+      callback(row);
+      inserted++;
     }));
 
     return inserted;
   }
 
   async update (query) {
-    let rows = await this.load(query);
+    let rows = [];
+    await this.load(query, row => rows.push(row));
 
-    let db = await getDB(this);
-    let store = db.transaction(query.schema.name, 'readwrite').objectStore(query.schema.name);
+    let store = await this.__getStore(query.schema.name);
 
     let keys = Object.keys(query._sets);
     let affected = 0;
@@ -107,11 +89,7 @@ class IndexedDB extends Memory {
       if (fieldChanges.length) {
         affected++;
 
-        return new Promise((resolve, reject) => {
-          let req = store.put(row);
-          req.onerror = reject;
-          req.onsuccess = resolve;
-        });
+        return this.__promised(store.put(row));
       }
     }));
 
@@ -119,34 +97,46 @@ class IndexedDB extends Memory {
   }
 
   async delete (query) {
-    let rows = await this.load(query);
+    let rows = [];
+    await this.load(query, row => rows.push(row));
 
-    let db = await getDB(this);
-    let store = db.transaction(query.schema.name, 'readwrite').objectStore(query.schema.name);
+    let store = await this.__getStore(query.schema.name);
 
-    rows.map(row => {
-      return new Promise((resolve, reject) => {
-        let req = store.delete(row.id);
-        req.onerror = reject;
-        req.onsuccess = resolve;
-      });
+    await rows.map(row => this.__promised(store.delete(row.id)));
+  }
+
+  async truncate (query) {
+    let store = await this.__getStore(query.schema.name);
+    await this.__promised(store.clear());
+  }
+
+  drop (query) {
+    return this.truncate(query);
+  }
+
+  async __getDB () {
+    let req = indexedDB.open(this.dbname, this.version);
+    req.onupgradeneeded = this.onUpgradeNeeded;
+    let db = await this.__promised(req);
+    return db;
+  }
+
+  __promised (req) {
+    return new Promise((resolve, reject) => {
+      req.onsuccess = evt => resolve(evt.target.result);
+      req.onerror = reject;
     });
   }
-}
 
-function getDB ({ dbname, version, onUpgradeNeeded }) {
-  return new Promise((resolve, reject) => {
-    let request = indexedDB.open(dbname, version);
-    request.onupgradeneeded = onUpgradeNeeded;
-    request.onsuccess = function () {
-      let db = request.result;
-      resolve(db);
-    };
-    request.onerror = function (err) {
-      console.error('err', err);
-      reject(err);
-    };
-  });
+  async __getTx (names) {
+    let db = await this.__getDB();
+    return db.transaction(names, 'readwrite');
+  }
+
+  async __getStore (name) {
+    let tx = await this.__getTx(name);
+    return tx.objectStore(name);
+  }
 }
 
 module.exports = IndexedDB;

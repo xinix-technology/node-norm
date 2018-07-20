@@ -1,15 +1,20 @@
 const genericPool = require('generic-pool');
 const Schema = require('./schema');
 
+let poolNextId = 0;
+
 class Pool {
   constructor (config) {
-    let { name, adapter, schemas = [], min = 1, max = 1 } = config;
-    this.name = name;
+    let { name, adapter = require('./adapters/memory'), schemas = [], min = 1, max = 1 } = config;
+
+    this.name = name || `pool-${poolNextId++}`;
     this.schemas = {};
+
+    schemas.forEach(colOptions => this.putSchema(colOptions));
 
     const Adapter = adapter;
 
-    Object.defineProperty(this, 'pool', {
+    Object.defineProperty(this, '_pool', {
       enumerable: false,
       writable: false,
       configurable: false,
@@ -22,13 +27,11 @@ class Pool {
         },
       }, { min, max }),
     });
-
-    schemas.map(colOptions => this.putSchema(colOptions));
   }
 
-  putSchema ({ name, fields, modelClass }) {
+  putSchema ({ name, fields, observers, modelClass }) {
     let connection = this.name;
-    this.schemas[name] = new Schema({ connection, name, fields, modelClass });
+    this.schemas[name] = new Schema({ connection, name, fields, observers, modelClass });
     return this;
   }
 
@@ -40,37 +43,19 @@ class Pool {
   }
 
   acquire (...args) {
-    // console.log(
-    //   'pool:acquire',
-    //   'spareResourceCapacity',
-    //   this.pool.spareResourceCapacity,
-    //   'size',
-    //   this.pool.size,
-    //   'available',
-    //   this.pool.available,
-    //   'borrowed',
-    //   this.pool.borrowed,
-    //   'pending',
-    //   this.pool.pending,
-    //   'max',
-    //   this.pool.max,
-    //   'min',
-    //   this.pool.min
-    // );
-
-    return this.pool.acquire(...args);
+    return this._pool.acquire(...args);
   }
 
   release (...args) {
-    return this.pool.release(...args);
+    return this._pool.release(...args);
   }
 
   drain (...args) {
-    return this.pool.acquire(...args);
+    return this._pool.acquire(...args);
   }
 
   clear (...args) {
-    return this.pool.clear(...args);
+    return this._pool.clear(...args);
   }
 }
 

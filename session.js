@@ -1,17 +1,13 @@
 const Query = require('./query');
 const Factory = require('async-factory');
 const connectionFactory = new Factory();
-const uuid = require('uuid');
 
-function nextId () {
-  return `session:${uuid.v4()}`;
-}
+let sessionNextId = 0;
 
 class Session {
-  constructor ({ manager, autocommit = true }) {
-    this.id = nextId();
+  constructor ({ manager }) {
+    this.id = `session-${sessionNextId++}`;
     this.manager = manager;
-    this.autocommit = autocommit;
     this.connections = {};
   }
 
@@ -51,9 +47,7 @@ class Session {
       let fn = () => pool.acquire();
       this.connections[name] = await connectionFactory.singleton(id, fn);
 
-      if (!this.autocommit) {
-        await this.connections[name].begin();
-      }
+      await this.connections[name].begin();
     }
 
     return this.connections[name];

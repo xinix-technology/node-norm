@@ -1,16 +1,16 @@
 const assert = require('assert');
-const Manager = require('../manager');
-const Memory = require('../adapters/memory');
+const { Manager } = require('../..');
+const Memory = require('../../adapters/memory');
 const sinon = require('sinon');
 
 describe('Manager', () => {
   describe('.adapter()', () => {
     it('validate adapter', () => {
       let Adapter = Manager.adapter();
-      assert.equal(Adapter, Memory);
+      assert.strictEqual(Adapter, Memory);
 
-      Adapter = Manager.adapter(require('../adapters/memory'));
-      assert.equal(Adapter, Memory);
+      Adapter = Manager.adapter(Memory);
+      assert.strictEqual(Adapter, Memory);
 
       assert.throws(() => {
         Adapter = Manager.adapter('other-adapter');
@@ -18,7 +18,7 @@ describe('Manager', () => {
 
       class Foo {}
       Adapter = Manager.adapter(Foo);
-      assert.equal(Adapter, Foo);
+      assert.strictEqual(Adapter, Foo);
     });
   });
 
@@ -118,7 +118,7 @@ describe('Manager', () => {
           throw new Error('generated-error');
         });
       } catch (err) {
-        assert.equal(err.message, 'generated-error');
+        assert.strictEqual(err.message, 'generated-error');
       }
 
       assert(session.dispose.called);

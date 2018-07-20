@@ -18,11 +18,12 @@ class Manager {
   }
 
   putPool (config) {
-    config = Object.assign({ name: ':auto' }, config, { adapter: Manager.adapter(config.adapter) });
+    // resolve adapter first before creating
+    config.adapter = Manager.adapter(config.adapter);
 
-    let { main, name } = config;
-    this.main = main ? name : (this.main || name);
-    this.pools[name] = new Pool(config);
+    let pool = new Pool(config);
+    this.pools[pool.name] = pool;
+    this.main = config.main ? pool.name : (this.main || pool.name);
 
     return this;
   }
@@ -33,7 +34,6 @@ class Manager {
     }
 
     name = `${name || this.main}`;
-
     if (!this.pools[name]) {
       throw new Error(`Pool '${name}' not found`);
     }
@@ -41,8 +41,8 @@ class Manager {
     return this.pools[name];
   }
 
-  async runSession (fn, { autocommit } = {}) {
-    const session = this.openSession({ autocommit });
+  async runSession (fn, options) {
+    const session = this.openSession(options);
     try {
       const result = await fn(session);
       await session.close();
@@ -54,8 +54,8 @@ class Manager {
     }
   }
 
-  openSession ({ autocommit } = {}) {
-    return new Session({ manager: this, autocommit });
+  openSession (options) {
+    return new Session({ manager: this });
   }
 }
 

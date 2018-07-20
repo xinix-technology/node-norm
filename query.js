@@ -1,4 +1,3 @@
-const assert = require('assert');
 class Query {
   constructor ({ session, schema, criteria }) {
     this.session = session;
@@ -55,27 +54,40 @@ class Query {
     return result;
   }
 
-  async save ({ filter = true } = {}) {
-    const connection = await this.session.acquire(this.schema.connection);
-    let { session } = this;
+  async save ({ filter = true, observer = true } = {}) {
+    this.mode = this._inserts.length ? 'insert' : 'update';
 
-    if (this._inserts.length) {
-      if (filter) {
-        await Promise.all(this._inserts.map(row => this.schema.filter(row, { session })));
+    async function doSave ({ query }) {
+      const connection = await query.session.acquire(query.schema.connection);
+      let { session } = query;
+
+      if (query._inserts.length) {
+        if (filter) {
+          await Promise.all(query._inserts.map(row => query.schema.filter(row, { session })));
+        }
+
+        let rows = [];
+        let inserted = await connection.insert(query, row => rows.push(query.schema.attach(row)));
+        ctx.result = { inserted, rows };
+      } else {
+        if (filter) {
+          let partial = true;
+          await query.schema.filter(query._sets, { session, partial });
+        }
+
+        let affected = await connection.update(query);
+        ctx.result = { affected };
       }
-
-      let rows = [];
-      let inserted = await connection.insert(this, row => rows.push(this.schema.attach(row)));
-      return { inserted, rows };
-    } else {
-      if (filter) {
-        let partial = true;
-        await this.schema.filter(this._sets, { session, partial });
-      }
-
-      let affected = await connection.update(this);
-      return { affected };
     }
+
+    let ctx = { query: this, filter };
+    if (observer) {
+      await this.schema.observe(ctx, doSave);
+    } else {
+      await doSave(ctx);
+    }
+
+    return ctx.result;
   }
 
   async drop () {
@@ -99,7 +111,9 @@ class Query {
 
   async count (useSkipAndLimit = false) {
     const connection = await this.session.acquire(this.schema.connection);
-    assert(typeof connection.count === 'function', 'Connection does not implement method count');
+    if (typeof connection.count !== 'function') {
+      throw new Error('Connection does not implement method count');
+    }
     return connection.count(this, useSkipAndLimit);
   }
 
@@ -109,6 +123,10 @@ class Query {
     const connection = await this.session.acquire(this.schema.connection);
     await connection.load(this, row => (model = this.schema.attach(row)));
     return model;
+  }
+
+  getInsertedRows () {
+    return this._inserts;
   }
 }
 

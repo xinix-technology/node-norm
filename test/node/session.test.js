@@ -1,5 +1,4 @@
-const Manager = require('../manager');
-const Query = require('../query');
+const { Manager, Query } = require('../..');
 const assert = require('assert');
 
 describe('Session', () => {

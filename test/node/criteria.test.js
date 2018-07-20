@@ -1,5 +1,5 @@
 const assert = require('assert');
-const Manager = require('../manager');
+const { Manager } = require('../..');
 
 describe('criteria', () => {
   it('eq', async () => {
@@ -16,8 +16,8 @@ describe('criteria', () => {
       let users = await session.factory('user', criteria).all();
       let [ user ] = users;
 
-      assert.equal(users.length, 1);
-      assert.equal(user.username, 'foo');
+      assert.strictEqual(users.length, 1);
+      assert.strictEqual(user.username, 'foo');
     });
   });
 
@@ -34,8 +34,8 @@ describe('criteria', () => {
       let criteria = { 'username!ne': 'foo' };
       let users = await session.factory('user', criteria).all();
 
-      assert.equal(users[0].username, 'bar');
-      assert.equal(users[1].username, 'baz');
+      assert.strictEqual(users[0].username, 'bar');
+      assert.strictEqual(users[1].username, 'baz');
     });
   });
 
@@ -53,7 +53,7 @@ describe('criteria', () => {
       let users = await session.factory('user', criteria).all();
       let [ user ] = users;
 
-      assert.equal(user.username, 'baz');
+      assert.strictEqual(user.username, 'baz');
     });
   });
 
@@ -70,9 +70,9 @@ describe('criteria', () => {
       let criteria = { 'age!gte': 15 };
       let users = await session.factory('user', criteria).all();
 
-      assert.equal(users.length, 2);
-      assert.equal(users[0].username, 'foo');
-      assert.equal(users[1].username, 'baz');
+      assert.strictEqual(users.length, 2);
+      assert.strictEqual(users[0].username, 'foo');
+      assert.strictEqual(users[1].username, 'baz');
     });
   });
 
@@ -90,7 +90,7 @@ describe('criteria', () => {
       let users = await session.factory('user', criteria).all();
       let [ user ] = users;
 
-      assert.equal(user.username, 'bar');
+      assert.strictEqual(user.username, 'bar');
     });
   });
 
@@ -107,9 +107,9 @@ describe('criteria', () => {
       let criteria = { 'age!lte': 15 };
       let users = await session.factory('user', criteria).all();
 
-      assert.equal(users.length, 2);
-      assert.equal(users[0].username, 'foo');
-      assert.equal(users[1].username, 'bar');
+      assert.strictEqual(users.length, 2);
+      assert.strictEqual(users[0].username, 'foo');
+      assert.strictEqual(users[1].username, 'bar');
     });
   });
 
@@ -126,9 +126,9 @@ describe('criteria', () => {
       let criteria = { 'age!in': [ 14, 15 ] };
       let users = await session.factory('user', criteria).all();
 
-      assert.equal(users.length, 2);
-      assert.equal(users[0].username, 'foo');
-      assert.equal(users[1].username, 'bar');
+      assert.strictEqual(users.length, 2);
+      assert.strictEqual(users[0].username, 'foo');
+      assert.strictEqual(users[1].username, 'bar');
     });
   });
 
@@ -145,8 +145,8 @@ describe('criteria', () => {
       let criteria = { 'age!nin': [ 14, 15 ] };
       let users = await session.factory('user', criteria).all();
 
-      assert.equal(users.length, 1);
-      assert.equal(users[0].username, 'baz');
+      assert.strictEqual(users.length, 1);
+      assert.strictEqual(users[0].username, 'baz');
     });
   });
 
@@ -168,9 +168,9 @@ describe('criteria', () => {
       };
       let users = await session.factory('user', criteria).all();
 
-      assert.equal(users.length, 2);
-      assert.equal(users[0].username, 'foo');
-      assert.equal(users[1].username, 'baz');
+      assert.strictEqual(users.length, 2);
+      assert.strictEqual(users[0].username, 'foo');
+      assert.strictEqual(users[1].username, 'baz');
     });
   });
 
@@ -193,9 +193,9 @@ describe('criteria', () => {
       };
       let users = await session.factory('user', criteria).all();
 
-      assert.equal(users.length, 1);
-      assert.equal(users[0].username, 'foo');
-      assert.equal(users[0].age, 10);
+      assert.strictEqual(users.length, 1);
+      assert.strictEqual(users[0].username, 'foo');
+      assert.strictEqual(users[0].age, 10);
     });
   });
 
@@ -212,9 +212,9 @@ describe('criteria', () => {
       let criteria = { 'username!like': 'ba' };
       let users = await session.factory('user', criteria).all();
 
-      assert.equal(users.length, 2);
-      assert.equal(users[0].username, 'bar');
-      assert.equal(users[1].username, 'baz');
+      assert.strictEqual(users.length, 2);
+      assert.strictEqual(users[0].username, 'bar');
+      assert.strictEqual(users[1].username, 'baz');
     });
   });
 
@@ -231,9 +231,9 @@ describe('criteria', () => {
       let criteria = { 'username!regex': /^ba/ };
       let users = await session.factory('user', criteria).all();
 
-      assert.equal(users.length, 2);
-      assert.equal(users[0].username, 'bar');
-      assert.equal(users[1].username, 'baz');
+      assert.strictEqual(users.length, 2);
+      assert.strictEqual(users[0].username, 'bar');
+      assert.strictEqual(users[1].username, 'baz');
     });
   });
 
@@ -250,8 +250,8 @@ describe('criteria', () => {
       let criteria = { 'username!where': (v, row) => v === 'bar' };
       let users = await session.factory('user', criteria).all();
 
-      assert.equal(users.length, 1);
-      assert.equal(users[0].username, 'bar');
+      assert.strictEqual(users.length, 1);
+      assert.strictEqual(users[0].username, 'bar');
     });
   });
 

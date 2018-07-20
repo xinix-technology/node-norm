@@ -1,10 +1,11 @@
 const Filter = require('../filter');
 
 class NField {
-  constructor (name) {
-    // this.kind = 'string'; // TODO idk whats for?
+  constructor (name, ...filters) {
     this.name = name;
     this.filters = [];
+
+    this.filter(...filters);
   }
 
   filter (...filters) {
@@ -24,7 +25,7 @@ class NField {
     let field = this;
     return this.filters.reduce(
       async (promise, filter) => filter(await promise, { session, row, field }),
-      Promise.resolve(value)
+      value
     );
   }
 

@@ -1,4 +1,4 @@
-const filters = {};
+let filters = {};
 
 class Filter {
   static get (signature) {
@@ -6,6 +6,7 @@ class Filter {
     let err = new Error(`Unimplemented get filter by ${signatureType}`);
     let fn = '';
     let args = [];
+
     switch (signatureType) {
       case 'string':
         signature = signature.split(':');
@@ -15,10 +16,10 @@ class Filter {
       case 'object':
         if (!Array.isArray(signature)) {
           throw err;
-        } else {
-          signatureType = 'array';
-          [ fn, ...args ] = signature;
         }
+
+        signatureType = 'array';
+        [ fn, ...args ] = signature;
         break;
       case 'function':
         return signature;
@@ -45,12 +46,12 @@ class Filter {
     return filters[fn](...args);
   }
 
-  static register (name, filter) {
+  static put (name, filter) {
     filters[name] = filter;
   }
 
-  static put (name, filter) {
-    filters[name] = filter;
+  static reset () {
+    filters = {};
   }
 }
 

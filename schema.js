@@ -1,10 +1,16 @@
 const FilterError = require('./errors/filter');
 const Model = require('./model');
+const compose = require('koa-compose');
 
 class Schema {
-  constructor ({ name, fields = [], modelClass = Model }) {
+  constructor ({ name, fields = [], observers = [], modelClass = Model }) {
+    if (!name) {
+      throw new Error('Schema name is required');
+    }
+
     this.name = name;
     this.fields = fields;
+    this.observers = observers;
     this.modelClass = modelClass;
   }
 
@@ -20,6 +26,20 @@ class Schema {
     });
 
     return new M(this, row);
+  }
+
+  observe (ctx, next) {
+    if (!this._observerRunner) {
+      let units = this.observers.map(observer => {
+        return (ctx, next) => {
+          return observer[ctx.query.mode](ctx, next);
+        };
+      });
+
+      this._observerRunner = compose(units);
+    }
+
+    return this._observerRunner(ctx, next);
   }
 
   async filter (row, { session, partial = false }) {
