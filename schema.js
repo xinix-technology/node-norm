@@ -32,6 +32,9 @@ class Schema {
     if (!this._observerRunner) {
       let units = this.observers.map(observer => {
         return (ctx, next) => {
+          if (typeof observer[ctx.query.mode] !== 'function') {
+            return next();
+          }
           return observer[ctx.query.mode](ctx, next);
         };
       });

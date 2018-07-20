@@ -48,7 +48,21 @@ class Query {
     return this;
   }
 
-  async delete () {
+  async delete ({ observer = true } = {}) {
+    this.mode = 'delete';
+
+    let ctx = { query: this };
+
+    if (observer) {
+      await this.schema.observe(ctx, ctx => this._delete(ctx));
+    } else {
+      await this._delete(ctx);
+    }
+
+    return ctx.result;
+  }
+
+  async _delete () {
     const connection = await this.session.acquire(this.schema.connection);
     let result = await connection.delete(this);
     return result;
@@ -57,37 +71,38 @@ class Query {
   async save ({ filter = true, observer = true } = {}) {
     this.mode = this._inserts.length ? 'insert' : 'update';
 
-    async function doSave ({ query }) {
-      const connection = await query.session.acquire(query.schema.connection);
-      let { session } = query;
-
-      if (query._inserts.length) {
-        if (filter) {
-          await Promise.all(query._inserts.map(row => query.schema.filter(row, { session })));
-        }
-
-        let rows = [];
-        let inserted = await connection.insert(query, row => rows.push(query.schema.attach(row)));
-        ctx.result = { inserted, rows };
-      } else {
-        if (filter) {
-          let partial = true;
-          await query.schema.filter(query._sets, { session, partial });
-        }
-
-        let affected = await connection.update(query);
-        ctx.result = { affected };
-      }
-    }
-
     let ctx = { query: this, filter };
+
     if (observer) {
-      await this.schema.observe(ctx, doSave);
+      await this.schema.observe(ctx, ctx => this._save(ctx));
     } else {
-      await doSave(ctx);
+      await this._save(ctx);
     }
 
     return ctx.result;
+  }
+
+  async _save (ctx) {
+    const connection = await this.session.acquire(this.schema.connection);
+    let { session, filter } = this;
+
+    if (this._inserts.length) {
+      if (filter) {
+        await Promise.all(this._inserts.map(row => this.schema.filter(row, { session })));
+      }
+
+      let rows = [];
+      let inserted = await connection.insert(this, row => rows.push(this.schema.attach(row)));
+      ctx.result = { inserted, rows };
+    } else {
+      if (filter) {
+        let partial = true;
+        await this.schema.filter(this._sets, { session, partial });
+      }
+
+      let affected = await connection.update(this);
+      ctx.result = { affected };
+    }
   }
 
   async drop () {
