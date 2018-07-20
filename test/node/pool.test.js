@@ -1,11 +1,11 @@
 const assert = require('assert');
-const { Manager, Pool, Schema } = require('../..');
+const { Pool, Schema } = require('../..');
 
 describe('Pool', () => {
   describe('constructor', () => {
     it('is pool instance', () => {
       let pool = new Pool({
-        adapter: Manager.adapter(),
+        adapter: require('../../adapters/memory'),
       });
       assert(pool instanceof Pool);
     });
@@ -14,7 +14,7 @@ describe('Pool', () => {
   describe('#putSchema()', () => {
     it('add new schema', () => {
       let pool = new Pool({
-        adapter: Manager.adapter(),
+        adapter: require('../../adapters/memory'),
       });
       pool.putSchema({
         name: 'foo',
@@ -29,16 +29,9 @@ describe('Pool', () => {
         schemas: [
           { name: 'foo' },
         ],
-        adapter: Manager.adapter(),
+        adapter: require('../../adapters/memory'),
       });
       assert(pool.getSchema('foo') instanceof Schema);
-    });
-
-    it('return auto schema though no schema with name as arg', () => {
-      let pool = new Pool({
-        adapter: Manager.adapter(),
-      });
-      assert(pool.getSchema('bar') instanceof Schema);
     });
   });
 });

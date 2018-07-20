@@ -2,7 +2,7 @@ const Pool = require('./pool');
 const Session = require('./session');
 
 class Manager {
-  static adapter (ctr = require(`./adapters/memory`)) {
+  static adapter (ctr) {
     if (typeof ctr === 'function') {
       return ctr;
     }

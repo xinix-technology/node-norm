@@ -214,4 +214,14 @@ class Memory extends Connection {
   }
 }
 
+if (typeof window !== 'undefined') {
+  let norm = window.norm;
+  if (!norm) {
+    throw new Error('Norm is not defined yet!');
+  }
+
+  norm.adapters = norm.adapters || {};
+  norm.adapters.Memory = Memory;
+}
+
 module.exports = Memory;

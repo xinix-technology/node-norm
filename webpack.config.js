@@ -1,13 +1,11 @@
 const path = require('path');
+const fs = require('fs');
 
 module.exports = function (env, { mode = 'development' }) {
   return {
     mode,
     context: __dirname,
-    entry: {
-      norm: './index.js',
-      'adapters/indexeddb': './adapters/indexeddb.js',
-    },
+    entry: getEntries(),
     output: {
       path: path.join(__dirname, 'dist'),
       filename: `[name]${mode === 'development' ? '' : '.min'}.js`,
@@ -20,3 +18,18 @@ module.exports = function (env, { mode = 'development' }) {
     },
   };
 };
+
+function getEntries () {
+  let entries = {
+    'norm': './index.js',
+    'adapters/memory': './adapters/memory.js',
+    'adapters/indexeddb': './adapters/indexeddb.js',
+  };
+
+  fs.readdirSync('./observers').forEach(file => {
+    let basename = path.basename(file, '.js');
+    entries[`observers/${basename}`] = `./observers/${file}`;
+  });
+
+  return entries;
+}

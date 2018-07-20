@@ -30,6 +30,7 @@ describe('Query', () => {
       let manager = new Manager({
         connections: [
           {
+            adapter: require('../../adapters/memory'),
             data,
             schemas,
           },
@@ -63,6 +64,7 @@ describe('Query', () => {
       let manager = new Manager({
         connections: [
           {
+            adapter: require('../../adapters/memory'),
             data,
             schemas,
           },

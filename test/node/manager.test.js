@@ -6,15 +6,14 @@ const sinon = require('sinon');
 describe('Manager', () => {
   describe('.adapter()', () => {
     it('validate adapter', () => {
-      let Adapter = Manager.adapter();
-      assert.strictEqual(Adapter, Memory);
+      let Adapter;
+
+      assert.throws(() => Manager.adapter());
 
       Adapter = Manager.adapter(Memory);
       assert.strictEqual(Adapter, Memory);
 
-      assert.throws(() => {
-        Adapter = Manager.adapter('other-adapter');
-      });
+      assert.throws(() => Manager.adapter('other-adapter'));
 
       class Foo {}
       Adapter = Manager.adapter(Foo);
@@ -33,7 +32,7 @@ describe('Manager', () => {
 
     it('create instance with connection when arg connections specified', () => {
       let connections = [
-        { name: 'one' },
+        { name: 'one', adapter: require('../../adapters/memory') },
       ];
 
       let manager = new Manager({ connections });
@@ -51,7 +50,7 @@ describe('Manager', () => {
 
       assert.strictEqual(Object.keys(manager.pools).length, 0);
 
-      manager.putPool({ name: 'one' });
+      manager.putPool({ name: 'one', adapter: require('../../adapters/memory') });
 
       assert.strictEqual(Object.keys(manager.pools).length, 1);
     });
@@ -59,8 +58,8 @@ describe('Manager', () => {
     it('set main connection to connection config with truthy main property', () => {
       let manager = new Manager({
         connections: [
-          { name: 'foo' },
-          { name: 'bar', main: true },
+          { name: 'foo', adapter: require('../../adapters/memory') },
+          { name: 'bar', adapter: require('../../adapters/memory'), main: true },
         ],
       });
 
@@ -72,8 +71,8 @@ describe('Manager', () => {
     it('get main connection when no arg specified', () => {
       let manager = new Manager({
         connections: [
-          { name: 'foo' },
-          { name: 'bar', main: true },
+          { name: 'foo', adapter: require('../../adapters/memory') },
+          { name: 'bar', adapter: require('../../adapters/memory'), main: true },
         ],
       });
 
@@ -81,7 +80,13 @@ describe('Manager', () => {
     });
 
     it('throw error when pool not exist', () => {
-      let manager = new Manager();
+      let manager = new Manager({
+        connections: [
+          {
+            adapter: require('../../adapters/memory'),
+          },
+        ],
+      });
 
       assert.throws(() => manager.getPool('foo'));
     });
@@ -105,7 +110,13 @@ describe('Manager', () => {
 
   describe('#runSession()', () => {
     it('throw error and dispose session when error caught', async () => {
-      const manager = new Manager();
+      const manager = new Manager({
+        connections: [
+          {
+            adapter: require('../../adapters/memory'),
+          },
+        ],
+      });
       let session = {
         dispose: sinon.spy(),
       };

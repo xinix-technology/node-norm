@@ -19,7 +19,7 @@ const lib = {
 };
 
 if (typeof window !== 'undefined') {
-  window.Norm = lib;
+  window.norm = lib;
 }
 
 module.exports = lib;

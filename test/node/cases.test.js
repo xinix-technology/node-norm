@@ -232,6 +232,7 @@ describe('cases', () => {
     return new Manager({
       connections: [
         {
+          adapter: require('../../adapters/memory'),
           data,
         },
       ],

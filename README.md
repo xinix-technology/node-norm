@@ -22,7 +22,7 @@ const manager = new Manager({
   connections: [
     {
       name: 'default',
-      adapter: 'disk',
+      adapter: Disk, // change with constructor of adapter
       schemas: [
         {
           name: 'friend',

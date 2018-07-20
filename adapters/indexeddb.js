@@ -139,4 +139,14 @@ class IndexedDB extends Memory {
   }
 }
 
+if (typeof window !== 'undefined') {
+  let norm = window.norm;
+  if (!norm) {
+    throw new Error('Norm is not defined yet!');
+  }
+
+  norm.adapters = norm.adapters || {};
+  norm.adapters.IndexedDB = IndexedDB;
+}
+
 module.exports = IndexedDB;
