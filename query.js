@@ -84,7 +84,8 @@ class Query {
 
   async _save (ctx) {
     const connection = await this.session.acquire(this.schema.connection);
-    let { session, filter } = this;
+    let { session } = this;
+    let { filter } = ctx;
 
     if (this._inserts.length) {
       if (filter) {
