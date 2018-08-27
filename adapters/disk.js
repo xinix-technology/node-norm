@@ -43,7 +43,7 @@ class Disk extends Memory {
     return result;
   }
 
-  commit () {
+  _commit () {
     clearTimeout(this._writing);
     fs.writeFileSync(this.file, JSON.stringify(this.data, null, 2));
   }
