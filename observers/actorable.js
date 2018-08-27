@@ -24,6 +24,7 @@ class Actorable {
   }
 }
 
+// eslint-disable
 if (typeof window !== 'undefined') {
   let norm = window.norm;
   if (!norm) {
@@ -33,5 +34,6 @@ if (typeof window !== 'undefined') {
   norm.observers = norm.observers || {};
   norm.observers.Actorable = Actorable;
 }
+// eslint-enable
 
 module.exports = Actorable;
