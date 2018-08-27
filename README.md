@@ -17,7 +17,7 @@ npm i node-norm
 
 ```js
 
-const Manager = require('node-norm');
+const { Manager } = require('node-norm');
 const manager = new Manager({
   connections: [
     {
