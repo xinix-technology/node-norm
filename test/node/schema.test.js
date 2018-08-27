@@ -10,7 +10,7 @@ describe('Schema', () => {
         {
           name: 'bar',
           fields: [
-            new NString('baz', 'default:baz'),
+            new NString('baz').filter('default:baz'),
           ],
         },
       ],

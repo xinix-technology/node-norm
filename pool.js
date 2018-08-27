@@ -35,6 +35,11 @@ class Pool {
     return this;
   }
 
+  /**
+   * Getter schema
+   *
+   * @param {string} name
+   */
   getSchema (name) {
     if (!this.schemas[name]) {
       this.putSchema({ name });

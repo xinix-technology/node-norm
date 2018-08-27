@@ -7,12 +7,12 @@ describe('cases', () => {
       let data = {};
       let manager = createManager(data);
       await manager.runSession(async session => {
-        let { inserted, rows } = await session.factory('user')
+        let { affected, rows } = await session.factory('user')
           .insert({ username: 'admin', password: 'adminPassword' })
           .insert({ username: 'user', password: 'userPassword' })
           .save();
 
-        assert.strictEqual(inserted, 2);
+        assert.strictEqual(affected, 2);
         assert(rows[0] instanceof Model);
 
         assert(data.user);

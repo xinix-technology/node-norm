@@ -15,7 +15,7 @@ class Schema {
   }
 
   attach (row = {}) {
-    let M = this.modelClass;
+    let Model = this.modelClass;
 
     this.fields.forEach(field => {
       if (row[field.name] === undefined || row[field.name] === null) {
@@ -25,7 +25,7 @@ class Schema {
       }
     });
 
-    return new M(this, row);
+    return new Model(row);
   }
 
   observe (ctx, next) {
@@ -59,7 +59,7 @@ class Schema {
           return;
         }
 
-        row[field.name] = await field.doFilter(row[field.name], { session, row });
+        row[field.name] = await field.execFilter(row[field.name], { session, row });
       } catch (err) {
         err.field = field;
         error.add(err);

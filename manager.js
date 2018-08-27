@@ -28,6 +28,12 @@ class Manager {
     return this;
   }
 
+  /**
+   * Getter pool
+   *
+   * @param {string} name
+   * @returns {Pool}
+   */
   getPool (name) {
     if (this.main === '') {
       this.putPool({});

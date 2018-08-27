@@ -10,16 +10,16 @@ describe('NField', () => {
     });
   });
 
-  describe('#doFilter()', () => {
+  describe('#execFilter()', () => {
     it('filter value', async () => {
-      let field = new NField('foo', 'default:zzz');
+      let field = new NField('foo').filter('default:zzz');
       let session = {};
       let row = {};
 
-      assert.strictEqual(await field.doFilter(null, { session, row }), 'zzz');
-      assert.strictEqual(await field.doFilter(undefined, { session, row }), 'zzz');
-      assert.strictEqual(await field.doFilter('', { session, row }), '');
-      assert.strictEqual(await field.doFilter('foo', { session, row }), 'foo');
+      assert.strictEqual(await field.execFilter(null, { session, row }), 'zzz');
+      assert.strictEqual(await field.execFilter(undefined, { session, row }), 'zzz');
+      assert.strictEqual(await field.execFilter('', { session, row }), '');
+      assert.strictEqual(await field.execFilter('foo', { session, row }), 'foo');
     });
   });
 });

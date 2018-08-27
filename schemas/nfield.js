@@ -1,11 +1,9 @@
 const Filter = require('../filter');
 
 class NField {
-  constructor (name, ...filters) {
+  constructor (name) {
     this.name = name;
     this.filters = [];
-
-    this.filter(...filters);
   }
 
   filter (...filters) {
@@ -16,7 +14,7 @@ class NField {
     return this;
   }
 
-  doFilter (value, { session, row }) {
+  execFilter (value, { session, row }) {
     // when value is string, trim first before filtering
     if (typeof value === 'string') {
       value = value.trim();

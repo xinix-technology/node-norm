@@ -64,12 +64,12 @@ describe('cases', () => {
 
     it('insert multiple rows', async () => {
       await manager.runSession(async session => {
-        let { inserted, rows } = await session.factory('foo')
+        let { affected, rows } = await session.factory('foo')
           .insert({ name: 'admin', value: 'adminPassword' })
           .insert({ name: 'foo', value: 'userPassword' })
           .save();
 
-        assert.strictEqual(inserted, 2);
+        assert.strictEqual(affected, 2);
         assert(rows[0] instanceof Model);
 
         rows = await getAll('foo');

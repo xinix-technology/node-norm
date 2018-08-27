@@ -1,49 +1,52 @@
 class Query {
   constructor ({ session, schema, criteria }) {
     this.session = session;
-    this.schema = this.session.getSchema(schema);
+
+    [ this.connection, this.schema ] = this.session.parseSchema(schema);
 
     this.find(criteria);
 
-    this._inserts = [];
-    this._sets = {};
-    this._limit = -1;
-    this._skip = 0;
-    this._sorts = undefined;
+    this.rows = [];
+    this.sets = {};
+    this.length = -1;
+    this.offset = 0;
+    this.sorts = undefined;
   }
 
   find (criteria = {}) {
-    this._criteria = typeof criteria === 'object' ? criteria : { id: criteria };
+    this.criteria = typeof criteria === 'object' ? criteria : { id: criteria };
 
     return this;
   }
 
   insert (row) {
-    this._inserts.push(row);
+    this.mode = 'insert';
+    this.rows.push(this.schema.attach(row));
 
     return this;
   }
 
   sort (sorts) {
-    this._sorts = sorts;
+    this.sorts = sorts;
 
     return this;
   }
 
-  limit (limit) {
-    this._limit = limit;
+  limit (length) {
+    this.length = length;
 
     return this;
   }
 
-  skip (skip) {
-    this._skip = skip;
+  skip (offset) {
+    this.offset = offset;
 
     return this;
   }
 
   set (set) {
-    this._sets = set;
+    this.mode = 'update';
+    this.sets = this.schema.attach(set);
 
     return this;
   }
@@ -63,14 +66,12 @@ class Query {
   }
 
   async _delete () {
-    const connection = await this.session.acquire(this.schema.connection);
+    const connection = await this.session.acquire(this.connection);
     let result = await connection.delete(this);
     return result;
   }
 
   async save ({ filter = true, observer = true } = {}) {
-    this.mode = this._inserts.length ? 'insert' : 'update';
-
     let ctx = { query: this, filter };
 
     if (observer) {
@@ -79,54 +80,53 @@ class Query {
       await this._save(ctx);
     }
 
-    return ctx.result;
+    return this;
   }
 
   async _save (ctx) {
-    const connection = await this.session.acquire(this.schema.connection);
+    const connection = await this.session.acquire(this.connection);
     let { session } = this;
     let { filter } = ctx;
 
-    if (this._inserts.length) {
+    if (this.rows.length) {
       if (filter) {
-        await Promise.all(this._inserts.map(row => this.schema.filter(row, { session })));
+        await Promise.all(this.rows.map(row => this.schema.filter(row, { session })));
       }
 
       let rows = [];
-      let inserted = await connection.insert(this, row => rows.push(this.schema.attach(row)));
-      ctx.result = { inserted, rows };
+      this.affected = await connection.insert(this, row => rows.push(this.schema.attach(row)));
+      this.rows = rows;
     } else {
       if (filter) {
         let partial = true;
-        await this.schema.filter(this._sets, { session, partial });
+        await this.schema.filter(this.sets, { session, partial });
       }
 
-      let affected = await connection.update(this);
-      ctx.result = { affected };
+      this.affected = await connection.update(this);
     }
   }
 
   async drop () {
-    const connection = await this.session.acquire(this.schema.connection);
+    const connection = await this.session.acquire(this.connection);
     let result = await connection.drop(this);
     return result;
   }
 
   async truncate () {
-    const connection = await this.session.acquire(this.schema.connection);
+    const connection = await this.session.acquire(this.connection);
     let result = await connection.truncate(this);
     return result;
   }
 
   async all () {
-    let models = [];
-    const connection = await this.session.acquire(this.schema.connection);
-    await connection.load(this, row => models.push(this.schema.attach(row)));
-    return models;
+    let rows = [];
+    const connection = await this.session.acquire(this.connection);
+    await connection.load(this, row => rows.push(this.schema.attach(row)));
+    return rows;
   }
 
   async count (useSkipAndLimit = false) {
-    const connection = await this.session.acquire(this.schema.connection);
+    const connection = await this.session.acquire(this.connection);
     if (typeof connection.count !== 'function') {
       throw new Error('Connection does not implement method count');
     }
@@ -134,15 +134,12 @@ class Query {
   }
 
   async single () {
-    this.limit(1);
-    let model;
-    const connection = await this.session.acquire(this.schema.connection);
-    await connection.load(this, row => (model = this.schema.attach(row)));
-    return model;
+    let [ row ] = await this.limit(1).all();
+    return row;
   }
 
   getInsertedRows () {
-    return this._inserts;
+    return this.rows;
   }
 }
 

@@ -11,21 +11,21 @@ class Memory extends Connection {
   load (query, callback = () => {}) {
     let data = this.data[query.schema.name] || [];
 
-    let { _criteria, _sorts } = query;
+    let { criteria, sorts } = query;
 
-    if (_criteria && typeof _criteria.id !== 'undefined') {
-      const row = data.find(row => row.id === _criteria.id);
+    if (criteria && typeof criteria.id !== 'undefined') {
+      const row = data.find(row => row.id === criteria.id);
       data = row ? [ row ] : [];
     } else {
-      data = data.filter(row => this._matchCriteria(_criteria, row));
+      data = data.filter(row => this._matchCriteria(criteria, row));
 
-      if (_sorts) {
-        let sortFields = Object.keys(_sorts);
+      if (sorts) {
+        let sortFields = Object.keys(sorts);
 
         data = data.sort((a, b) => {
           let score = 0;
           sortFields.forEach((field, index) => {
-            let sortV = _sorts[field];
+            let sortV = sorts[field];
             let fieldScore = Math.pow(2, sortFields.length - index - 1) * sortV;
             if (a[field] < b[field]) {
               score -= fieldScore;
@@ -37,12 +37,12 @@ class Memory extends Connection {
         });
       }
 
-      if (query._skip < 0) {
+      if (query.offset < 0) {
         return data;
-      } else if (query._limit < 0) {
-        data = data.slice(query._skip);
+      } else if (query.length < 0) {
+        data = data.slice(query.offset);
       } else {
-        data = data.slice(query._skip, query._skip + query._limit);
+        data = data.slice(query.offset, query.offset + query.length);
       }
     }
 
@@ -55,7 +55,7 @@ class Memory extends Connection {
   insert (query, callback = () => {}) {
     const data = this.data[query.schema.name] = this.data[query.schema.name] || [];
 
-    return query._inserts.reduce((inserted, row) => {
+    return query.rows.reduce((inserted, row) => {
       row = Object.assign({ id: uuidv4() }, row);
       data.push(row);
       callback(row);
@@ -65,14 +65,14 @@ class Memory extends Connection {
   }
 
   update (query) {
-    let keys = Object.keys(query._sets);
+    let keys = Object.keys(query.sets);
     return this.load(query).reduce((affected, row) => {
       let fieldChanges = keys.filter(key => {
-        if (row[key] === query._sets[key]) {
+        if (row[key] === query.sets[key]) {
           return false;
         }
 
-        row[key] = query._sets[key];
+        row[key] = query.sets[key];
         return true;
       });
       if (fieldChanges.length) {
@@ -102,19 +102,19 @@ class Memory extends Connection {
   }
 
   async count (query, useSkipAndLimit) {
-    let { _limit, _skip } = query;
+    let { length, offset } = query;
 
     if (!useSkipAndLimit) {
-      query._skip = 0;
-      query._limit = -1;
+      query.offset = 0;
+      query.length = -1;
     }
 
     let count = 0;
 
     await this.load(query, () => count++);
 
-    query._skip = _skip;
-    query._limit = _limit;
+    query.offset = offset;
+    query.length = length;
 
     return count;
   }

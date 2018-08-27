@@ -23,11 +23,11 @@ class IndexedDB extends Memory {
   }
 
   async load (query, callback = () => {}) {
-    let { _criteria } = query;
+    let { criteria } = query;
     let store = await this.__getStore(query.schema.name);
 
     // TODO: implement sorting?
-    // let { _criteria, _sorts } = query;
+    // let { criteria, sorts } = query;
 
     let rows = await new Promise((resolve, reject) => {
       let rows = [];
@@ -39,7 +39,7 @@ class IndexedDB extends Memory {
         }
 
         let row = cursor.value;
-        if (this._matchCriteria(_criteria, row)) {
+        if (this._matchCriteria(criteria, row)) {
           rows.push(row);
         }
         cursor.continue();
@@ -58,7 +58,7 @@ class IndexedDB extends Memory {
 
     let inserted = 0;
 
-    await Promise.all(query._inserts.map(async row => {
+    await Promise.all(query.rows.map(async row => {
       row.id = await this.__promised(store.add(row));
       callback(row);
       inserted++;
@@ -73,16 +73,16 @@ class IndexedDB extends Memory {
 
     let store = await this.__getStore(query.schema.name);
 
-    let keys = Object.keys(query._sets);
+    let keys = Object.keys(query.sets);
     let affected = 0;
 
     await Promise.all(rows.map(row => {
       let fieldChanges = keys.filter(key => {
-        if (row[key] === query._sets[key]) {
+        if (row[key] === query.sets[key]) {
           return false;
         }
 
-        row[key] = query._sets[key];
+        row[key] = query.sets[key];
         return true;
       });
 

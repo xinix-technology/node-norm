@@ -11,52 +11,27 @@ class Session {
     this.connections = {};
   }
 
-  getPool (...args) {
-    return this.manager.getPool(...args);
-  }
-
-  getSchema (name) {
-    const [ connection, schema ] = this.parseSchemaIdentifier(name);
-    return this.getPool(connection).getSchema(schema);
-  }
-
-  parseSchemaIdentifier (name) {
-    if (Array.isArray(name)) {
-      if (name.length < 2) {
-        throw new Error('Malformed schema name tupple');
-      }
-      return name;
-    }
-
-    if (name.indexOf('.') !== -1) {
-      return name.split('.');
-    }
-    return [ this.getPool().name, name ];
-  }
-
   factory (schema, criteria) {
     return new Query({ session: this, schema, criteria });
   }
 
   async acquire (name) {
-    let pool = this.getPool(name);
-    name = name || pool.name;
+    let pool = this.manager.getPool(name);
 
-    if (!this.connections[name]) {
-      let id = `${this.id}-${name}`;
-      let fn = () => pool.acquire();
-      this.connections[name] = await connectionFactory.singleton(id, fn);
+    if (!this.connections[pool.name]) {
+      let id = `${this.id}-${pool.name}`;
+      this.connections[pool.name] = await connectionFactory.singleton(id, () => pool.acquire());
 
-      await this.connections[name].begin();
+      await this.connections[pool.name].begin();
     }
 
-    return this.connections[name];
+    return this.connections[pool.name];
   }
 
   async dispose () {
     await this.rollback();
     await Promise.all(Object.keys(this.connections).map(name => {
-      return this.getPool(name).release(this.connections[name]);
+      return this.manager.getPool(name).release(this.connections[name]);
     }));
 
     this.connections = {};
@@ -85,6 +60,30 @@ class Session {
       let connection = this.connections[name];
       await connection.begin();
     }));
+  }
+
+  async flush () {
+    await this.commit();
+    await this.begin();
+  }
+
+  parseSchema (name) {
+    let connection;
+    let schema;
+    if (Array.isArray(name)) {
+      if (name.length < 2) {
+        throw new Error('Malformed schema name tupple');
+      }
+      [ connection, schema ] = name;
+    } else if (name.indexOf('.') !== -1) {
+      [ connection, schema ] = name.split('.');
+    } else {
+      connection = this.manager.getPool().name;
+      schema = name;
+    }
+
+    let pool = this.manager.getPool(connection);
+    return [ pool.name, pool.getSchema(schema) ];
   }
 }
 
