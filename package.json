@@ -1,6 +1,6 @@
 {
   "name": "node-norm",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Norm is Not ORM though data access layer",
   "main": "index.js",
   "scripts": {
@@ -29,14 +29,14 @@
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
-    "babel-eslint": "^8.2.6",
+    "babel-eslint": "^9.0.0",
     "eslint": "^5.4.0",
-    "eslint-config-standard": "^11.0.0",
+    "eslint-config-standard": "^12.0.0",
     "eslint-config-xinix": "^1.1.1",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-node": "^7.0.1",
     "eslint-plugin-promise": "^4.0.0",
-    "eslint-plugin-standard": "^3.1.0",
+    "eslint-plugin-standard": "^4.0.0",
     "husky": "^0.14.3",
     "istanbul-instrumenter-loader": "^3.0.1",
     "karma": "^3.0.0",
@@ -48,7 +48,7 @@
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "^3.0.0",
     "mocha": "^5.2.0",
-    "nyc": "^12.0.2",
+    "nyc": "^13.0.1",
     "sinon": "^6.1.5",
     "webpack": "^4.17.1",
     "webpack-cli": "^3.0.8"

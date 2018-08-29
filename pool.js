@@ -23,7 +23,7 @@ class Pool {
           return new Adapter(config);
         },
         destroy () {
-          // console.log('pool:destroy', name);
+          // noop
         },
       }, { min, max }),
     });

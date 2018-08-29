@@ -6,11 +6,6 @@ class Disk extends Memory {
     super(options);
 
     this.file = options.file || './.tmp/db.json';
-
-    try {
-      fs.ensureFileSync(this.file);
-      this.data = JSON.parse(fs.readFileSync(this.file));
-    } catch (err) {}
   }
 
   async insert (query, callback = () => {}) {
@@ -41,6 +36,13 @@ class Disk extends Memory {
     let result = await super.delete(query);
     this._write();
     return result;
+  }
+
+  _begin () {
+    try {
+      fs.ensureFileSync(this.file);
+      this.data = JSON.parse(fs.readFileSync(this.file));
+    } catch (err) {}
   }
 
   _commit () {
