@@ -48,9 +48,9 @@ const manager = new Manager({
     //similiar with syntax: SELECT * FROM foo where bar = 'foobar' ;
     let data = await session.factory('foo').all();
     //similiar with syntax: SELECT * FROM foo;
-    let data = await session.factory('foo').find({ UserId: 1, 'UserName!like': 'foo' }).all();
-    // on example UserName separate by !, you can use 'or', 'lt', 'gt' 
-    //similiar with syntax: SELECT * FROM foo where UserId = 1 and UserName LIKE %foo%;
+    let data = await session.factory('foo').find({ userId: 1, 'userName!like': 'foo' }).all();
+    // on example userName separate by !, you can use 'or', 'lt', 'gt' 
+    //similiar with syntax: SELECT * FROM foo where userId = 1 and userName LIKE %foo%;
     let { inserted, rows } = await session.factory('foo').insert({ field1: 'bar', field2: 'baz' }).save();
                              await session.factory('foo').insert({ field1: 'bar', field2: 'baz' }).insert({ field1: 'bar1' }).save();
     // insert data to table foo
