@@ -6,4 +6,7 @@ module.exports = {
   NInteger: require('./ninteger'),
   NReference: require('./nreference'),
   NString: require('./nstring'),
+  NList: require('./nlist'),
+  NMap: require('./nmap'),
+  NEnum: require('./nenum'),
 };

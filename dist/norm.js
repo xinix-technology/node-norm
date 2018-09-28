@@ -3299,7 +3299,7 @@ class Pool {
           return new Adapter(config);
         },
         destroy () {
-          // console.log('pool:destroy', name);
+          // noop
         },
       }, { min, max }),
     });
@@ -3605,6 +3605,9 @@ module.exports = {
   NInteger: __webpack_require__(/*! ./ninteger */ "./schemas/ninteger.js"),
   NReference: __webpack_require__(/*! ./nreference */ "./schemas/nreference.js"),
   NString: __webpack_require__(/*! ./nstring */ "./schemas/nstring.js"),
+  NList: __webpack_require__(/*! ./nlist */ "./schemas/nlist.js"),
+  NMap: __webpack_require__(/*! ./nmap */ "./schemas/nmap.js"),
+  NEnum: __webpack_require__(/*! ./nenum */ "./schemas/nenum.js"),
 };
 
 
@@ -3671,6 +3674,40 @@ module.exports = class NDouble extends NField {
 
 /***/ }),
 
+/***/ "./schemas/nenum.js":
+/*!**************************!*\
+  !*** ./schemas/nenum.js ***!
+  \**************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const NField = __webpack_require__(/*! ./nfield */ "./schemas/nfield.js");
+
+module.exports = class NEnum extends NField {
+  constructor (name) {
+    super(name);
+
+    this.enumTo = [];
+  }
+
+  to (enumTo) {
+    this.enumTo = enumTo;
+
+    return this;
+  }
+
+  attach (value) {
+    if (!value) {
+      return;
+    }
+
+    return this.enumTo.find(v => v === value);
+  }
+};
+
+
+/***/ }),
+
 /***/ "./schemas/nfield.js":
 /*!***************************!*\
   !*** ./schemas/nfield.js ***!
@@ -3729,6 +3766,86 @@ const NField = __webpack_require__(/*! ./nfield */ "./schemas/nfield.js");
 module.exports = class NInteger extends NField {
   attach (value) {
     return parseInt(value, 10);
+  }
+};
+
+
+/***/ }),
+
+/***/ "./schemas/nlist.js":
+/*!**************************!*\
+  !*** ./schemas/nlist.js ***!
+  \**************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const NField = __webpack_require__(/*! ./nfield */ "./schemas/nfield.js");
+
+module.exports = class NList extends NField {
+  of (childField) {
+    this.childField = childField;
+
+    return this;
+  }
+
+  attach (value) {
+    if (!value) {
+      return;
+    }
+
+    if (typeof value === 'string') {
+      try {
+        value = JSON.parse(value);
+      } catch (err) {
+        return;
+      }
+    }
+
+    if (!Array.isArray(value)) {
+      return;
+    }
+
+    if (this.childField) {
+      value = value.map(o => this.childField.attach(o));
+    }
+
+    return value;
+  }
+};
+
+
+/***/ }),
+
+/***/ "./schemas/nmap.js":
+/*!*************************!*\
+  !*** ./schemas/nmap.js ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const NField = __webpack_require__(/*! ./nfield */ "./schemas/nfield.js");
+
+module.exports = class NMap extends NField {
+  attach (value) {
+    if (!value) {
+      return;
+    }
+
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch (err) {
+        return;
+      }
+    }
+
+    if (typeof value === 'object') {
+      if (Array.isArray(value)) {
+        return;
+      }
+
+      return value;
+    }
   }
 };
 

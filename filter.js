@@ -39,7 +39,9 @@ class Filter {
       let normalizedSignature = 'unknown';
       try {
         normalizedSignature = JSON.stringify(signature);
-      } catch (err) {};
+      } catch (err) {
+        // noop
+      }
       throw new Error(`Filter ${fn} not found <${signatureType}(${normalizedSignature})>`);
     }
 
