@@ -15,7 +15,7 @@ describe('Query', () => {
       await next();
       this.afterInvoked = true;
     }
-  };
+  }
 
   describe('#save()', () => {
     it('run composed function of observers', async () => {
