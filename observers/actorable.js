@@ -2,23 +2,25 @@ class Actorable {
   constructor ({
     createdKey = 'created_by',
     updatedKey = 'updated_by',
-    userCallback = ctx => '',
+    userCallback = ctx => ctx.query.session.actor,
   } = {}) {
     this.createdKey = createdKey;
     this.updatedKey = updatedKey;
     this.userCallback = userCallback;
   }
 
-  async insert ({ query }, next) {
+  async insert (ctx, next) {
+    let { query } = ctx;
     query.rows.forEach(row => {
-      row[this.createdKey] = row[this.updatedKey] = this.userCallback();
+      row[this.createdKey] = row[this.updatedKey] = this.userCallback(ctx);
     });
 
     await next();
   }
 
-  async update ({ query }, next) {
-    query.sets[this.updatedKey] = this.userCallback();
+  async update (ctx, next) {
+    let { query } = ctx;
+    query.sets[this.updatedKey] = this.userCallback(ctx);
 
     await next();
   }
