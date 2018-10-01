@@ -1,5 +1,9 @@
 module.exports = function exists (schema, key = 'id') {
   return async function (value, { session, field: { name } }) {
+    if (!value) {
+      return;
+    }
+
     let criteria = {};
     criteria[key] = value;
 
