@@ -224,7 +224,7 @@ class Memory extends Connection {
       let [ nkey, op = 'eq' ] = key.split('!');
       let rowValue = row[nkey];
       switch (op) {
-        case 'or':
+        case 'or': {
           let valid = false;
           for (let subCriteria of critValue) {
             let match = this._matchCriteria(subCriteria, row);
@@ -237,6 +237,7 @@ class Memory extends Connection {
             return false;
           }
           break;
+        }
         case 'and':
           for (let subCriteria of critValue) {
             if (!this._matchCriteria(subCriteria, row)) {
@@ -284,12 +285,13 @@ class Memory extends Connection {
             return false;
           }
           break;
-        case 'like':
+        case 'like': {
           let re = new RegExp(critValue);
           if (!rowValue.match(re)) {
             return false;
           }
           break;
+        }
         case 'regex':
           if (!rowValue.match(critValue)) {
             return false;
@@ -464,7 +466,9 @@ class Filter {
       let normalizedSignature = 'unknown';
       try {
         normalizedSignature = JSON.stringify(signature);
-      } catch (err) {};
+      } catch (err) {
+        // noop
+      }
       throw new Error(`Filter ${fn} not found <${signatureType}(${normalizedSignature})>`);
     }
 
@@ -665,6 +669,10 @@ module.exports = function (...enums) {
 
 module.exports = function exists (schema, key = 'id') {
   return async function (value, { session, field: { name } }) {
+    if (!value) {
+      return;
+    }
+
     let criteria = {};
     criteria[key] = value;
 

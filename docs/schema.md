@@ -45,7 +45,7 @@ Every field extends from `NField` class.
 const NField = require('node-norm/schemas/nfield');
 ```
 
-Default field schema:
+Built-in field schema:
 
 - `NBoolean`
 - `NDateTime`
@@ -58,8 +58,28 @@ Default field schema:
 
 ## Filters
 
-TBD
+```js
+new NString('fieldName').filter(
+  'required',
+  ['default', '1'],
+);
+```
+
+Built-in field filters:
+
+- are
+- default
+- email
+- enum
+- exists
+- notEmpty
+- required
+- requiredIf
+- unique
 
 ## Observers
 
-TBD
+Schema observer is an object which has methods,
+
+- `async #insert ({ query }, next)`
+- `async #update ({ query }, next)`
