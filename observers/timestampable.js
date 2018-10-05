@@ -1,3 +1,5 @@
+const NDateTime = require('../schemas/ndatetime');
+
 class Timestampable {
   constructor ({
     createdKey = 'created_time',
@@ -5,6 +7,11 @@ class Timestampable {
   } = {}) {
     this.createdKey = createdKey;
     this.updatedKey = updatedKey;
+  }
+
+  initialize (schema) {
+    schema.addField(new NDateTime(this.createdKey));
+    schema.addField(new NDateTime(this.updatedKey));
   }
 
   async insert ({ query }, next) {

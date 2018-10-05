@@ -10,18 +10,43 @@ class Schema {
 
     this.name = name;
     this.fields = fields;
-    this.observers = observers;
+    this.observers = [];
     this.modelClass = modelClass;
+
+    observers.forEach(observer => this.addObserver(observer));
   }
 
-  attach (row = {}) {
+  addField (field) {
+    let existingField = this.fields.find(f => f.name === field.name);
+    if (existingField) {
+      return;
+    }
+
+    this.fields.push(field);
+  }
+
+  addObserver (observer) {
+    if ('initialize' in observer) {
+      observer.initialize(this);
+    }
+    this.observers.push(observer);
+  }
+
+  attach (row, partial = false) {
     let Model = this.modelClass;
 
     this.fields.forEach(field => {
-      if (row[field.name] === undefined || row[field.name] === null) {
-        row[field.name] = null;
-      } else {
-        row[field.name] = field.attach(row[field.name]);
+      switch (row[field.name]) {
+        case undefined:
+          if (!partial) {
+            row[field.name] = null;
+          }
+          break;
+        case null:
+          row[field.name] = null;
+          break;
+        default:
+          row[field.name] = field.attach(row[field.name]);
       }
     });
 
@@ -59,7 +84,7 @@ class Schema {
           return;
         }
 
-        row[field.name] = await field.execFilter(row[field.name], { session, row });
+        row[field.name] = await field.execFilter(row[field.name], { session, row, schema: this });
       } catch (err) {
         err.field = field;
         error.add(err);

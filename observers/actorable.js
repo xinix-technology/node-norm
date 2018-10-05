@@ -1,3 +1,5 @@
+const NString = require('../schemas/nstring');
+
 class Actorable {
   constructor ({
     createdKey = 'created_by',
@@ -7,6 +9,11 @@ class Actorable {
     this.createdKey = createdKey;
     this.updatedKey = updatedKey;
     this.userCallback = userCallback;
+  }
+
+  initialize (schema) {
+    schema.addField(new NString(this.createdKey));
+    schema.addField(new NString(this.updatedKey));
   }
 
   async insert (ctx, next) {

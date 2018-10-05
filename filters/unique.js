@@ -1,11 +1,9 @@
-module.exports = function unique (schema) {
-  return async function (value, { row, session, field: { name } }) {
-    let criteria = {};
-    criteria[name] = value;
-
-    let foundRow = await session.factory(schema, criteria).single();
+module.exports = function unique () {
+  return async function (value, { row, session, schema, field: { name } }) {
+    let criteria = { [name]: value };
+    let foundRow = await session.factory(schema.name, criteria).single();
     if (foundRow && foundRow.id !== row.id) {
-      throw new Error(`Field ${name} already exists`);
+      throw new Error(`Field ${name} must be unique`);
     }
 
     return value;

@@ -428,31 +428,34 @@ module.exports = Filter;
 let filters = {};
 
 class Filter {
+  static tokenize (signature) {
+    if (typeof signature !== 'string') {
+      throw new Error('Cannot tokenize non-string filter signature');
+    }
+
+    let [ head, ...rest ] = signature.split(':');
+    rest = rest.join(':');
+    rest = rest.length === 0 ? [] : rest.split(',');
+
+    return [ head, ...rest ];
+  }
+
   static get (signature) {
     let signatureType = typeof signature;
-    let err = new Error(`Unimplemented get filter by ${signatureType}`);
-    let fn = '';
-    let args = [];
 
-    switch (signatureType) {
-      case 'string':
-        signature = signature.split(':');
-        [ fn, ...args ] = signature;
-        args = args.join(':').split(',');
-        break;
-      case 'object':
-        if (!Array.isArray(signature)) {
-          throw err;
-        }
-
-        signatureType = 'array';
-        [ fn, ...args ] = signature;
-        break;
-      case 'function':
-        return signature;
-      default:
-        throw err;
+    if (signatureType === 'function') {
+      return signature;
     }
+
+    if (signatureType === 'string') {
+      signature = Filter.tokenize(signature);
+    }
+
+    if (!Array.isArray(signature)) {
+      throw new Error(`Unknown filter by ${signatureType}`);
+    }
+
+    let [ fn, ...args ] = signature;
 
     if (fn in filters === false) {
       try {
@@ -509,6 +512,8 @@ var map = {
 	"./exists.js": "./filters/exists.js",
 	"./notEmpty": "./filters/notEmpty.js",
 	"./notEmpty.js": "./filters/notEmpty.js",
+	"./notExists": "./filters/notExists.js",
+	"./notExists.js": "./filters/notExists.js",
 	"./required": "./filters/required.js",
 	"./required.js": "./filters/required.js",
 	"./requiredIf": "./filters/requiredIf.js",
@@ -707,6 +712,28 @@ module.exports = function notEmpty () {
 
 /***/ }),
 
+/***/ "./filters/notExists.js":
+/*!******************************!*\
+  !*** ./filters/notExists.js ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = function notExists (schema) {
+  return async function (value, { row, session, field: { name } }) {
+    let criteria = { [name]: value };
+    let foundRow = await session.factory(schema, criteria).single();
+    if (foundRow && foundRow.id !== row.id) {
+      throw new Error(`Field ${name} already exists in ${schema}`);
+    }
+
+    return value;
+  };
+};
+
+
+/***/ }),
+
 /***/ "./filters/required.js":
 /*!*****************************!*\
   !*** ./filters/required.js ***!
@@ -754,14 +781,12 @@ module.exports = function requiredIf (key, expected) {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = function unique (schema) {
-  return async function (value, { row, session, field: { name } }) {
-    let criteria = {};
-    criteria[name] = value;
-
-    let foundRow = await session.factory(schema, criteria).single();
+module.exports = function unique () {
+  return async function (value, { row, session, schema, field: { name } }) {
+    let criteria = { [name]: value };
+    let foundRow = await session.factory(schema.name, criteria).single();
     if (foundRow && foundRow.id !== row.id) {
-      throw new Error(`Field ${name} already exists`);
+      throw new Error(`Field ${name} must be unique`);
     }
 
     return value;
@@ -3408,7 +3433,7 @@ class Query {
 
   set (set) {
     this.mode = 'update';
-    this.sets = this.schema.attach(set);
+    this.sets = this.schema.attach(set, true);
 
     return this;
   }
@@ -3529,18 +3554,43 @@ class Schema {
 
     this.name = name;
     this.fields = fields;
-    this.observers = observers;
+    this.observers = [];
     this.modelClass = modelClass;
+
+    observers.forEach(observer => this.addObserver(observer));
   }
 
-  attach (row = {}) {
+  addField (field) {
+    let existingField = this.fields.find(f => f.name === field.name);
+    if (existingField) {
+      return;
+    }
+
+    this.fields.push(field);
+  }
+
+  addObserver (observer) {
+    if ('initialize' in observer) {
+      observer.initialize(this);
+    }
+    this.observers.push(observer);
+  }
+
+  attach (row, partial = false) {
     let Model = this.modelClass;
 
     this.fields.forEach(field => {
-      if (row[field.name] === undefined || row[field.name] === null) {
-        row[field.name] = null;
-      } else {
-        row[field.name] = field.attach(row[field.name]);
+      switch (row[field.name]) {
+        case undefined:
+          if (!partial) {
+            row[field.name] = null;
+          }
+          break;
+        case null:
+          row[field.name] = null;
+          break;
+        default:
+          row[field.name] = field.attach(row[field.name]);
       }
     });
 
@@ -3578,7 +3628,7 @@ class Schema {
           return;
         }
 
-        row[field.name] = await field.execFilter(row[field.name], { session, row });
+        row[field.name] = await field.execFilter(row[field.name], { session, row, schema: this });
       } catch (err) {
         err.field = field;
         error.add(err);
@@ -3728,18 +3778,26 @@ const Filter = __webpack_require__(/*! ../filter */ "./filter.js");
 class NField {
   constructor (name) {
     this.name = name;
+    this.rawFilters = [];
     this.filters = [];
   }
 
   filter (...filters) {
     filters.forEach(filter => {
+      try {
+        filter = Filter.tokenize(filter);
+      } catch (err) {
+        // noop
+      }
+
+      this.rawFilters.push(filter);
       this.filters.push(Filter.get(filter));
     });
 
     return this;
   }
 
-  execFilter (value, { session, row }) {
+  execFilter (value, { session, row, schema }) {
     // when value is string, trim first before filtering
     if (typeof value === 'string') {
       value = value.trim();
@@ -3747,7 +3805,7 @@ class NField {
 
     let field = this;
     return this.filters.reduce(
-      async (promise, filter) => filter(await promise, { session, row, field }),
+      async (promise, filter) => filter(await promise, { session, row, schema, field }),
       value
     );
   }

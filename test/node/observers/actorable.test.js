@@ -17,7 +17,7 @@ describe('Observer: Actorable', () => {
   it('update updated_by at update', async () => {
     let data = {
       foo: [
-        { foo: 'bar' },
+        { foo: 'bar', created_by: 'someone' },
       ],
     };
     let manager = createManager(data);
@@ -27,7 +27,7 @@ describe('Observer: Actorable', () => {
       await session.factory('foo', { foo: 'bar' })
         .set({ foo: 'bar1' })
         .save();
-      assert.strictEqual(data.foo[0].created_by, undefined);
+      assert.strictEqual(data.foo[0].created_by, 'someone');
       assert.strictEqual(data.foo[0].updated_by, 'user');
     });
   });

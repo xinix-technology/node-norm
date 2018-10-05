@@ -46,7 +46,7 @@ class Query {
 
   set (set) {
     this.mode = 'update';
-    this.sets = this.schema.attach(set);
+    this.sets = this.schema.attach(set, true);
 
     return this;
   }
