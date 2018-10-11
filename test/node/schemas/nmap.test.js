@@ -7,9 +7,9 @@ describe('NMap', () => {
       let field = new NMap();
 
       assert.deepStrictEqual(field.attach({}), {});
-      assert.strictEqual(field.attach(undefined), undefined);
-      assert.strictEqual(field.attach(null), undefined);
-      assert.strictEqual(field.attach(''), undefined);
+      // assert.strictEqual(field.attach(undefined), undefined);
+      assert.strictEqual(field.attach(null), null);
+      assert.strictEqual(field.attach(''), null);
       assert.deepStrictEqual(field.attach(JSON.stringify({ foo: 'bar' })), { foo: 'bar' });
     });
   });

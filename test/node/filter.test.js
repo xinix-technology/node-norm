@@ -12,7 +12,7 @@ describe('Filter', () => {
 
       assert.strictEqual(filter(null), 'foo');
       assert.strictEqual(filter(), 'foo');
-      assert.strictEqual(filter(''), '');
+      assert.strictEqual(filter(''), 'foo');
       assert.strictEqual(filter('bar'), 'bar');
     });
 
@@ -21,7 +21,7 @@ describe('Filter', () => {
 
       assert.strictEqual(filter(null), 'foo');
       assert.strictEqual(filter(), 'foo');
-      assert.strictEqual(filter(''), '');
+      assert.strictEqual(filter(''), 'foo');
       assert.strictEqual(filter('bar'), 'bar');
     });
 

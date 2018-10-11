@@ -1,7 +1,7 @@
 module.exports = function email () {
   return function (value = null, { field: { name } }) {
-    if (value === null) {
-      return value;
+    if (value === null || value === '') {
+      return null;
     }
 
     value = value.toLowerCase();

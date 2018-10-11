@@ -9,19 +9,19 @@ module.exports = class NList extends NField {
 
   attach (value) {
     if (!value) {
-      return;
+      return null;
     }
 
     if (typeof value === 'string') {
       try {
         value = JSON.parse(value);
       } catch (err) {
-        return;
+        return null;
       }
     }
 
     if (!Array.isArray(value)) {
-      return;
+      return null;
     }
 
     if (this.childField) {

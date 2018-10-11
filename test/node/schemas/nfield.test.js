@@ -18,7 +18,7 @@ describe('NField', () => {
 
       assert.strictEqual(await field.execFilter(null, { session, row }), 'zzz');
       assert.strictEqual(await field.execFilter(undefined, { session, row }), 'zzz');
-      assert.strictEqual(await field.execFilter('', { session, row }), '');
+      assert.strictEqual(await field.execFilter('', { session, row }), 'zzz');
       assert.strictEqual(await field.execFilter('foo', { session, row }), 'foo');
     });
   });

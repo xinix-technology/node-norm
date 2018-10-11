@@ -1,7 +1,7 @@
 module.exports = function (schema) {
   return async function (value = null, { session, field: { name } }) {
-    if (value === null) {
-      return value;
+    if (value === null || value === '') {
+      return null;
     }
 
     let err = new Error(`Field ${name} values must be ${schema}`);

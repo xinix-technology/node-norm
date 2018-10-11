@@ -3,23 +3,21 @@ const NField = require('./nfield');
 module.exports = class NMap extends NField {
   attach (value) {
     if (!value) {
-      return;
+      return null;
     }
 
-    if (typeof value === 'string') {
-      try {
-        return JSON.parse(value);
-      } catch (err) {
-        return;
-      }
-    }
-
-    if (typeof value === 'object') {
-      if (Array.isArray(value)) {
-        return;
+    try {
+      if (typeof value === 'string') {
+        value = JSON.parse(value);
       }
 
-      return value;
+      if (typeof value === 'object' && !Array.isArray(value)) {
+        return value;
+      }
+    } catch (err) {
+      // noop
     }
+
+    return null;
   }
 };

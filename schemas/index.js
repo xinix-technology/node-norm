@@ -8,5 +8,4 @@ module.exports = {
   NString: require('./nstring'),
   NList: require('./nlist'),
   NMap: require('./nmap'),
-  NEnum: require('./nenum'),
 };

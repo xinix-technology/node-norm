@@ -7,9 +7,9 @@ describe('NList', () => {
       {
         let field = new NList();
         assert.deepStrictEqual(field.attach([1, 2]), [1, 2]);
-        assert.strictEqual(field.attach(undefined), undefined);
-        assert.strictEqual(field.attach(null), undefined);
-        assert.strictEqual(field.attach(''), undefined);
+        // assert.strictEqual(field.attach(undefined), undefined);
+        assert.strictEqual(field.attach(null), null);
+        assert.strictEqual(field.attach(''), null);
       }
 
       {

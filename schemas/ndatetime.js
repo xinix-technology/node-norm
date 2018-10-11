@@ -3,7 +3,7 @@ const NField = require('./nfield');
 module.exports = class NDatetime extends NField {
   attach (value) {
     if (!value) {
-      return;
+      return null;
     }
 
     if (typeof value === 'string' && !isNaN(value)) {
