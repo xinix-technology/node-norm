@@ -13,38 +13,38 @@ class Memory extends Connection {
 
     let { criteria, sorts } = query;
 
-    if (criteria && typeof criteria.id !== 'undefined') {
-      const row = data.find(row => row.id === criteria.id);
-      data = row ? [ row ] : [];
-    } else {
-      data = data.filter(row => this._matchCriteria(criteria, row));
+    // if (criteria && typeof criteria.id !== 'undefined') {
+    //   const row = data.find(row => row.id === criteria.id);
+    //   data = row ? [ row ] : [];
+    // } else {
+    data = data.filter(row => this._matchCriteria(criteria, row));
 
-      if (sorts) {
-        let sortFields = Object.keys(sorts);
+    if (sorts) {
+      let sortFields = Object.keys(sorts);
 
-        data = data.sort((a, b) => {
-          let score = 0;
-          sortFields.forEach((field, index) => {
-            let sortV = sorts[field];
-            let fieldScore = Math.pow(2, sortFields.length - index - 1) * sortV;
-            if (a[field] < b[field]) {
-              score -= fieldScore;
-            } else if (a[field] > b[field]) {
-              score += fieldScore;
-            }
-          });
-          return score;
+      data = data.sort((a, b) => {
+        let score = 0;
+        sortFields.forEach((field, index) => {
+          let sortV = sorts[field];
+          let fieldScore = Math.pow(2, sortFields.length - index - 1) * sortV;
+          if (a[field] < b[field]) {
+            score -= fieldScore;
+          } else if (a[field] > b[field]) {
+            score += fieldScore;
+          }
         });
-      }
-
-      if (query.offset < 0) {
-        return data;
-      } else if (query.length < 0) {
-        data = data.slice(query.offset);
-      } else {
-        data = data.slice(query.offset, query.offset + query.length);
-      }
+        return score;
+      });
     }
+
+    if (query.offset < 0) {
+      return data;
+    } else if (query.length < 0) {
+      data = data.slice(query.offset);
+    } else {
+      data = data.slice(query.offset, query.offset + query.length);
+    }
+    // }
 
     return data.map(row => {
       callback(row);

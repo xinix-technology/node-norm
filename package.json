@@ -1,6 +1,6 @@
 {
   "name": "node-norm",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "description": "Norm is Not ORM though data access layer",
   "main": "index.js",
   "scripts": {
@@ -36,7 +36,7 @@
     "eslint-plugin-node": "^7.0.1",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
-    "husky": "^1.1.1",
+    "husky": "^1.1.2",
     "istanbul-instrumenter-loader": "^3.0.1",
     "karma": "^3.0.0",
     "karma-chrome-launcher": "^2.2.0",
