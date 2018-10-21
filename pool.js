@@ -22,8 +22,10 @@ class Pool {
         create () {
           return new Adapter(config);
         },
-        destroy () {
-          // noop
+        async destroy (adapter) {
+          if (adapter.end) {
+            await adapter.end();
+          }
         },
       }, { min, max }),
     });
@@ -56,7 +58,7 @@ class Pool {
   }
 
   drain (...args) {
-    return this._pool.acquire(...args);
+    return this._pool.drain(...args);
   }
 
   clear (...args) {

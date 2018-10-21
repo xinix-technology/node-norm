@@ -63,6 +63,16 @@ class Manager {
   openSession (options) {
     return new Session({ manager: this });
   }
+
+  async end () {
+    await Promise.all(Object.keys(this.pools).map(async name => {
+      let pool = this.pools[name];
+      await pool.drain();
+      await pool.clear();
+    }));
+
+    this.pools = {};
+  }
 }
 
 module.exports = Manager;
