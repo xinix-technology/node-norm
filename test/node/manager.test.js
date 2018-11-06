@@ -1,7 +1,6 @@
 const assert = require('assert');
 const { Manager } = require('../..');
 const Memory = require('../../adapters/memory');
-const sinon = require('sinon');
 
 describe('Manager', () => {
   describe('.adapter()', () => {
@@ -117,12 +116,17 @@ describe('Manager', () => {
           },
         ],
       });
+
+      let disposeCalled = false;
       let session = {
-        dispose: sinon.spy(),
+        dispose () {
+          disposeCalled = true;
+        },
       };
 
-      let stub = sinon.stub(manager, 'openSession');
-      stub.returns(session);
+      manager.openSession = function () {
+        return session;
+      };
 
       try {
         await manager.runSession(() => {
@@ -132,9 +136,7 @@ describe('Manager', () => {
         assert.strictEqual(err.message, 'generated-error');
       }
 
-      assert(session.dispose.called);
-
-      stub.restore();
+      assert(disposeCalled);
     });
   });
 });

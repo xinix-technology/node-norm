@@ -4,7 +4,7 @@ class Actorable {
   constructor ({
     createdKey = 'created_by',
     updatedKey = 'updated_by',
-    userCallback = ctx => ctx.query.session.actor,
+    userCallback = ctx => ctx.query.session.actor || null,
   } = {}) {
     this.createdKey = createdKey;
     this.updatedKey = updatedKey;
