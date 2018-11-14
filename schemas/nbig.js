@@ -3,25 +3,37 @@ const Big = require('big.js');
 
 module.exports = class NBig extends NField {
   attach (value) {
-    if (value === undefined || value === null || value === '') {
+    value = super.attach(value);
+
+    if (value === null) {
       return null;
     }
 
     try {
       return new Big(value);
     } catch (err) {
-      // noop
+      throw new Error('Invalid big value');
     }
-
-    return null;
   }
 
   compare (criteria, value) {
-    return this.attach(value).cmp(criteria);
+    if (value === undefined) {
+      value = null;
+    }
+
+    if (criteria === value) {
+      return 0;
+    }
+
+    if (criteria === null) {
+      return 1;
+    }
+
+    return new Big(value).cmp(criteria);
   }
 
   serialize (value) {
-    if (!value) {
+    if (value === null) {
       return value;
     }
 

@@ -2,7 +2,9 @@ const NField = require('./nfield');
 
 module.exports = class NDatetime extends NField {
   attach (value) {
-    if (!value) {
+    value = super.attach(value);
+
+    if (value === null) {
       return null;
     }
 
@@ -17,8 +19,10 @@ module.exports = class NDatetime extends NField {
     }
 
     let date = new Date(value);
-    if (!isNaN(date.getTime())) {
-      return date;
+    if (isNaN(date.getTime())) {
+      throw new Error('Invalid datetime value');
     }
+
+    return date;
   }
 };

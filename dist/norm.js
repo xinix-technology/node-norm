@@ -4660,25 +4660,37 @@ const Big = __webpack_require__(/*! big.js */ "./node_modules/big.js/big.js");
 
 module.exports = class NBig extends NField {
   attach (value) {
-    if (value === undefined || value === null || value === '') {
+    value = super.attach(value);
+
+    if (value === null) {
       return null;
     }
 
     try {
       return new Big(value);
     } catch (err) {
-      // noop
+      throw new Error('Invalid big value');
     }
-
-    return null;
   }
 
   compare (criteria, value) {
-    return this.attach(value).cmp(criteria);
+    if (value === undefined) {
+      value = null;
+    }
+
+    if (criteria === value) {
+      return 0;
+    }
+
+    if (criteria === null) {
+      return 1;
+    }
+
+    return new Big(value).cmp(criteria);
   }
 
   serialize (value) {
-    if (!value) {
+    if (value === null) {
       return value;
     }
 
@@ -4700,6 +4712,10 @@ const NField = __webpack_require__(/*! ./nfield */ "./schemas/nfield.js");
 
 module.exports = class NBoolean extends NField {
   attach (value) {
+    if (value === undefined || value === null) {
+      return null;
+    }
+
     if (value === 'false' || value === '0' || value === '') {
       return false;
     }
@@ -4722,7 +4738,9 @@ const NField = __webpack_require__(/*! ./nfield */ "./schemas/nfield.js");
 
 module.exports = class NDatetime extends NField {
   attach (value) {
-    if (!value) {
+    value = super.attach(value);
+
+    if (value === null) {
       return null;
     }
 
@@ -4737,9 +4755,11 @@ module.exports = class NDatetime extends NField {
     }
 
     let date = new Date(value);
-    if (!isNaN(date.getTime())) {
-      return date;
+    if (isNaN(date.getTime())) {
+      throw new Error('Invalid datetime value');
     }
+
+    return date;
   }
 };
 
@@ -4757,13 +4777,33 @@ const NField = __webpack_require__(/*! ./nfield */ "./schemas/nfield.js");
 
 module.exports = class NDouble extends NField {
   attach (value) {
-    value = parseFloat(value);
-
-    if (isNaN(value)) {
+    value = super.attach(value);
+    if (value === null) {
       return null;
     }
 
+    value = parseFloat(value);
+    if (isNaN(value)) {
+      throw new Error('Invalid double value');
+    }
+
     return value;
+  }
+
+  compare (criteria, value) {
+    if (value === undefined) {
+      value = null;
+    }
+
+    if (criteria === value) {
+      return 0;
+    }
+
+    if (criteria === null) {
+      return 1;
+    }
+
+    return value - criteria;
   }
 };
 
@@ -4815,6 +4855,10 @@ class NField {
   }
 
   attach (value) {
+    if (value === '' || value === undefined || value === null) {
+      return null;
+    }
+
     return value;
   }
 
@@ -4823,12 +4867,16 @@ class NField {
   }
 
   compare (criteria, value) {
-    if (typeof criteria === 'number' && typeof value === 'number') {
-      return value - criteria;
+    if (value === undefined) {
+      value = null;
     }
 
     if (criteria === value) {
       return 0;
+    }
+
+    if (criteria === null) {
+      return 1;
     }
 
     if (criteria > value) {
@@ -4859,13 +4907,33 @@ const NField = __webpack_require__(/*! ./nfield */ "./schemas/nfield.js");
 
 module.exports = class NInteger extends NField {
   attach (value) {
-    value = parseInt(value, 10);
-
-    if (isNaN(value)) {
+    value = super.attach(value);
+    if (value === null) {
       return null;
     }
 
+    value = parseInt(value, 10);
+    if (isNaN(value)) {
+      throw new Error('Invalid integer value');
+    }
+
     return value;
+  }
+
+  compare (criteria, value) {
+    if (value === undefined) {
+      value = null;
+    }
+
+    if (criteria === value) {
+      return 0;
+    }
+
+    if (criteria === null) {
+      return 1;
+    }
+
+    return value - criteria;
   }
 };
 
@@ -4889,7 +4957,8 @@ module.exports = class NList extends NField {
   }
 
   attach (value) {
-    if (!value) {
+    value = super.attach(value);
+    if (value === null) {
       return null;
     }
 
@@ -4897,12 +4966,12 @@ module.exports = class NList extends NField {
       try {
         value = JSON.parse(value);
       } catch (err) {
-        return null;
+        throw new Error('Invalid list value');
       }
     }
 
     if (!Array.isArray(value)) {
-      return null;
+      throw new Error('Invalid list value');
     }
 
     if (this.childField) {
@@ -4927,26 +4996,39 @@ const NField = __webpack_require__(/*! ./nfield */ "./schemas/nfield.js");
 
 module.exports = class NMap extends NField {
   attach (value) {
-    if (!value) {
+    value = super.attach(value);
+    if (value === null) {
       return null;
     }
 
-    try {
-      if (typeof value === 'string') {
+    if (typeof value === 'string') {
+      try {
         value = JSON.parse(value);
+      } catch (err) {
+        throw new Error('Invalid map value');
       }
-
-      if (typeof value === 'object' && !Array.isArray(value)) {
-        return value;
-      }
-    } catch (err) {
-      // noop
     }
 
-    return null;
+    if (typeof value !== 'object' || Array.isArray(value)) {
+      throw new Error('Invalid map value');
+    }
+
+    return value;
   }
 
   compare (criteria, value) {
+    if (value === undefined) {
+      value = null;
+    }
+
+    if (criteria === value) {
+      return 0;
+    }
+
+    if (criteria === null) {
+      return 1;
+    }
+
     let criteriaKeys = Object.getOwnPropertyNames(criteria);
     let valueKeys = Object.getOwnPropertyNames(value);
 

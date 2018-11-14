@@ -576,6 +576,10 @@ class NField {
   }
 
   attach (value) {
+    if (value === '' || value === undefined || value === null) {
+      return null;
+    }
+
     return value;
   }
 
@@ -584,12 +588,16 @@ class NField {
   }
 
   compare (criteria, value) {
-    if (typeof criteria === 'number' && typeof value === 'number') {
-      return value - criteria;
+    if (value === undefined) {
+      value = null;
     }
 
     if (criteria === value) {
       return 0;
+    }
+
+    if (criteria === null) {
+      return 1;
     }
 
     if (criteria > value) {

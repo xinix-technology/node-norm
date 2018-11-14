@@ -8,7 +8,8 @@ module.exports = class NList extends NField {
   }
 
   attach (value) {
-    if (!value) {
+    value = super.attach(value);
+    if (value === null) {
       return null;
     }
 
@@ -16,12 +17,12 @@ module.exports = class NList extends NField {
       try {
         value = JSON.parse(value);
       } catch (err) {
-        return null;
+        throw new Error('Invalid list value');
       }
     }
 
     if (!Array.isArray(value)) {
-      return null;
+      throw new Error('Invalid list value');
     }
 
     if (this.childField) {

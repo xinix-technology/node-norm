@@ -538,7 +538,9 @@ const NField = __webpack_require__(/*! ./nfield */ "./schemas/nfield.js");
 
 module.exports = class NDatetime extends NField {
   attach (value) {
-    if (!value) {
+    value = super.attach(value);
+
+    if (value === null) {
       return null;
     }
 
@@ -553,9 +555,11 @@ module.exports = class NDatetime extends NField {
     }
 
     let date = new Date(value);
-    if (!isNaN(date.getTime())) {
-      return date;
+    if (isNaN(date.getTime())) {
+      throw new Error('Invalid datetime value');
     }
+
+    return date;
   }
 };
 
@@ -607,6 +611,10 @@ class NField {
   }
 
   attach (value) {
+    if (value === '' || value === undefined || value === null) {
+      return null;
+    }
+
     return value;
   }
 
@@ -615,12 +623,16 @@ class NField {
   }
 
   compare (criteria, value) {
-    if (typeof criteria === 'number' && typeof value === 'number') {
-      return value - criteria;
+    if (value === undefined) {
+      value = null;
     }
 
     if (criteria === value) {
       return 0;
+    }
+
+    if (criteria === null) {
+      return 1;
     }
 
     if (criteria > value) {
