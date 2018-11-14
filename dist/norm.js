@@ -4529,8 +4529,18 @@ class Schema {
     this.fields = fields;
     this.observers = [];
     this.modelClass = modelClass;
+    this.attributes = {};
 
     observers.forEach(observer => this.addObserver(observer));
+  }
+
+  set (key, value) {
+    this.attributes[key] = value;
+    return this;
+  }
+
+  get (key) {
+    return this.attributes[key];
   }
 
   getField (name) {
@@ -4824,6 +4834,16 @@ class NField {
     this.name = name;
     this.rawFilters = [];
     this.filters = [];
+    this.attributes = {};
+  }
+
+  set (key, value) {
+    this.attributes[key] = value;
+    return this;
+  }
+
+  get (key) {
+    return this.attributes[key];
   }
 
   filter (...filters) {

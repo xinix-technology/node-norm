@@ -13,8 +13,18 @@ class Schema {
     this.fields = fields;
     this.observers = [];
     this.modelClass = modelClass;
+    this.attributes = {};
 
     observers.forEach(observer => this.addObserver(observer));
+  }
+
+  set (key, value) {
+    this.attributes[key] = value;
+    return this;
+  }
+
+  get (key) {
+    return this.attributes[key];
   }
 
   getField (name) {
