@@ -1,5 +1,6 @@
 const FilterError = require('./errors/filter');
 const Model = require('./model');
+const NField = require('./schemas/nfield');
 const compose = require('koa-compose');
 
 class Schema {
@@ -14,6 +15,10 @@ class Schema {
     this.modelClass = modelClass;
 
     observers.forEach(observer => this.addObserver(observer));
+  }
+
+  getField (name) {
+    return this.fields.find(f => f.name === name) || new NField(name);
   }
 
   addField (field) {

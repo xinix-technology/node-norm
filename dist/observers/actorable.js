@@ -222,8 +222,8 @@ webpackContext.id = "./filters sync recursive ^\\.\\/.*$";
 
 module.exports = function (schema) {
   return async function (value = null, { session, field: { name } }) {
-    if (value === null) {
-      return value;
+    if (value === null || value === '') {
+      return null;
     }
 
     let err = new Error(`Field ${name} values must be ${schema}`);
@@ -257,7 +257,7 @@ module.exports = function (schema) {
 
 module.exports = function def (defaultValue) {
   return function (value = null) {
-    if (value === null) {
+    if (!value) {
       return defaultValue;
     }
 
@@ -277,8 +277,8 @@ module.exports = function def (defaultValue) {
 
 module.exports = function email () {
   return function (value = null, { field: { name } }) {
-    if (value === null) {
-      return value;
+    if (value === null || value === '') {
+      return null;
     }
 
     value = value.toLowerCase();
@@ -318,8 +318,8 @@ module.exports = function email () {
 
 module.exports = function (...enums) {
   return function (value = null, { field: { name } }) {
-    if (value === null) {
-      return value;
+    if (value === null || value === '') {
+      return null;
     }
 
     if (enums.indexOf(value) === -1) {
@@ -342,8 +342,8 @@ module.exports = function (...enums) {
 
 module.exports = function exists (schema, key = 'id') {
   return async function (value, { session, field: { name } }) {
-    if (!value) {
-      return;
+    if (value === null || value === '') {
+      return null;
     }
 
     let criteria = {};
@@ -389,6 +389,10 @@ module.exports = function notEmpty () {
 
 module.exports = function notExists (schema) {
   return async function (value, { row, session, field: { name } }) {
+    if (value === null || value === '') {
+      return null;
+    }
+
     let criteria = { [name]: value };
     let foundRow = await session.factory(schema, criteria).single();
     if (foundRow && foundRow.id !== row.id) {
@@ -431,7 +435,7 @@ module.exports = function required () {
 
 module.exports = function requiredIf (key, expected) {
   return function (value = null, { session, row, field: { name = 'unknown' } }) {
-    if (row[key] === expected && value === null) {
+    if (row[key] === expected && (value === null || value === '')) {
       throw new Error(`Field ${name} is required`);
     }
 
@@ -451,6 +455,10 @@ module.exports = function requiredIf (key, expected) {
 
 module.exports = function unique () {
   return async function (value, { row, session, schema, field: { name } }) {
+    if (value === null || value === '') {
+      return null;
+    }
+
     let criteria = { [name]: value };
     let foundRow = await session.factory(schema.name, criteria).single();
     if (foundRow && foundRow.id !== row.id) {
@@ -477,7 +485,7 @@ class Actorable {
   constructor ({
     createdKey = 'created_by',
     updatedKey = 'updated_by',
-    userCallback = ctx => ctx.query.session.actor,
+    userCallback = ctx => ctx.query.session.actor || null,
   } = {}) {
     this.createdKey = createdKey;
     this.updatedKey = updatedKey;
@@ -569,6 +577,30 @@ class NField {
 
   attach (value) {
     return value;
+  }
+
+  serialize (value) {
+    return value;
+  }
+
+  compare (criteria, value) {
+    if (typeof criteria === 'number' && typeof value === 'number') {
+      return value - criteria;
+    }
+
+    if (criteria === value) {
+      return 0;
+    }
+
+    if (criteria > value) {
+      return -1;
+    }
+
+    return 1;
+  }
+
+  indexOf (criteria, value) {
+    return criteria.indexOf(value);
   }
 }
 

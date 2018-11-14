@@ -17,7 +17,7 @@ class Memory extends Connection {
     //   const row = data.find(row => row.id === criteria.id);
     //   data = row ? [ row ] : [];
     // } else {
-    data = data.filter(row => this._matchCriteria(criteria, row));
+    data = data.filter(row => this._matchCriteria(criteria, row, query.schema));
 
     if (sorts) {
       let sortFields = Object.keys(sorts);
@@ -55,8 +55,11 @@ class Memory extends Connection {
   insert (query, callback = () => {}) {
     const data = this.data[query.schema.name] = this.data[query.schema.name] || [];
 
-    return query.rows.reduce((inserted, row) => {
-      row = Object.assign({ id: uuidv4() }, row);
+    return query.rows.reduce((inserted, qRow) => {
+      let row = { id: uuidv4() };
+      for (let k in qRow) {
+        row[k] = query.schema.getField(k).serialize(qRow[k]);
+      }
       data.push(row);
       callback(row);
       inserted++;
@@ -72,7 +75,7 @@ class Memory extends Connection {
           return false;
         }
 
-        row[key] = query.sets[key];
+        row[key] = query.schema.getField(key).serialize(query.sets[key]);
         return true;
       });
       if (fieldChanges.length) {
@@ -119,7 +122,7 @@ class Memory extends Connection {
     return count;
   }
 
-  _matchCriteria (criteria, row) {
+  _matchCriteria (criteria, row, schema) {
     if (!criteria) {
       return true;
     }
@@ -127,12 +130,13 @@ class Memory extends Connection {
     for (let key in criteria) {
       let critValue = criteria[key];
       let [ nkey, op = 'eq' ] = key.split('!');
+      let field = schema.getField(nkey);
       let rowValue = row[nkey];
       switch (op) {
         case 'or': {
           let valid = false;
           for (let subCriteria of critValue) {
-            let match = this._matchCriteria(subCriteria, row);
+            let match = this._matchCriteria(subCriteria, row, schema);
             if (match) {
               valid = true;
               break;
@@ -145,48 +149,49 @@ class Memory extends Connection {
         }
         case 'and':
           for (let subCriteria of critValue) {
-            if (!this._matchCriteria(subCriteria, row)) {
+            if (!this._matchCriteria(subCriteria, row, schema)) {
               return false;
             }
           }
           break;
         case 'eq':
-          if (critValue !== rowValue) {
+          if (field.compare(critValue, rowValue) !== 0) {
             return false;
           }
           break;
         case 'ne':
-          if (critValue === rowValue) {
+          if (field.compare(critValue, rowValue) === 0) {
             return false;
           }
           break;
-        case 'gt':
-          if (!(rowValue > critValue)) {
+        case 'gt': {
+          if (field.compare(critValue, rowValue) <= 0) {
             return false;
           }
           break;
+        }
         case 'gte':
-          if (!(rowValue >= critValue)) {
+          if (field.compare(critValue, rowValue) < 0) {
             return false;
           }
           break;
         case 'lt':
-          if (!(rowValue < critValue)) {
+          if (field.compare(critValue, rowValue) >= 0) {
             return false;
           }
           break;
         case 'lte':
-          if (!(rowValue <= critValue)) {
+          if (field.compare(critValue, rowValue) > 0) {
             return false;
           }
           break;
         case 'in':
-          if (critValue.indexOf(rowValue) === -1) {
+          if (field.indexOf(critValue, rowValue) === -1) {
             return false;
           }
           break;
         case 'nin':
-          if (critValue.indexOf(rowValue) !== -1) {
+          if (field.indexOf(critValue, rowValue) !== -1) {
             return false;
           }
           break;

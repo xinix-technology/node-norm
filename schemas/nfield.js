@@ -38,6 +38,30 @@ class NField {
   attach (value) {
     return value;
   }
+
+  serialize (value) {
+    return value;
+  }
+
+  compare (criteria, value) {
+    if (typeof criteria === 'number' && typeof value === 'number') {
+      return value - criteria;
+    }
+
+    if (criteria === value) {
+      return 0;
+    }
+
+    if (criteria > value) {
+      return -1;
+    }
+
+    return 1;
+  }
+
+  indexOf (criteria, value) {
+    return criteria.indexOf(value);
+  }
 }
 
 module.exports = NField;

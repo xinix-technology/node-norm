@@ -1,6 +1,6 @@
 {
   "name": "node-norm",
-  "version": "1.2.11",
+  "version": "1.2.12",
   "description": "Norm is Not ORM though data access layer",
   "main": "index.js",
   "scripts": {
@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "async-factory": "^1.0.0",
+    "big.js": "^5.2.2",
     "fs-extra": "^7.0.0",
     "generic-pool": "^3.4.2",
     "koa-compose": "^4.1.0",

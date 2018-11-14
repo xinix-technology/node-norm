@@ -20,4 +20,25 @@ module.exports = class NMap extends NField {
 
     return null;
   }
+
+  compare (criteria, value) {
+    let criteriaKeys = Object.getOwnPropertyNames(criteria);
+    let valueKeys = Object.getOwnPropertyNames(value);
+
+    if (criteriaKeys.length !== valueKeys.length) {
+      return 1;
+    }
+
+    for (let key of criteriaKeys) {
+      if (!valueKeys.includes(key)) {
+        return 1;
+      }
+
+      if (criteria[key] !== value[key]) {
+        return 1;
+      }
+    }
+
+    return 0;
+  }
 };
