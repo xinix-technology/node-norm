@@ -11,8 +11,8 @@ class Session {
     this.connections = {};
   }
 
-  factory (schema, criteria) {
-    return new Query({ session: this, schema, criteria });
+  factory (schema, criteria, ctx) {
+    return new Query({ session: this, schema, criteria, ctx });
   }
 
   async acquire (name) {

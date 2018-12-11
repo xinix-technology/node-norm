@@ -1,6 +1,6 @@
 {
   "name": "node-norm",
-  "version": "1.2.15",
+  "version": "1.2.16",
   "description": "Norm is Not ORM though data access layer",
   "main": "index.js",
   "scripts": {
@@ -39,8 +39,7 @@
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "^3.0.5",
     "mocha": "^5.2.0",
-    "nyc": "^13.1.0",
-    "webpack": "^4.27.0",
+    "webpack": "^4.27.1",
     "webpack-cli": "^3.1.2"
   },
   "husky": {
