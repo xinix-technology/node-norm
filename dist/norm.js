@@ -915,7 +915,7 @@ class Manager {
   }
 
   openSession (options) {
-    return new Session({ manager: this });
+    return new Session({ manager: this, options });
   }
 
   async end () {
@@ -4358,7 +4358,22 @@ module.exports = Pool;
 /***/ (function(module, exports) {
 
 class Query {
-  constructor ({ session, schema, criteria }) {
+  constructor (options) {
+    if (options instanceof Query) {
+      this.session = options.session;
+      this.connection = options.connection;
+      this.schema = options.schema;
+      this.find(options.criteria);
+
+      this.length = options.length;
+      this.offset = options.offset;
+      this.sorts = options.sorts;
+
+      return;
+    }
+
+    let { session, schema, criteria } = options;
+
     this.session = session;
 
     [ this.connection, this.schema ] = this.session.parseSchema(schema);
@@ -4370,6 +4385,10 @@ class Query {
     this.length = -1;
     this.offset = 0;
     this.sorts = undefined;
+  }
+
+  clone () {
+    return new Query(this);
   }
 
   find (criteria = {}) {
@@ -4650,6 +4669,7 @@ module.exports = {
   NInteger: __webpack_require__(/*! ./ninteger */ "./schemas/ninteger.js"),
   NReference: __webpack_require__(/*! ./nreference */ "./schemas/nreference.js"),
   NString: __webpack_require__(/*! ./nstring */ "./schemas/nstring.js"),
+  NText: __webpack_require__(/*! ./ntext */ "./schemas/ntext.js"),
   NList: __webpack_require__(/*! ./nlist */ "./schemas/nlist.js"),
   NMap: __webpack_require__(/*! ./nmap */ "./schemas/nmap.js"),
   NBig: __webpack_require__(/*! ./nbig */ "./schemas/nbig.js"),
@@ -5109,6 +5129,22 @@ module.exports = class NString extends NField {
 
 /***/ }),
 
+/***/ "./schemas/ntext.js":
+/*!**************************!*\
+  !*** ./schemas/ntext.js ***!
+  \**************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const NField = __webpack_require__(/*! ./nfield */ "./schemas/nfield.js");
+
+module.exports = class NText extends NField {
+
+};
+
+
+/***/ }),
+
 /***/ "./session.js":
 /*!********************!*\
   !*** ./session.js ***!
@@ -5123,10 +5159,11 @@ const connectionFactory = new Factory();
 let sessionNextId = 0;
 
 class Session {
-  constructor ({ manager }) {
+  constructor ({ manager, options = {} }) {
     this.id = `session-${sessionNextId++}`;
     this.manager = manager;
     this.connections = {};
+    this.state = Object.assign({}, options.state);
   }
 
   factory (schema, criteria) {

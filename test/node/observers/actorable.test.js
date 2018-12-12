@@ -7,7 +7,7 @@ describe('Observer: Actorable', () => {
     let manager = createManager();
 
     await manager.runSession(async session => {
-      session.actor = 'user';
+      session.state.user = { sub: 'user' };
       let { rows } = await session.factory('foo').insert({ foo: 'bar' }).save();
       assert.strictEqual(rows[0].created_by, 'user');
       assert.strictEqual(rows[0].updated_by, 'user');
@@ -23,7 +23,7 @@ describe('Observer: Actorable', () => {
     let manager = createManager(data);
 
     await manager.runSession(async session => {
-      session.actor = 'user';
+      session.state.user = { sub: 'user' };
       await session.factory('foo', { foo: 'bar' })
         .set({ foo: 'bar1' })
         .save();

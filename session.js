@@ -5,14 +5,15 @@ const connectionFactory = new Factory();
 let sessionNextId = 0;
 
 class Session {
-  constructor ({ manager }) {
+  constructor ({ manager, options = {} }) {
     this.id = `session-${sessionNextId++}`;
     this.manager = manager;
     this.connections = {};
+    this.state = Object.assign({}, options.state);
   }
 
-  factory (schema, criteria, ctx) {
-    return new Query({ session: this, schema, criteria, ctx });
+  factory (schema, criteria) {
+    return new Query({ session: this, schema, criteria });
   }
 
   async acquire (name) {

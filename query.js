@@ -1,12 +1,26 @@
 class Query {
-  constructor ({ session, schema, criteria, ctx = {} }) {
+  constructor (options) {
+    if (options instanceof Query) {
+      this.session = options.session;
+      this.connection = options.connection;
+      this.schema = options.schema;
+      this.find(options.criteria);
+
+      this.length = options.length;
+      this.offset = options.offset;
+      this.sorts = options.sorts;
+
+      return;
+    }
+
+    let { session, schema, criteria } = options;
+
     this.session = session;
 
     [ this.connection, this.schema ] = this.session.parseSchema(schema);
 
     this.find(criteria);
 
-    this.ctx = ctx;
     this.rows = [];
     this.sets = {};
     this.length = -1;
@@ -14,8 +28,8 @@ class Query {
     this.sorts = undefined;
   }
 
-  setContext (ctx) {
-    this.ctx = ctx;
+  clone () {
+    return new Query(this);
   }
 
   find (criteria = {}) {
@@ -59,7 +73,7 @@ class Query {
   async delete ({ observer = true } = {}) {
     this.mode = 'delete';
 
-    let ctx = Object.assign({}, this.ctx, { query: this });
+    let ctx = { query: this };
 
     if (observer) {
       await this.schema.observe(ctx, ctx => this._delete(ctx));
@@ -77,7 +91,7 @@ class Query {
   }
 
   async save ({ filter = true, observer = true } = {}) {
-    let ctx = Object.assign({}, this.ctx, { query: this, filter });
+    let ctx = { query: this, filter };
 
     if (observer) {
       await this.schema.observe(ctx, ctx => this._save(ctx));

@@ -61,7 +61,7 @@ class Manager {
   }
 
   openSession (options) {
-    return new Session({ manager: this });
+    return new Session({ manager: this, options });
   }
 
   async end () {
