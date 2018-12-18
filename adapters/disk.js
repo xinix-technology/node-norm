@@ -43,7 +43,7 @@ class Disk extends Memory {
       fs.ensureFileSync(this.file);
       this.data = JSON.parse(fs.readFileSync(this.file));
     } catch (err) {
-      this.data = undefined;
+      this.data = {};
     }
   }
 
