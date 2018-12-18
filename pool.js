@@ -5,7 +5,7 @@ let poolNextId = 0;
 
 class Pool {
   constructor (config) {
-    let { name, adapter = require('./adapters/memory'), schemas = [], min = 1, max = 1 } = config;
+    let { name, adapter = require('./adapters/memory'), schemas = [], min = 1, max = 2 } = config;
 
     this.name = name || `pool-${poolNextId++}`;
     this.schemas = {};
