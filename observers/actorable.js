@@ -9,8 +9,6 @@ class Actorable {
       if (user) {
         return user.sub;
       }
-
-      return null;
     },
   } = {}) {
     this.createdKey = createdKey;
@@ -26,7 +24,7 @@ class Actorable {
   async insert (ctx, next) {
     let { query } = ctx;
     query.rows.forEach(row => {
-      row[this.createdKey] = row[this.updatedKey] = this.userCallback(ctx);
+      row[this.createdKey] = row[this.updatedKey] = this.userCallback(ctx) || null;
     });
 
     await next();
@@ -34,7 +32,7 @@ class Actorable {
 
   async update (ctx, next) {
     let { query } = ctx;
-    query.sets[this.updatedKey] = this.userCallback(ctx);
+    query.sets[this.updatedKey] = this.userCallback(ctx) || null;
 
     await next();
   }
