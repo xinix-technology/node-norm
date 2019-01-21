@@ -1,6 +1,6 @@
 {
   "name": "node-norm",
-  "version": "1.2.20",
+  "version": "1.2.21",
   "description": "Norm is Not ORM though data access layer",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,7 @@
     "async-factory": "^1.0.0",
     "big.js": "^5.2.2",
     "fs-extra": "^7.0.1",
-    "generic-pool": "^3.4.2",
+    "generic-pool": "^3.5.0",
     "koa-compose": "^4.1.0",
     "uuid": "^3.3.2"
   },
@@ -39,8 +39,8 @@
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "^3.0.5",
     "mocha": "^5.2.0",
-    "webpack": "^4.28.3",
-    "webpack-cli": "^3.2.0"
+    "webpack": "^4.29.0",
+    "webpack-cli": "^3.2.1"
   },
   "husky": {
     "hooks": {

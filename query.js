@@ -121,6 +121,10 @@ class Query {
         await this.schema.filter(this.sets, { session, partial });
       }
 
+      if (Object.keys(this.sets).length === 0) {
+        throw new Error('Neither insert and update to save');
+      }
+
       this.affected = await connection.update(this);
     }
   }
