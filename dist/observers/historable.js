@@ -99,10 +99,10 @@ class Historable {
   }
 
   async insert (ctx, next) {
-    let { query } = ctx;
-    let { session } = query;
-    let historySchema = `${query.schema.name}${this.suffix}`;
-    let now = new Date();
+    const { query } = ctx;
+    const { session } = query;
+    const historySchema = `${query.schema.name}${this.suffix}`;
+    const now = new Date();
 
     await next();
 
@@ -114,12 +114,12 @@ class Historable {
   }
 
   async update (ctx, next) {
-    let { query } = ctx;
-    let { session } = query;
-    let historySchema = `${query.schema.name}${this.suffix}`;
-    let now = new Date();
+    const { query } = ctx;
+    const { session } = query;
+    const historySchema = `${query.schema.name}${this.suffix}`;
+    const now = new Date();
 
-    let affectedRows = await session.factory(query.schema.name, query.criteria).all();
+    const affectedRows = await session.factory(query.schema.name, query.criteria).all();
 
     await next();
 
@@ -131,12 +131,12 @@ class Historable {
   }
 
   async delete (ctx, next) {
-    let { query } = ctx;
-    let { session } = query;
-    let historySchema = `${query.schema.name}${this.suffix}`;
-    let now = new Date();
+    const { query } = ctx;
+    const { session } = query;
+    const historySchema = `${query.schema.name}${this.suffix}`;
+    const now = new Date();
 
-    let affectedRows = await session.factory(query.schema.name, query.criteria).all();
+    const affectedRows = await session.factory(query.schema.name, query.criteria).all();
 
     await next();
 
@@ -150,7 +150,7 @@ class Historable {
 
 // eslint-disable
 if (typeof window !== 'undefined') {
-  let norm = window.norm;
+  const norm = window.norm;
   if (!norm) {
     throw new Error('Norm is not defined yet!');
   }

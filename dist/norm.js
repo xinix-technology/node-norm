@@ -106,7 +106,7 @@ class Memory extends Connection {
   load (query, callback = () => {}) {
     let data = this.data[query.schema.name] || [];
 
-    let { criteria, sorts } = query;
+    const { criteria, sorts } = query;
 
     // if (criteria && typeof criteria.id !== 'undefined') {
     //   const row = data.find(row => row.id === criteria.id);
@@ -115,13 +115,13 @@ class Memory extends Connection {
     data = data.filter(row => this._matchCriteria(criteria, row, query.schema));
 
     if (sorts) {
-      let sortFields = Object.keys(sorts);
+      const sortFields = Object.keys(sorts);
 
       data = data.sort((a, b) => {
         let score = 0;
         sortFields.forEach((field, index) => {
-          let sortV = sorts[field];
-          let fieldScore = Math.pow(2, sortFields.length - index - 1) * sortV;
+          const sortV = sorts[field];
+          const fieldScore = Math.pow(2, sortFields.length - index - 1) * sortV;
           if (a[field] < b[field]) {
             score -= fieldScore;
           } else if (a[field] > b[field]) {
@@ -151,8 +151,8 @@ class Memory extends Connection {
     const data = this.data[query.schema.name] = this.data[query.schema.name] || [];
 
     return query.rows.reduce((inserted, qRow) => {
-      let row = { id: uuidv4() };
-      for (let k in qRow) {
+      const row = { id: uuidv4() };
+      for (const k in qRow) { // eslint-disable-line no-unused-vars
         row[k] = query.schema.getField(k).serialize(qRow[k]);
       }
       data.push(row);
@@ -163,9 +163,9 @@ class Memory extends Connection {
   }
 
   update (query) {
-    let keys = Object.keys(query.sets);
+    const keys = Object.keys(query.sets);
     return this.load(query).reduce((affected, row) => {
-      let fieldChanges = keys.filter(key => {
+      const fieldChanges = keys.filter(key => {
         if (row[key] === query.sets[key]) {
           return false;
         }
@@ -200,7 +200,7 @@ class Memory extends Connection {
   }
 
   async count (query, useSkipAndLimit) {
-    let { length, offset } = query;
+    const { length, offset } = query;
 
     if (!useSkipAndLimit) {
       query.offset = 0;
@@ -211,8 +211,8 @@ class Memory extends Connection {
 
     await this.load(query, () => count++);
 
-    query.offset = offset;
-    query.length = length;
+    query.offset = offset; // eslint-disable-line require-atomic-updates
+    query.length = length; // eslint-disable-line require-atomic-updates
 
     return count;
   }
@@ -222,16 +222,16 @@ class Memory extends Connection {
       return true;
     }
 
-    for (let key in criteria) {
-      let critValue = criteria[key];
-      let [ nkey, op = 'eq' ] = key.split('!');
-      let field = schema.getField(nkey);
-      let rowValue = row[nkey];
+    for (const key in criteria) { // eslint-disable-line no-unused-vars
+      const critValue = criteria[key];
+      const [nkey, op = 'eq'] = key.split('!');
+      const field = schema.getField(nkey);
+      const rowValue = row[nkey];
       switch (op) {
         case 'or': {
           let valid = false;
-          for (let subCriteria of critValue) {
-            let match = this._matchCriteria(subCriteria, row, schema);
+          for (const subCriteria of critValue) { // eslint-disable-line no-unused-vars
+            const match = this._matchCriteria(subCriteria, row, schema);
             if (match) {
               valid = true;
               break;
@@ -243,7 +243,7 @@ class Memory extends Connection {
           break;
         }
         case 'and':
-          for (let subCriteria of critValue) {
+          for (const subCriteria of critValue) { // eslint-disable-line no-unused-vars
             if (!this._matchCriteria(subCriteria, row, schema)) {
               return false;
             }
@@ -291,7 +291,7 @@ class Memory extends Connection {
           }
           break;
         case 'like': {
-          let re = new RegExp(critValue);
+          const re = new RegExp(critValue);
           if (!rowValue.match(re)) {
             return false;
           }
@@ -317,7 +317,7 @@ class Memory extends Connection {
 }
 
 if (typeof window !== 'undefined') {
-  let norm = window.norm;
+  const norm = window.norm;
   if (!norm) {
     throw new Error('Norm is not defined yet!');
   }
@@ -438,15 +438,15 @@ class Filter {
       throw new Error('Cannot tokenize non-string filter signature');
     }
 
-    let [ head, ...rest ] = signature.split(':');
+    let [head, ...rest] = signature.split(':');
     rest = rest.join(':');
     rest = rest.length === 0 ? [] : rest.split(',');
 
-    return [ head, ...rest ];
+    return [head, ...rest];
   }
 
   static get (signature) {
-    let signatureType = typeof signature;
+    const signatureType = typeof signature;
 
     if (signatureType === 'function') {
       return signature;
@@ -460,7 +460,7 @@ class Filter {
       throw new Error(`Unknown filter by ${signatureType}`);
     }
 
-    let [ fn, ...args ] = signature;
+    const [fn, ...args] = signature;
 
     if (fn in filters === false) {
       try {
@@ -533,13 +533,12 @@ function webpackContext(req) {
 	return __webpack_require__(id);
 }
 function webpackContextResolve(req) {
-	var id = map[req];
-	if(!(id + 1)) { // check for number or string
+	if(!__webpack_require__.o(map, req)) {
 		var e = new Error("Cannot find module '" + req + "'");
 		e.code = 'MODULE_NOT_FOUND';
 		throw e;
 	}
-	return id;
+	return map[req];
 }
 webpackContext.keys = function webpackContextKeys() {
 	return Object.keys(map);
@@ -563,14 +562,14 @@ module.exports = function (schema) {
       return null;
     }
 
-    let err = new Error(`Field ${name} values must be ${schema}`);
+    const err = new Error(`Field ${name} values must be ${schema}`);
 
     if (!Array.isArray(value)) {
       throw err;
     }
 
     try {
-      let schemaO = session.getSchema(schema);
+      const schemaO = session.getSchema(schema);
       await Promise.all(value.map(row => schemaO.filter(row, { session })));
       value = value.map(row => schemaO.attach(row));
     } catch (err) {
@@ -594,7 +593,7 @@ module.exports = function (schema) {
 
 module.exports = function def (defaultValue) {
   return function (value = null) {
-    if (!value) {
+    if (value === null || value === undefined || value === '') {
       return defaultValue;
     }
 
@@ -620,7 +619,7 @@ module.exports = function email () {
 
     value = value.toLowerCase();
 
-    let err = new Error(`Field ${name} must be valid email`);
+    const err = new Error(`Field ${name} must be valid email`);
 
     const parts = value.split('@');
 
@@ -683,7 +682,7 @@ module.exports = function exists (schema, key = 'id') {
       return null;
     }
 
-    let criteria = {};
+    const criteria = {};
     criteria[key] = value;
 
     if (!(await session.factory(schema, criteria).single())) {
@@ -730,8 +729,8 @@ module.exports = function notExists (schema) {
       return null;
     }
 
-    let criteria = { [name]: value };
-    let foundRow = await session.factory(schema, criteria).single();
+    const criteria = { [name]: value };
+    const foundRow = await session.factory(schema, criteria).single();
     if (foundRow && foundRow.id !== row.id) {
       throw new Error(`Field ${name} already exists in ${schema}`);
     }
@@ -796,8 +795,8 @@ module.exports = function unique () {
       return null;
     }
 
-    let criteria = { [name]: value };
-    let foundRow = await session.factory(schema.name, criteria).single();
+    const criteria = { [name]: value };
+    const foundRow = await session.factory(schema.name, criteria).single();
     if (foundRow && foundRow.id !== row.id) {
       throw new Error(`Field ${name} must be unique`);
     }
@@ -875,7 +874,7 @@ class Manager {
     // resolve adapter first before creating
     config.adapter = Manager.adapter(config.adapter);
 
-    let pool = new Pool(config);
+    const pool = new Pool(config);
     this.pools[pool.name] = pool;
     this.main = config.main ? pool.name : (this.main || pool.name);
 
@@ -920,7 +919,7 @@ class Manager {
 
   async end () {
     await Promise.all(Object.keys(this.pools).map(async name => {
-      let pool = this.pools[name];
+      const pool = this.pools[name];
       await pool.drain();
       await pool.clear();
     }));
@@ -943,8 +942,8 @@ module.exports = Manager;
 
 class Model {
   constructor (row) {
-    for (let key in row) {
-      if (!row.hasOwnProperty(key) || row[key] === undefined) {
+    for (const key in row) { // eslint-disable-line no-unused-vars
+      if (!Object.prototype.hasOwnProperty.call(row, key) || row[key] === undefined) {
         continue;
       }
 
@@ -3243,24 +3242,26 @@ class Pool extends EventEmitter {
   _createResource() {
     // An attempt to create a resource
     const factoryPromise = this._factory.create();
-    const wrappedFactoryPromise = this._Promise.resolve(factoryPromise);
+    const wrappedFactoryPromise = this._Promise
+      .resolve(factoryPromise)
+      .then(resource => {
+        const pooledResource = new PooledResource(resource);
+        this._allObjects.add(pooledResource);
+        this._addPooledResourceToAvailableObjects(pooledResource);
+      });
 
     this._trackOperation(wrappedFactoryPromise, this._factoryCreateOperations)
-      .then(resource => {
-        this._handleNewResource(resource);
+      .then(() => {
+        this._dispense();
+        // Stop bluebird complaining about this side-effect only handler
+        // - a promise was created in a handler but was not returned from it
+        // https://goo.gl/rRqMUw
         return null;
       })
       .catch(reason => {
         this.emit(FACTORY_CREATE_ERROR, reason);
         this._dispense();
       });
-  }
-
-  _handleNewResource(resource) {
-    const pooledResource = new PooledResource(resource);
-    this._allObjects.add(pooledResource);
-    // TODO: check we aren't exceding our maxPoolSize before doing
-    this._dispatchPooledResourceToNextWaitingClient(pooledResource);
   }
 
   /**
@@ -3407,7 +3408,7 @@ class Pool extends EventEmitter {
           return result;
         },
         err => {
-          this.release(resource);
+          this.destroy(resource);
           throw err;
         }
       );
@@ -3555,7 +3556,7 @@ class Pool extends EventEmitter {
       const reflectedDestroyPromises = Array.from(
         this._factoryDestroyOperations
       ).map(reflector);
-      return this._Promise.all(reflectedDestroyPromises);
+      return reflector(this._Promise.all(reflectedDestroyPromises));
     });
   }
 
@@ -3722,8 +3723,8 @@ class PoolOptions {
    * @param {Number} [opts.maxWaitingClients=null]
    *   maximum number of queued requests allowed after which acquire calls will be rejected
    * @param {Boolean} [opts.testOnBorrow=false]
-   *   should the pool validate resources before giving them to clients. Requires that either
-   *   `factory.validate` or `factory.validateAsync` to be specified.
+   *   should the pool validate resources before giving them to clients. Requires that
+   *   `factory.validate` is specified.
    * @param {Boolean} [opts.testOnReturn=false]
    *   should the pool validate resources before returning them to the pool.
    * @param {Number} [opts.acquireTimeoutMillis=null]
@@ -4434,7 +4435,7 @@ let poolNextId = 0;
 
 class Pool {
   constructor (config) {
-    let { name, adapter = __webpack_require__(/*! ./adapters/memory */ "./adapters/memory.js"), schemas = [], min = 1, max = 2 } = config;
+    const { name, adapter = __webpack_require__(/*! ./adapters/memory */ "./adapters/memory.js"), schemas = [], min = 1, max = 2 } = config;
 
     this.name = name || `pool-${poolNextId++}`;
     this.schemas = {};
@@ -4461,7 +4462,7 @@ class Pool {
   }
 
   putSchema ({ name, fields, observers, modelClass }) {
-    let connection = this.name;
+    const connection = this.name;
     this.schemas[name] = new Schema({ connection, name, fields, observers, modelClass });
     return this;
   }
@@ -4522,11 +4523,11 @@ class Query {
       return;
     }
 
-    let { session, schema, criteria } = options;
+    const { session, schema, criteria } = options;
 
     this.session = session;
 
-    [ this.connection, this.schema ] = this.session.parseSchema(schema);
+    [this.connection, this.schema] = this.session.parseSchema(schema);
 
     this.find(criteria);
 
@@ -4582,7 +4583,7 @@ class Query {
   async delete ({ observer = true } = {}) {
     this.mode = 'delete';
 
-    let ctx = { query: this };
+    const ctx = { query: this };
 
     if (observer) {
       await this.schema.observe(ctx, ctx => this._delete(ctx));
@@ -4595,12 +4596,12 @@ class Query {
 
   async _delete () {
     const connection = await this.session.acquire(this.connection);
-    let result = await connection.delete(this);
+    const result = await connection.delete(this);
     return result;
   }
 
   async save ({ filter = true, observer = true } = {}) {
-    let ctx = { query: this, filter };
+    const ctx = { query: this, filter };
 
     if (observer) {
       await this.schema.observe(ctx, ctx => this._save(ctx));
@@ -4613,20 +4614,20 @@ class Query {
 
   async _save (ctx) {
     const connection = await this.session.acquire(this.connection);
-    let { session } = this;
-    let { filter } = ctx;
+    const { session } = this;
+    const { filter } = ctx;
 
     if (this.rows.length) {
       if (filter) {
         await Promise.all(this.rows.map(row => this.schema.filter(row, { session })));
       }
 
-      let rows = [];
+      const rows = [];
       this.affected = await connection.insert(this, row => rows.push(this.schema.attach(row)));
       this.rows = rows;
     } else {
       if (filter) {
-        let partial = true;
+        const partial = true;
         await this.schema.filter(this.sets, { session, partial });
       }
 
@@ -4640,18 +4641,18 @@ class Query {
 
   async drop () {
     const connection = await this.session.acquire(this.connection);
-    let result = await connection.drop(this);
+    const result = await connection.drop(this);
     return result;
   }
 
   async truncate () {
     const connection = await this.session.acquire(this.connection);
-    let result = await connection.truncate(this);
+    const result = await connection.truncate(this);
     return result;
   }
 
   async all () {
-    let rows = [];
+    const rows = [];
     const connection = await this.session.acquire(this.connection);
     await connection.load(this, row => rows.push(this.schema.attach(row)));
     return rows;
@@ -4666,7 +4667,7 @@ class Query {
   }
 
   async single () {
-    let [ row ] = await this.limit(1).all();
+    const [row] = await this.limit(1).all();
     return row;
   }
 
@@ -4721,7 +4722,7 @@ class Schema {
   }
 
   addField (field) {
-    let existingField = this.fields.find(f => f.name === field.name);
+    const existingField = this.fields.find(f => f.name === field.name);
     if (existingField) {
       return;
     }
@@ -4737,7 +4738,7 @@ class Schema {
   }
 
   attach (row, partial = false) {
-    let Model = this.modelClass;
+    const Model = this.modelClass;
 
     this.fields.forEach(field => {
       switch (row[field.name]) {
@@ -4759,7 +4760,7 @@ class Schema {
 
   observe (ctx, next) {
     if (!this._observerRunner) {
-      let units = this.observers.map(observer => {
+      const units = this.observers.map(observer => {
         return (ctx, next) => {
           if (typeof observer[ctx.query.mode] !== 'function') {
             return next();
@@ -4788,7 +4789,7 @@ class Schema {
           return;
         }
 
-        row[field.name] = await field.execFilter(row[field.name], { session, row, schema: this });
+        row[field.name] = await field.execFilter(row[field.name], { session, row, schema: this }); // eslint-disable-line require-atomic-updates
       } catch (err) {
         err.field = field;
         error.add(err);
@@ -4933,12 +4934,12 @@ module.exports = class NDatetime extends NField {
     }
 
     if (typeof value === 'number') {
-      let date = new Date();
+      const date = new Date();
       date.setTime(value);
       return date;
     }
 
-    let date = new Date(value);
+    const date = new Date(value);
     if (isNaN(date.getTime())) {
       throw new Error('Invalid datetime value');
     }
@@ -5041,7 +5042,7 @@ class NField {
       value = value.trim();
     }
 
-    let field = this;
+    const field = this;
     return this.filters.reduce(
       async (promise, filter) => filter(await promise, { session, row, schema, field }),
       value
@@ -5223,14 +5224,14 @@ module.exports = class NMap extends NField {
       return 1;
     }
 
-    let criteriaKeys = Object.getOwnPropertyNames(criteria);
-    let valueKeys = Object.getOwnPropertyNames(value);
+    const criteriaKeys = Object.getOwnPropertyNames(criteria);
+    const valueKeys = Object.getOwnPropertyNames(value);
 
     if (criteriaKeys.length !== valueKeys.length) {
       return 1;
     }
 
-    for (let key of criteriaKeys) {
+    for (const key of criteriaKeys) { // eslint-disable-line no-unused-vars
       if (!valueKeys.includes(key)) {
         return 1;
       }
@@ -5325,10 +5326,10 @@ class Session {
   }
 
   async acquire (name) {
-    let pool = this.manager.getPool(name);
+    const pool = this.manager.getPool(name);
 
     if (!this.connections[pool.name]) {
-      let id = `${this.id}-${pool.name}`;
+      const id = `${this.id}-${pool.name}`;
       this.connections[pool.name] = await connectionFactory.singleton(id, () => pool.acquire());
 
       await this.connections[pool.name].begin();
@@ -5352,21 +5353,21 @@ class Session {
 
   async commit () {
     await Promise.all(Object.keys(this.connections).map(async name => {
-      let connection = this.connections[name];
+      const connection = this.connections[name];
       await connection.commit();
     }));
   }
 
   async rollback () {
     await Promise.all(Object.keys(this.connections).map(async name => {
-      let connection = this.connections[name];
+      const connection = this.connections[name];
       await connection.rollback();
     }));
   }
 
   async begin () {
     await Promise.all(Object.keys(this.connections).map(async name => {
-      let connection = this.connections[name];
+      const connection = this.connections[name];
       await connection.begin();
     }));
   }
@@ -5383,16 +5384,16 @@ class Session {
       if (name.length < 2) {
         throw new Error('Malformed schema name tupple');
       }
-      [ connection, schema ] = name;
+      [connection, schema] = name;
     } else if (name.indexOf('.') !== -1) {
-      [ connection, schema ] = name.split('.');
+      [connection, schema] = name.split('.');
     } else {
       connection = this.manager.getPool().name;
       schema = name;
     }
 
-    let pool = this.manager.getPool(connection);
-    return [ pool.name, pool.getSchema(schema) ];
+    const pool = this.manager.getPool(connection);
+    return [pool.name, pool.getSchema(schema)];
   }
 }
 

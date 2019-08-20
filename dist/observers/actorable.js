@@ -101,15 +101,15 @@ class Filter {
       throw new Error('Cannot tokenize non-string filter signature');
     }
 
-    let [ head, ...rest ] = signature.split(':');
+    let [head, ...rest] = signature.split(':');
     rest = rest.join(':');
     rest = rest.length === 0 ? [] : rest.split(',');
 
-    return [ head, ...rest ];
+    return [head, ...rest];
   }
 
   static get (signature) {
-    let signatureType = typeof signature;
+    const signatureType = typeof signature;
 
     if (signatureType === 'function') {
       return signature;
@@ -123,7 +123,7 @@ class Filter {
       throw new Error(`Unknown filter by ${signatureType}`);
     }
 
-    let [ fn, ...args ] = signature;
+    const [fn, ...args] = signature;
 
     if (fn in filters === false) {
       try {
@@ -196,13 +196,12 @@ function webpackContext(req) {
 	return __webpack_require__(id);
 }
 function webpackContextResolve(req) {
-	var id = map[req];
-	if(!(id + 1)) { // check for number or string
+	if(!__webpack_require__.o(map, req)) {
 		var e = new Error("Cannot find module '" + req + "'");
 		e.code = 'MODULE_NOT_FOUND';
 		throw e;
 	}
-	return id;
+	return map[req];
 }
 webpackContext.keys = function webpackContextKeys() {
 	return Object.keys(map);
@@ -226,14 +225,14 @@ module.exports = function (schema) {
       return null;
     }
 
-    let err = new Error(`Field ${name} values must be ${schema}`);
+    const err = new Error(`Field ${name} values must be ${schema}`);
 
     if (!Array.isArray(value)) {
       throw err;
     }
 
     try {
-      let schemaO = session.getSchema(schema);
+      const schemaO = session.getSchema(schema);
       await Promise.all(value.map(row => schemaO.filter(row, { session })));
       value = value.map(row => schemaO.attach(row));
     } catch (err) {
@@ -257,7 +256,7 @@ module.exports = function (schema) {
 
 module.exports = function def (defaultValue) {
   return function (value = null) {
-    if (!value) {
+    if (value === null || value === undefined || value === '') {
       return defaultValue;
     }
 
@@ -283,7 +282,7 @@ module.exports = function email () {
 
     value = value.toLowerCase();
 
-    let err = new Error(`Field ${name} must be valid email`);
+    const err = new Error(`Field ${name} must be valid email`);
 
     const parts = value.split('@');
 
@@ -346,7 +345,7 @@ module.exports = function exists (schema, key = 'id') {
       return null;
     }
 
-    let criteria = {};
+    const criteria = {};
     criteria[key] = value;
 
     if (!(await session.factory(schema, criteria).single())) {
@@ -393,8 +392,8 @@ module.exports = function notExists (schema) {
       return null;
     }
 
-    let criteria = { [name]: value };
-    let foundRow = await session.factory(schema, criteria).single();
+    const criteria = { [name]: value };
+    const foundRow = await session.factory(schema, criteria).single();
     if (foundRow && foundRow.id !== row.id) {
       throw new Error(`Field ${name} already exists in ${schema}`);
     }
@@ -459,8 +458,8 @@ module.exports = function unique () {
       return null;
     }
 
-    let criteria = { [name]: value };
-    let foundRow = await session.factory(schema.name, criteria).single();
+    const criteria = { [name]: value };
+    const foundRow = await session.factory(schema.name, criteria).single();
     if (foundRow && foundRow.id !== row.id) {
       throw new Error(`Field ${name} must be unique`);
     }
@@ -486,7 +485,7 @@ class Actorable {
     createdKey = 'created_by',
     updatedKey = 'updated_by',
     userCallback = ctx => {
-      let { user } = ctx.query.session.state;
+      const { user } = ctx.query.session.state;
       if (user) {
         return user.sub;
       }
@@ -503,7 +502,7 @@ class Actorable {
   }
 
   async insert (ctx, next) {
-    let { query } = ctx;
+    const { query } = ctx;
     query.rows.forEach(row => {
       row[this.createdKey] = row[this.updatedKey] = this.userCallback(ctx) || null;
     });
@@ -512,7 +511,7 @@ class Actorable {
   }
 
   async update (ctx, next) {
-    let { query } = ctx;
+    const { query } = ctx;
     query.sets[this.updatedKey] = this.userCallback(ctx) || null;
 
     await next();
@@ -521,7 +520,7 @@ class Actorable {
 
 // eslint-disable
 if (typeof window !== 'undefined') {
-  let norm = window.norm;
+  const norm = window.norm;
   if (!norm) {
     throw new Error('Norm is not defined yet!');
   }
@@ -583,7 +582,7 @@ class NField {
       value = value.trim();
     }
 
-    let field = this;
+    const field = this;
     return this.filters.reduce(
       async (promise, filter) => filter(await promise, { session, row, schema, field }),
       value

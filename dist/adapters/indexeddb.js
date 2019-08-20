@@ -105,7 +105,7 @@ const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexe
 // const IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
 
 if (!window.indexedDB) {
-  throw new Error(`Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available.`);
+  throw new Error('Your browser doesn\'t support a stable version of IndexedDB. Such and such feature will not be available.');
 }
 
 class IndexedDB extends Memory {
@@ -118,22 +118,22 @@ class IndexedDB extends Memory {
   }
 
   async load (query, callback = () => {}) {
-    let { criteria } = query;
-    let store = await this.__getStore(query.schema.name);
+    const { criteria } = query;
+    const store = await this.__getStore(query.schema.name);
 
     // TODO: implement sorting?
     // let { criteria, sorts } = query;
 
-    let rows = await new Promise((resolve, reject) => {
-      let rows = [];
-      let req = store.openCursor();
+    const rows = await new Promise((resolve, reject) => {
+      const rows = [];
+      const req = store.openCursor();
       req.onsuccess = evt => {
-        let cursor = evt.target.result;
+        const cursor = evt.target.result;
         if (!cursor) {
           return resolve(rows);
         }
 
-        let row = cursor.value;
+        const row = cursor.value;
         if (this._matchCriteria(criteria, row, query.schema)) {
           rows.push(row);
         }
@@ -149,12 +149,12 @@ class IndexedDB extends Memory {
   }
 
   async insert (query, callback = () => {}) {
-    let store = await this.__getStore(query.schema.name);
+    const store = await this.__getStore(query.schema.name);
 
     let inserted = 0;
 
     await Promise.all(query.rows.map(async row => {
-      row.id = await this.__promised(store.add(row));
+      row.id = await this.__promised(store.add(row)); // eslint-disable-line require-atomic-updates
       callback(row);
       inserted++;
     }));
@@ -163,16 +163,16 @@ class IndexedDB extends Memory {
   }
 
   async update (query) {
-    let rows = [];
+    const rows = [];
     await this.load(query, row => rows.push(row));
 
-    let store = await this.__getStore(query.schema.name);
+    const store = await this.__getStore(query.schema.name);
 
-    let keys = Object.keys(query.sets);
+    const keys = Object.keys(query.sets);
     let affected = 0;
 
     await Promise.all(rows.map(row => {
-      let fieldChanges = keys.filter(key => {
+      const fieldChanges = keys.filter(key => {
         if (row[key] === query.sets[key]) {
           return false;
         }
@@ -192,16 +192,16 @@ class IndexedDB extends Memory {
   }
 
   async delete (query) {
-    let rows = [];
+    const rows = [];
     await this.load(query, row => rows.push(row));
 
-    let store = await this.__getStore(query.schema.name);
+    const store = await this.__getStore(query.schema.name);
 
     await rows.map(row => this.__promised(store.delete(row.id)));
   }
 
   async truncate (query) {
-    let store = await this.__getStore(query.schema.name);
+    const store = await this.__getStore(query.schema.name);
     await this.__promised(store.clear());
   }
 
@@ -210,9 +210,9 @@ class IndexedDB extends Memory {
   }
 
   async __getDB () {
-    let req = indexedDB.open(this.dbname, this.version);
+    const req = indexedDB.open(this.dbname, this.version);
     req.onupgradeneeded = this.onUpgradeNeeded;
-    let db = await this.__promised(req);
+    const db = await this.__promised(req);
     return db;
   }
 
@@ -224,18 +224,18 @@ class IndexedDB extends Memory {
   }
 
   async __getTx (names) {
-    let db = await this.__getDB();
+    const db = await this.__getDB();
     return db.transaction(names, 'readwrite');
   }
 
   async __getStore (name) {
-    let tx = await this.__getTx(name);
+    const tx = await this.__getTx(name);
     return tx.objectStore(name);
   }
 }
 
 if (typeof window !== 'undefined') {
-  let norm = window.norm;
+  const norm = window.norm;
   if (!norm) {
     throw new Error('Norm is not defined yet!');
   }
@@ -269,7 +269,7 @@ class Memory extends Connection {
   load (query, callback = () => {}) {
     let data = this.data[query.schema.name] || [];
 
-    let { criteria, sorts } = query;
+    const { criteria, sorts } = query;
 
     // if (criteria && typeof criteria.id !== 'undefined') {
     //   const row = data.find(row => row.id === criteria.id);
@@ -278,13 +278,13 @@ class Memory extends Connection {
     data = data.filter(row => this._matchCriteria(criteria, row, query.schema));
 
     if (sorts) {
-      let sortFields = Object.keys(sorts);
+      const sortFields = Object.keys(sorts);
 
       data = data.sort((a, b) => {
         let score = 0;
         sortFields.forEach((field, index) => {
-          let sortV = sorts[field];
-          let fieldScore = Math.pow(2, sortFields.length - index - 1) * sortV;
+          const sortV = sorts[field];
+          const fieldScore = Math.pow(2, sortFields.length - index - 1) * sortV;
           if (a[field] < b[field]) {
             score -= fieldScore;
           } else if (a[field] > b[field]) {
@@ -314,8 +314,8 @@ class Memory extends Connection {
     const data = this.data[query.schema.name] = this.data[query.schema.name] || [];
 
     return query.rows.reduce((inserted, qRow) => {
-      let row = { id: uuidv4() };
-      for (let k in qRow) {
+      const row = { id: uuidv4() };
+      for (const k in qRow) { // eslint-disable-line no-unused-vars
         row[k] = query.schema.getField(k).serialize(qRow[k]);
       }
       data.push(row);
@@ -326,9 +326,9 @@ class Memory extends Connection {
   }
 
   update (query) {
-    let keys = Object.keys(query.sets);
+    const keys = Object.keys(query.sets);
     return this.load(query).reduce((affected, row) => {
-      let fieldChanges = keys.filter(key => {
+      const fieldChanges = keys.filter(key => {
         if (row[key] === query.sets[key]) {
           return false;
         }
@@ -363,7 +363,7 @@ class Memory extends Connection {
   }
 
   async count (query, useSkipAndLimit) {
-    let { length, offset } = query;
+    const { length, offset } = query;
 
     if (!useSkipAndLimit) {
       query.offset = 0;
@@ -374,8 +374,8 @@ class Memory extends Connection {
 
     await this.load(query, () => count++);
 
-    query.offset = offset;
-    query.length = length;
+    query.offset = offset; // eslint-disable-line require-atomic-updates
+    query.length = length; // eslint-disable-line require-atomic-updates
 
     return count;
   }
@@ -385,16 +385,16 @@ class Memory extends Connection {
       return true;
     }
 
-    for (let key in criteria) {
-      let critValue = criteria[key];
-      let [ nkey, op = 'eq' ] = key.split('!');
-      let field = schema.getField(nkey);
-      let rowValue = row[nkey];
+    for (const key in criteria) { // eslint-disable-line no-unused-vars
+      const critValue = criteria[key];
+      const [nkey, op = 'eq'] = key.split('!');
+      const field = schema.getField(nkey);
+      const rowValue = row[nkey];
       switch (op) {
         case 'or': {
           let valid = false;
-          for (let subCriteria of critValue) {
-            let match = this._matchCriteria(subCriteria, row, schema);
+          for (const subCriteria of critValue) { // eslint-disable-line no-unused-vars
+            const match = this._matchCriteria(subCriteria, row, schema);
             if (match) {
               valid = true;
               break;
@@ -406,7 +406,7 @@ class Memory extends Connection {
           break;
         }
         case 'and':
-          for (let subCriteria of critValue) {
+          for (const subCriteria of critValue) { // eslint-disable-line no-unused-vars
             if (!this._matchCriteria(subCriteria, row, schema)) {
               return false;
             }
@@ -454,7 +454,7 @@ class Memory extends Connection {
           }
           break;
         case 'like': {
-          let re = new RegExp(critValue);
+          const re = new RegExp(critValue);
           if (!rowValue.match(re)) {
             return false;
           }
@@ -480,7 +480,7 @@ class Memory extends Connection {
 }
 
 if (typeof window !== 'undefined') {
-  let norm = window.norm;
+  const norm = window.norm;
   if (!norm) {
     throw new Error('Norm is not defined yet!');
   }

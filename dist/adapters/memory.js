@@ -106,7 +106,7 @@ class Memory extends Connection {
   load (query, callback = () => {}) {
     let data = this.data[query.schema.name] || [];
 
-    let { criteria, sorts } = query;
+    const { criteria, sorts } = query;
 
     // if (criteria && typeof criteria.id !== 'undefined') {
     //   const row = data.find(row => row.id === criteria.id);
@@ -115,13 +115,13 @@ class Memory extends Connection {
     data = data.filter(row => this._matchCriteria(criteria, row, query.schema));
 
     if (sorts) {
-      let sortFields = Object.keys(sorts);
+      const sortFields = Object.keys(sorts);
 
       data = data.sort((a, b) => {
         let score = 0;
         sortFields.forEach((field, index) => {
-          let sortV = sorts[field];
-          let fieldScore = Math.pow(2, sortFields.length - index - 1) * sortV;
+          const sortV = sorts[field];
+          const fieldScore = Math.pow(2, sortFields.length - index - 1) * sortV;
           if (a[field] < b[field]) {
             score -= fieldScore;
           } else if (a[field] > b[field]) {
@@ -151,8 +151,8 @@ class Memory extends Connection {
     const data = this.data[query.schema.name] = this.data[query.schema.name] || [];
 
     return query.rows.reduce((inserted, qRow) => {
-      let row = { id: uuidv4() };
-      for (let k in qRow) {
+      const row = { id: uuidv4() };
+      for (const k in qRow) { // eslint-disable-line no-unused-vars
         row[k] = query.schema.getField(k).serialize(qRow[k]);
       }
       data.push(row);
@@ -163,9 +163,9 @@ class Memory extends Connection {
   }
 
   update (query) {
-    let keys = Object.keys(query.sets);
+    const keys = Object.keys(query.sets);
     return this.load(query).reduce((affected, row) => {
-      let fieldChanges = keys.filter(key => {
+      const fieldChanges = keys.filter(key => {
         if (row[key] === query.sets[key]) {
           return false;
         }
@@ -200,7 +200,7 @@ class Memory extends Connection {
   }
 
   async count (query, useSkipAndLimit) {
-    let { length, offset } = query;
+    const { length, offset } = query;
 
     if (!useSkipAndLimit) {
       query.offset = 0;
@@ -211,8 +211,8 @@ class Memory extends Connection {
 
     await this.load(query, () => count++);
 
-    query.offset = offset;
-    query.length = length;
+    query.offset = offset; // eslint-disable-line require-atomic-updates
+    query.length = length; // eslint-disable-line require-atomic-updates
 
     return count;
   }
@@ -222,16 +222,16 @@ class Memory extends Connection {
       return true;
     }
 
-    for (let key in criteria) {
-      let critValue = criteria[key];
-      let [ nkey, op = 'eq' ] = key.split('!');
-      let field = schema.getField(nkey);
-      let rowValue = row[nkey];
+    for (const key in criteria) { // eslint-disable-line no-unused-vars
+      const critValue = criteria[key];
+      const [nkey, op = 'eq'] = key.split('!');
+      const field = schema.getField(nkey);
+      const rowValue = row[nkey];
       switch (op) {
         case 'or': {
           let valid = false;
-          for (let subCriteria of critValue) {
-            let match = this._matchCriteria(subCriteria, row, schema);
+          for (const subCriteria of critValue) { // eslint-disable-line no-unused-vars
+            const match = this._matchCriteria(subCriteria, row, schema);
             if (match) {
               valid = true;
               break;
@@ -243,7 +243,7 @@ class Memory extends Connection {
           break;
         }
         case 'and':
-          for (let subCriteria of critValue) {
+          for (const subCriteria of critValue) { // eslint-disable-line no-unused-vars
             if (!this._matchCriteria(subCriteria, row, schema)) {
               return false;
             }
@@ -291,7 +291,7 @@ class Memory extends Connection {
           }
           break;
         case 'like': {
-          let re = new RegExp(critValue);
+          const re = new RegExp(critValue);
           if (!rowValue.match(re)) {
             return false;
           }
@@ -317,7 +317,7 @@ class Memory extends Connection {
 }
 
 if (typeof window !== 'undefined') {
-  let norm = window.norm;
+  const norm = window.norm;
   if (!norm) {
     throw new Error('Norm is not defined yet!');
   }
