@@ -4,10 +4,10 @@ const { Manager, Model } = require('../..');
 describe('cases', () => {
   describe('single database crud', () => {
     it('insert multiple rows', async () => {
-      let data = {};
-      let manager = createManager(data);
+      const data = {};
+      const manager = createManager(data);
       await manager.runSession(async session => {
-        let { affected, rows } = await session.factory('user')
+        const { affected, rows } = await session.factory('user')
           .insert({ username: 'admin', password: 'adminPassword' })
           .insert({ username: 'user', password: 'userPassword' })
           .save();
@@ -23,7 +23,7 @@ describe('cases', () => {
     });
 
     it('update rows', async () => {
-      let data = {
+      const data = {
         foo: [
           { name: 'foo', value: 'foo1' },
           { name: 'foo', value: 'foo2' },
@@ -31,7 +31,7 @@ describe('cases', () => {
           { name: 'bar', value: 'bar2' },
         ],
       };
-      let manager = createManager(data);
+      const manager = createManager(data);
       await manager.runSession(async session => {
         await session.factory('foo', { name: 'foo' }).set({ value: 'fooz' }).save();
 
@@ -42,7 +42,7 @@ describe('cases', () => {
     });
 
     it('delete rows', async () => {
-      let data = {
+      const data = {
         foo: [
           { name: 'foo', value: 'foo1' },
           { name: 'foo', value: 'foo2' },
@@ -50,7 +50,7 @@ describe('cases', () => {
           { name: 'bar', value: 'bar2' },
         ],
       };
-      let manager = createManager(data);
+      const manager = createManager(data);
       await manager.runSession(async session => {
         await session.factory('foo', { name: 'foo' }).delete();
 
@@ -59,7 +59,7 @@ describe('cases', () => {
     });
 
     it('truncate collection', async () => {
-      let data = {
+      const data = {
         foo: [
           { name: 'foo', value: 'foo1' },
           { name: 'foo', value: 'foo2' },
@@ -67,7 +67,7 @@ describe('cases', () => {
           { name: 'bar', value: 'bar2' },
         ],
       };
-      let manager = createManager(data);
+      const manager = createManager(data);
       await manager.runSession(async session => {
         await session.factory('foo').truncate();
         assert.strictEqual(data.foo.length, 0);
@@ -75,7 +75,7 @@ describe('cases', () => {
     });
 
     it('drop collection', async () => {
-      let data = {
+      const data = {
         foo: [
           { name: 'foo', value: 'foo1' },
           { name: 'foo', value: 'foo2' },
@@ -83,7 +83,7 @@ describe('cases', () => {
           { name: 'bar', value: 'bar2' },
         ],
       };
-      let manager = createManager(data);
+      const manager = createManager(data);
       await manager.runSession(async session => {
         await session.factory('foo').drop();
         assert(!data.foo);
@@ -91,15 +91,15 @@ describe('cases', () => {
     });
 
     it('find all rows', async () => {
-      let data = {};
-      let manager = createManager(data);
+      const data = {};
+      const manager = createManager(data);
       await manager.runSession(async session => {
         await session.factory('user')
           .insert({ username: 'admin', password: 'adminPassword' })
           .insert({ username: 'user', password: 'userPassword' })
           .save();
 
-        let [ user1, user2 ] = await session.factory('user').all();
+        const [user1, user2] = await session.factory('user').all();
 
         assert.strictEqual(user1.username, 'admin');
         assert.strictEqual(user2.password, 'userPassword');
@@ -107,8 +107,8 @@ describe('cases', () => {
     });
 
     it('find with skip and limit', async () => {
-      let data = {};
-      let manager = createManager(data);
+      const data = {};
+      const manager = createManager(data);
       await manager.runSession(async session => {
         await session.factory('foo')
           .insert({ name: 'foo', value: 'foo1' })
@@ -117,7 +117,7 @@ describe('cases', () => {
           .insert({ name: 'bar', value: 'bar2' })
           .save();
 
-        let foos = await session.factory('foo').skip(1).limit(1).all();
+        const foos = await session.factory('foo').skip(1).limit(1).all();
 
         assert.strictEqual(foos.length, 1);
         assert.strictEqual(foos[0].name, 'foo');
@@ -126,8 +126,8 @@ describe('cases', () => {
     });
 
     it('find with criteria', async () => {
-      let data = {};
-      let manager = createManager(data);
+      const data = {};
+      const manager = createManager(data);
       await manager.runSession(async session => {
         await session.factory('foo')
           .insert({ name: 'foo', value: 'foo1' })
@@ -136,7 +136,7 @@ describe('cases', () => {
           .insert({ name: 'bar', value: 'bar2' })
           .save();
 
-        let foos = await session.factory('foo', { name: 'bar' }).all();
+        const foos = await session.factory('foo', { name: 'bar' }).all();
 
         assert.strictEqual(foos.length, 2);
         assert.strictEqual(foos[0].name, 'bar');
@@ -145,8 +145,8 @@ describe('cases', () => {
     });
 
     it('find with sort', async () => {
-      let data = {};
-      let manager = createManager(data);
+      const data = {};
+      const manager = createManager(data);
       await manager.runSession(async session => {
         await session.factory('foo')
           .insert({ name: 'foo', value: 'foo1' })
@@ -177,15 +177,15 @@ describe('cases', () => {
     });
 
     it('find single row', async () => {
-      let data = {};
-      let manager = createManager(data);
+      const data = {};
+      const manager = createManager(data);
       await manager.runSession(async session => {
         await session.factory('user')
           .insert({ username: 'admin', password: 'adminPassword' })
           .insert({ username: 'user', password: 'userPassword' })
           .save();
 
-        let user = await session.factory('user', { username: 'user' }).single();
+        const user = await session.factory('user', { username: 'user' }).single();
 
         assert.strictEqual(user.username, 'user');
         assert.strictEqual(user.password, 'userPassword');
@@ -193,7 +193,7 @@ describe('cases', () => {
     });
 
     it('count all rows', async () => {
-      let data = {
+      const data = {
         user: [
           { username: 'foo', password: '1' },
           { username: 'bar', password: '2' },
@@ -201,7 +201,7 @@ describe('cases', () => {
         ],
       };
 
-      let manager = createManager(data);
+      const manager = createManager(data);
       await manager.runSession(async session => {
         let count = await session.factory('user').skip(1).limit(1).count();
         assert.strictEqual(count, 3);
@@ -212,7 +212,7 @@ describe('cases', () => {
     });
 
     it('count respect skip and limit', async () => {
-      let data = {
+      const data = {
         user: [
           { username: 'foo', password: '1' },
           { username: 'bar', password: '2' },
@@ -220,9 +220,9 @@ describe('cases', () => {
         ],
       };
 
-      let manager = createManager(data);
+      const manager = createManager(data);
       await manager.runSession(async session => {
-        let count = await session.factory('user').skip(1).limit(1).count(true);
+        const count = await session.factory('user').skip(1).limit(1).count(true);
         assert.strictEqual(count, 1);
       });
     });

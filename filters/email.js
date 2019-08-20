@@ -6,7 +6,7 @@ module.exports = function email () {
 
     value = value.toLowerCase();
 
-    let err = new Error(`Field ${name} must be valid email`);
+    const err = new Error(`Field ${name} must be valid email`);
 
     const parts = value.split('@');
 

@@ -13,11 +13,11 @@ class Query {
       return;
     }
 
-    let { session, schema, criteria } = options;
+    const { session, schema, criteria } = options;
 
     this.session = session;
 
-    [ this.connection, this.schema ] = this.session.parseSchema(schema);
+    [this.connection, this.schema] = this.session.parseSchema(schema);
 
     this.find(criteria);
 
@@ -73,7 +73,7 @@ class Query {
   async delete ({ observer = true } = {}) {
     this.mode = 'delete';
 
-    let ctx = { query: this };
+    const ctx = { query: this };
 
     if (observer) {
       await this.schema.observe(ctx, ctx => this._delete(ctx));
@@ -86,12 +86,12 @@ class Query {
 
   async _delete () {
     const connection = await this.session.acquire(this.connection);
-    let result = await connection.delete(this);
+    const result = await connection.delete(this);
     return result;
   }
 
   async save ({ filter = true, observer = true } = {}) {
-    let ctx = { query: this, filter };
+    const ctx = { query: this, filter };
 
     if (observer) {
       await this.schema.observe(ctx, ctx => this._save(ctx));
@@ -104,20 +104,20 @@ class Query {
 
   async _save (ctx) {
     const connection = await this.session.acquire(this.connection);
-    let { session } = this;
-    let { filter } = ctx;
+    const { session } = this;
+    const { filter } = ctx;
 
     if (this.rows.length) {
       if (filter) {
         await Promise.all(this.rows.map(row => this.schema.filter(row, { session })));
       }
 
-      let rows = [];
+      const rows = [];
       this.affected = await connection.insert(this, row => rows.push(this.schema.attach(row)));
       this.rows = rows;
     } else {
       if (filter) {
-        let partial = true;
+        const partial = true;
         await this.schema.filter(this.sets, { session, partial });
       }
 
@@ -131,18 +131,18 @@ class Query {
 
   async drop () {
     const connection = await this.session.acquire(this.connection);
-    let result = await connection.drop(this);
+    const result = await connection.drop(this);
     return result;
   }
 
   async truncate () {
     const connection = await this.session.acquire(this.connection);
-    let result = await connection.truncate(this);
+    const result = await connection.truncate(this);
     return result;
   }
 
   async all () {
-    let rows = [];
+    const rows = [];
     const connection = await this.session.acquire(this.connection);
     await connection.load(this, row => rows.push(this.schema.attach(row)));
     return rows;
@@ -157,7 +157,7 @@ class Query {
   }
 
   async single () {
-    let [ row ] = await this.limit(1).all();
+    const [row] = await this.limit(1).all();
     return row;
   }
 

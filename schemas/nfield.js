@@ -38,7 +38,7 @@ class NField {
       value = value.trim();
     }
 
-    let field = this;
+    const field = this;
     return this.filters.reduce(
       async (promise, filter) => filter(await promise, { session, row, schema, field }),
       value

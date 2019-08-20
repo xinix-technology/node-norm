@@ -4,7 +4,7 @@ const { Pool, Schema } = require('../..');
 describe('Pool', () => {
   describe('constructor', () => {
     it('is pool instance', () => {
-      let pool = new Pool({
+      const pool = new Pool({
         adapter: require('../../adapters/memory'),
       });
       assert(pool instanceof Pool);
@@ -13,7 +13,7 @@ describe('Pool', () => {
 
   describe('#putSchema()', () => {
     it('add new schema', () => {
-      let pool = new Pool({
+      const pool = new Pool({
         adapter: require('../../adapters/memory'),
       });
       pool.putSchema({
@@ -25,7 +25,7 @@ describe('Pool', () => {
 
   describe('#getSchema()', () => {
     it('return schema by its name', () => {
-      let pool = new Pool({
+      const pool = new Pool({
         schemas: [
           { name: 'foo' },
         ],

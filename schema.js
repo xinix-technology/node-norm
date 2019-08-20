@@ -32,7 +32,7 @@ class Schema {
   }
 
   addField (field) {
-    let existingField = this.fields.find(f => f.name === field.name);
+    const existingField = this.fields.find(f => f.name === field.name);
     if (existingField) {
       return;
     }
@@ -48,7 +48,7 @@ class Schema {
   }
 
   attach (row, partial = false) {
-    let Model = this.modelClass;
+    const Model = this.modelClass;
 
     this.fields.forEach(field => {
       switch (row[field.name]) {
@@ -70,7 +70,7 @@ class Schema {
 
   observe (ctx, next) {
     if (!this._observerRunner) {
-      let units = this.observers.map(observer => {
+      const units = this.observers.map(observer => {
         return (ctx, next) => {
           if (typeof observer[ctx.query.mode] !== 'function') {
             return next();
@@ -99,7 +99,7 @@ class Schema {
           return;
         }
 
-        row[field.name] = await field.execFilter(row[field.name], { session, row, schema: this });
+        row[field.name] = await field.execFilter(row[field.name], { session, row, schema: this }); // eslint-disable-line require-atomic-updates
       } catch (err) {
         err.field = field;
         error.add(err);

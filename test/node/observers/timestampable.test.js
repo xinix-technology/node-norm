@@ -4,22 +4,22 @@ const assert = require('assert');
 
 describe('Observer: Timestampable', () => {
   it('append created_time and updated_time at insert', async () => {
-    let manager = createManager();
+    const manager = createManager();
 
     await manager.runSession(async session => {
-      let { rows } = await session.factory('foo').insert({ foo: 'bar' }).save();
+      const { rows } = await session.factory('foo').insert({ foo: 'bar' }).save();
       assert(rows[0].created_time instanceof Date);
       assert(rows[0].updated_time instanceof Date);
     });
   });
 
   it('update updated_time at update', async () => {
-    let data = {
+    const data = {
       foo: [
         { foo: 'bar' },
       ],
     };
-    let manager = createManager(data);
+    const manager = createManager(data);
 
     await manager.runSession(async session => {
       await session.factory('foo', { foo: 'bar' })

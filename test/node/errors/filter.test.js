@@ -4,7 +4,7 @@ const FilterError = require('../../../errors/filter');
 describe('FilterError', () => {
   describe('#message', () => {
     it('concatenate children message', () => {
-      let err = new FilterError();
+      const err = new FilterError();
       err.add(new Error('foo'));
       err.add(new Error('bar'));
 

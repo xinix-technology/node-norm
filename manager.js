@@ -21,7 +21,7 @@ class Manager {
     // resolve adapter first before creating
     config.adapter = Manager.adapter(config.adapter);
 
-    let pool = new Pool(config);
+    const pool = new Pool(config);
     this.pools[pool.name] = pool;
     this.main = config.main ? pool.name : (this.main || pool.name);
 
@@ -66,7 +66,7 @@ class Manager {
 
   async end () {
     await Promise.all(Object.keys(this.pools).map(async name => {
-      let pool = this.pools[name];
+      const pool = this.pools[name];
       await pool.drain();
       await pool.clear();
     }));

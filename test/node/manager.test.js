@@ -22,7 +22,7 @@ describe('Manager', () => {
 
   describe('contructor', () => {
     it('create instance without connection when no arg specified', () => {
-      let manager = new Manager();
+      const manager = new Manager();
 
       assert(manager instanceof Manager, 'manager instanceof Manager');
 
@@ -30,22 +30,22 @@ describe('Manager', () => {
     });
 
     it('create instance with connection when arg connections specified', () => {
-      let connections = [
+      const connections = [
         { name: 'one', adapter: require('../../adapters/memory') },
       ];
 
-      let manager = new Manager({ connections });
+      const manager = new Manager({ connections });
 
       assert.strictEqual(Object.keys(manager.pools).length, 1);
 
-      let connection = manager.pools.one;
+      const connection = manager.pools.one;
       assert.strictEqual(connection.name, 'one');
     });
   });
 
   describe('#put()', () => {
     it('add new connection', () => {
-      let manager = new Manager();
+      const manager = new Manager();
 
       assert.strictEqual(Object.keys(manager.pools).length, 0);
 
@@ -55,7 +55,7 @@ describe('Manager', () => {
     });
 
     it('set main connection to connection config with truthy main property', () => {
-      let manager = new Manager({
+      const manager = new Manager({
         connections: [
           { name: 'foo', adapter: require('../../adapters/memory') },
           { name: 'bar', adapter: require('../../adapters/memory'), main: true },
@@ -68,7 +68,7 @@ describe('Manager', () => {
 
   describe('#getPool()', () => {
     it('get main connection when no arg specified', () => {
-      let manager = new Manager({
+      const manager = new Manager({
         connections: [
           { name: 'foo', adapter: require('../../adapters/memory') },
           { name: 'bar', adapter: require('../../adapters/memory'), main: true },
@@ -79,7 +79,7 @@ describe('Manager', () => {
     });
 
     it('throw error when pool not exist', () => {
-      let manager = new Manager({
+      const manager = new Manager({
         connections: [
           {
             adapter: require('../../adapters/memory'),
@@ -94,7 +94,7 @@ describe('Manager', () => {
   describe('#main', () => {
     it('value is the first connection when no default set', () => {
       it('get default connection when no arg specified', () => {
-        let manager = new Manager({
+        const manager = new Manager({
           connections: [
             { name: 'foo' },
             { name: 'bar' },
@@ -118,7 +118,7 @@ describe('Manager', () => {
       });
 
       let disposeCalled = false;
-      let session = {
+      const session = {
         dispose () {
           disposeCalled = true;
         },

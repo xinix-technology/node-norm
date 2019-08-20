@@ -5,7 +5,7 @@ class Actorable {
     createdKey = 'created_by',
     updatedKey = 'updated_by',
     userCallback = ctx => {
-      let { user } = ctx.query.session.state;
+      const { user } = ctx.query.session.state;
       if (user) {
         return user.sub;
       }
@@ -22,7 +22,7 @@ class Actorable {
   }
 
   async insert (ctx, next) {
-    let { query } = ctx;
+    const { query } = ctx;
     query.rows.forEach(row => {
       row[this.createdKey] = row[this.updatedKey] = this.userCallback(ctx) || null;
     });
@@ -31,7 +31,7 @@ class Actorable {
   }
 
   async update (ctx, next) {
-    let { query } = ctx;
+    const { query } = ctx;
     query.sets[this.updatedKey] = this.userCallback(ctx) || null;
 
     await next();
@@ -40,7 +40,7 @@ class Actorable {
 
 // eslint-disable
 if (typeof window !== 'undefined') {
-  let norm = window.norm;
+  const norm = window.norm;
   if (!norm) {
     throw new Error('Norm is not defined yet!');
   }

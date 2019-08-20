@@ -4,7 +4,7 @@ module.exports = function exists (schema, key = 'id') {
       return null;
     }
 
-    let criteria = {};
+    const criteria = {};
     criteria[key] = value;
 
     if (!(await session.factory(schema, criteria).single())) {

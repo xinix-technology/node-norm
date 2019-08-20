@@ -4,7 +4,7 @@ const { NString } = require('../../schemas');
 
 describe('Schema', () => {
   it('define schemas by pool constructor', () => {
-    let pool = new Pool({
+    const pool = new Pool({
       name: 'foo',
       schemas: [
         {

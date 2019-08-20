@@ -4,14 +4,14 @@ module.exports = function (schema) {
       return null;
     }
 
-    let err = new Error(`Field ${name} values must be ${schema}`);
+    const err = new Error(`Field ${name} values must be ${schema}`);
 
     if (!Array.isArray(value)) {
       throw err;
     }
 
     try {
-      let schemaO = session.getSchema(schema);
+      const schemaO = session.getSchema(schema);
       await Promise.all(value.map(row => schemaO.filter(row, { session })));
       value = value.map(row => schemaO.attach(row));
     } catch (err) {

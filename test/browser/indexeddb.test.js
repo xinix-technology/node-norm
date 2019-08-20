@@ -4,7 +4,7 @@ const { Manager, Model } = require('../..');
 
 // localStorage.debug = 'node-norm:*';
 
-describe('cases', () => {
+describe('IndexedDB', () => {
   describe('single database crud', () => {
     const adapter = require('node-norm/adapters/indexeddb');
     const dbname = 'db';
@@ -12,13 +12,13 @@ describe('cases', () => {
     let manager;
 
     function onUpgradeNeeded (evt) {
-      let db = evt.target.result;
+      const db = evt.target.result;
       db.createObjectStore('foo', { keyPath: 'id', autoIncrement: true });
       // console.log('onUpgradeNeeded db', db);
     }
 
     function getDB () {
-      let req = window.indexedDB.open(dbname, version);
+      const req = window.indexedDB.open(dbname, version);
       req.onupgradeneeded = onUpgradeNeeded;
       return promised(req);
     }
@@ -38,19 +38,19 @@ describe('cases', () => {
     }
 
     async function getAll (name, db) {
-      let store = await getStore('foo', db);
+      const store = await getStore('foo', db);
       return promised(store.getAll());
     }
 
     async function insert (name, row, db) {
-      let store = await getStore('foo', db);
+      const store = await getStore('foo', db);
       return promised(store.add(row));
     }
 
     before(async () => {
-      let store = await getStore('foo');
+      const store = await getStore('foo');
       await new Promise((resolve, reject) => {
-        let req = store.clear();
+        const req = store.clear();
         req.onsuccess = resolve;
         req.onerror = reject;
       });
@@ -77,7 +77,7 @@ describe('cases', () => {
         assert.strictEqual(rows[0].name, 'admin');
         assert.strictEqual(rows[1].value, 'userPassword');
       });
-    });
+    }).timeout(10000);
 
     it('update rows', async () => {
       await insert('foo', { name: 'foo', value: 'foo1' });
@@ -85,7 +85,7 @@ describe('cases', () => {
       await manager.runSession(async session => {
         await session.factory('foo', { name: 'foo' }).set({ value: 'fooz' }).save();
 
-        let rows = await getAll('foo');
+        const rows = await getAll('foo');
         rows.filter(row => row.name === 'foo').map(row => {
           assert.strictEqual(row.value, 'fooz');
         });
@@ -103,7 +103,7 @@ describe('cases', () => {
       await manager.runSession(async session => {
         await session.factory('foo', { name: 'foo' }).delete();
 
-        let rows = await getAll('foo');
+        const rows = await getAll('foo');
         assert.strictEqual(rows.filter(row => row.name === 'foo').length, 0);
       });
     });
@@ -118,7 +118,7 @@ describe('cases', () => {
 
       await manager.runSession(async session => {
         await session.factory('foo').truncate();
-        let rows = await getAll('foo');
+        const rows = await getAll('foo');
         assert.strictEqual(rows.length, 0);
       });
     });
@@ -133,7 +133,7 @@ describe('cases', () => {
 
       await manager.runSession(async session => {
         await session.factory('foo').drop();
-        let rows = await getAll('foo');
+        const rows = await getAll('foo');
         assert.strictEqual(rows.length, 0);
       });
     });
@@ -145,7 +145,7 @@ describe('cases', () => {
           .insert({ username: 'user', password: 'userPassword' })
           .save();
 
-        let [ user1, user2 ] = await session.factory('foo').all();
+        const [user1, user2] = await session.factory('foo').all();
 
         assert.strictEqual(user1.username, 'admin');
         assert.strictEqual(user2.password, 'userPassword');

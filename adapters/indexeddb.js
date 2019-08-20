@@ -10,7 +10,7 @@ const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexe
 // const IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
 
 if (!window.indexedDB) {
-  throw new Error(`Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available.`);
+  throw new Error('Your browser doesn\'t support a stable version of IndexedDB. Such and such feature will not be available.');
 }
 
 class IndexedDB extends Memory {
@@ -23,22 +23,22 @@ class IndexedDB extends Memory {
   }
 
   async load (query, callback = () => {}) {
-    let { criteria } = query;
-    let store = await this.__getStore(query.schema.name);
+    const { criteria } = query;
+    const store = await this.__getStore(query.schema.name);
 
     // TODO: implement sorting?
     // let { criteria, sorts } = query;
 
-    let rows = await new Promise((resolve, reject) => {
-      let rows = [];
-      let req = store.openCursor();
+    const rows = await new Promise((resolve, reject) => {
+      const rows = [];
+      const req = store.openCursor();
       req.onsuccess = evt => {
-        let cursor = evt.target.result;
+        const cursor = evt.target.result;
         if (!cursor) {
           return resolve(rows);
         }
 
-        let row = cursor.value;
+        const row = cursor.value;
         if (this._matchCriteria(criteria, row, query.schema)) {
           rows.push(row);
         }
@@ -54,12 +54,12 @@ class IndexedDB extends Memory {
   }
 
   async insert (query, callback = () => {}) {
-    let store = await this.__getStore(query.schema.name);
+    const store = await this.__getStore(query.schema.name);
 
     let inserted = 0;
 
     await Promise.all(query.rows.map(async row => {
-      row.id = await this.__promised(store.add(row));
+      row.id = await this.__promised(store.add(row)); // eslint-disable-line require-atomic-updates
       callback(row);
       inserted++;
     }));
@@ -68,16 +68,16 @@ class IndexedDB extends Memory {
   }
 
   async update (query) {
-    let rows = [];
+    const rows = [];
     await this.load(query, row => rows.push(row));
 
-    let store = await this.__getStore(query.schema.name);
+    const store = await this.__getStore(query.schema.name);
 
-    let keys = Object.keys(query.sets);
+    const keys = Object.keys(query.sets);
     let affected = 0;
 
     await Promise.all(rows.map(row => {
-      let fieldChanges = keys.filter(key => {
+      const fieldChanges = keys.filter(key => {
         if (row[key] === query.sets[key]) {
           return false;
         }
@@ -97,16 +97,16 @@ class IndexedDB extends Memory {
   }
 
   async delete (query) {
-    let rows = [];
+    const rows = [];
     await this.load(query, row => rows.push(row));
 
-    let store = await this.__getStore(query.schema.name);
+    const store = await this.__getStore(query.schema.name);
 
     await rows.map(row => this.__promised(store.delete(row.id)));
   }
 
   async truncate (query) {
-    let store = await this.__getStore(query.schema.name);
+    const store = await this.__getStore(query.schema.name);
     await this.__promised(store.clear());
   }
 
@@ -115,9 +115,9 @@ class IndexedDB extends Memory {
   }
 
   async __getDB () {
-    let req = indexedDB.open(this.dbname, this.version);
+    const req = indexedDB.open(this.dbname, this.version);
     req.onupgradeneeded = this.onUpgradeNeeded;
-    let db = await this.__promised(req);
+    const db = await this.__promised(req);
     return db;
   }
 
@@ -129,18 +129,18 @@ class IndexedDB extends Memory {
   }
 
   async __getTx (names) {
-    let db = await this.__getDB();
+    const db = await this.__getDB();
     return db.transaction(names, 'readwrite');
   }
 
   async __getStore (name) {
-    let tx = await this.__getTx(name);
+    const tx = await this.__getTx(name);
     return tx.objectStore(name);
   }
 }
 
 if (typeof window !== 'undefined') {
-  let norm = window.norm;
+  const norm = window.norm;
   if (!norm) {
     throw new Error('Norm is not defined yet!');
   }

@@ -1,7 +1,7 @@
 class Model {
   constructor (row) {
-    for (let key in row) {
-      if (!row.hasOwnProperty(key) || row[key] === undefined) {
+    for (const key in row) { // eslint-disable-line no-unused-vars
+      if (!Object.prototype.hasOwnProperty.call(row, key) || row[key] === undefined) {
         continue;
       }
 

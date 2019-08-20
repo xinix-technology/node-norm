@@ -8,7 +8,7 @@ describe('Filter', () => {
 
   describe('#get()', () => {
     it('get default filter by string', () => {
-      let filter = Filter.get('default:foo');
+      const filter = Filter.get('default:foo');
 
       assert.strictEqual(filter(null), 'foo');
       assert.strictEqual(filter(), 'foo');
@@ -17,7 +17,7 @@ describe('Filter', () => {
     });
 
     it('get default filter by array', () => {
-      let filter = Filter.get([ 'default', 'foo' ]);
+      const filter = Filter.get(['default', 'foo']);
 
       assert.strictEqual(filter(null), 'foo');
       assert.strictEqual(filter(), 'foo');
@@ -30,7 +30,7 @@ describe('Filter', () => {
     });
 
     it('get function filter', () => {
-      let filter = Filter.get(v => 'foo');
+      const filter = Filter.get(v => 'foo');
       assert.strictEqual(filter('foo'), 'foo');
       assert.strictEqual(filter('bar'), 'foo');
     });
@@ -48,7 +48,7 @@ describe('Filter', () => {
         return val => `${val}-updated`;
       });
 
-      let filter = Filter.get('foo');
+      const filter = Filter.get('foo');
       assert.strictEqual(filter('foo'), 'foo-updated');
     });
   });

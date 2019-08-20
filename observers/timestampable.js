@@ -31,7 +31,7 @@ class Timestampable {
 
 // eslint-disable
 if (typeof window !== 'undefined') {
-  let norm = window.norm;
+  const norm = window.norm;
   if (!norm) {
     throw new Error('Norm is not defined yet!');
   }

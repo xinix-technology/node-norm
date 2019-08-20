@@ -4,8 +4,8 @@ module.exports = function unique () {
       return null;
     }
 
-    let criteria = { [name]: value };
-    let foundRow = await session.factory(schema.name, criteria).single();
+    const criteria = { [name]: value };
+    const foundRow = await session.factory(schema.name, criteria).single();
     if (foundRow && foundRow.id !== row.id) {
       throw new Error(`Field ${name} must be unique`);
     }

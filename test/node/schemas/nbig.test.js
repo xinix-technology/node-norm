@@ -6,7 +6,7 @@ const createManager = require('../_lib/create-manager');
 describe('NBig', () => {
   describe('#attach()', () => {
     it('return plain object or undefined', () => {
-      let field = new NBig();
+      const field = new NBig();
 
       assert.strictEqual(field.attach(0).toFixed(2), '0.00');
       assert.strictEqual(field.attach(1).toFixed(2), '1.00');
@@ -20,7 +20,7 @@ describe('NBig', () => {
 
   describe('#serialize()', () => {
     it('return serialized data', () => {
-      let field = new NBig();
+      const field = new NBig();
 
       assert.strictEqual(field.serialize(new Big('1.23')), '1.23');
       assert.strictEqual(field.serialize(new Big(1.23)), '1.23');
@@ -29,7 +29,7 @@ describe('NBig', () => {
   });
 
   describe('respond to criteria', () => {
-    let data = {
+    const data = {
       foo: [
         { bar: '1' },
         { bar: '10' },
@@ -37,7 +37,7 @@ describe('NBig', () => {
       ],
     };
 
-    let schemas = [
+    const schemas = [
       {
         name: 'foo',
         fields: [
@@ -47,41 +47,41 @@ describe('NBig', () => {
     ];
 
     it('respond to eq', async () => {
-      let manager = createManager({ data, schemas });
+      const manager = createManager({ data, schemas });
       await manager.runSession(async session => {
-        let rows = await session.factory('foo', { bar: 10 }).all();
+        const rows = await session.factory('foo', { bar: 10 }).all();
         assert.strictEqual(rows.length, 1);
       });
     });
 
     it('respond to gt', async () => {
-      let manager = createManager({ data, schemas });
+      const manager = createManager({ data, schemas });
       await manager.runSession(async session => {
-        let rows = await session.factory('foo', { 'bar!gt': 10 }).all();
+        const rows = await session.factory('foo', { 'bar!gt': 10 }).all();
         assert.strictEqual(rows.length, 1);
       });
     });
 
     it('respond to gte', async () => {
-      let manager = createManager({ data, schemas });
+      const manager = createManager({ data, schemas });
       await manager.runSession(async session => {
-        let rows = await session.factory('foo', { 'bar!gte': 10 }).all();
+        const rows = await session.factory('foo', { 'bar!gte': 10 }).all();
         assert.strictEqual(rows.length, 2);
       });
     });
 
     it('respond to lt', async () => {
-      let manager = createManager({ data, schemas });
+      const manager = createManager({ data, schemas });
       await manager.runSession(async session => {
-        let rows = await session.factory('foo', { 'bar!lt': 10 }).all();
+        const rows = await session.factory('foo', { 'bar!lt': 10 }).all();
         assert.strictEqual(rows.length, 1);
       });
     });
 
     it('respond to lte', async () => {
-      let manager = createManager({ data, schemas });
+      const manager = createManager({ data, schemas });
       await manager.runSession(async session => {
-        let rows = await session.factory('foo', { 'bar!lte': 10 }).all();
+        const rows = await session.factory('foo', { 'bar!lte': 10 }).all();
         assert.strictEqual(rows.length, 2);
       });
     });

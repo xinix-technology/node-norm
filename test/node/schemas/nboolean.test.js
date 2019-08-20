@@ -4,7 +4,7 @@ const { NBoolean } = require('../../../schemas');
 describe('NBoolean', () => {
   describe('#attach()', () => {
     it('return boolean', () => {
-      let field = new NBoolean();
+      const field = new NBoolean();
 
       assert.strictEqual(field.attach(false), false);
       assert.strictEqual(field.attach(undefined), null);

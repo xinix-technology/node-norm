@@ -35,14 +35,14 @@ module.exports = class NMap extends NField {
       return 1;
     }
 
-    let criteriaKeys = Object.getOwnPropertyNames(criteria);
-    let valueKeys = Object.getOwnPropertyNames(value);
+    const criteriaKeys = Object.getOwnPropertyNames(criteria);
+    const valueKeys = Object.getOwnPropertyNames(value);
 
     if (criteriaKeys.length !== valueKeys.length) {
       return 1;
     }
 
-    for (let key of criteriaKeys) {
+    for (const key of criteriaKeys) { // eslint-disable-line no-unused-vars
       if (!valueKeys.includes(key)) {
         return 1;
       }

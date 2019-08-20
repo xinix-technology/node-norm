@@ -1,6 +1,6 @@
 module.exports = function def (defaultValue) {
   return function (value = null) {
-    if (!value) {
+    if (value === null || value === undefined || value === '') {
       return defaultValue;
     }
 

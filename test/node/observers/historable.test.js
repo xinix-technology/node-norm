@@ -4,11 +4,11 @@ const assert = require('assert');
 
 describe('Observer: Historable', () => {
   it('append history', async () => {
-    let data = {};
-    let manager = createManager(data);
+    const data = {};
+    const manager = createManager(data);
 
     await manager.runSession(async session => {
-      let { rows } = await session.factory('foo').insert({ foo: 'bar' }).save();
+      const { rows } = await session.factory('foo').insert({ foo: 'bar' }).save();
 
       assert.strictEqual(data.foo_history.length, 1);
 

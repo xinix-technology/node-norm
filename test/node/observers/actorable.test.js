@@ -4,23 +4,23 @@ const assert = require('assert');
 
 describe('Observer: Actorable', () => {
   it('append created_by and updated_by at insert', async () => {
-    let manager = createManager();
+    const manager = createManager();
 
     await manager.runSession(async session => {
       session.state.user = { sub: 'user' };
-      let { rows } = await session.factory('foo').insert({ foo: 'bar' }).save();
+      const { rows } = await session.factory('foo').insert({ foo: 'bar' }).save();
       assert.strictEqual(rows[0].created_by, 'user');
       assert.strictEqual(rows[0].updated_by, 'user');
     });
   });
 
   it('update updated_by at update', async () => {
-    let data = {
+    const data = {
       foo: [
         { foo: 'bar', created_by: 'someone' },
       ],
     };
-    let manager = createManager(data);
+    const manager = createManager(data);
 
     await manager.runSession(async session => {
       session.state.user = { sub: 'user' };
@@ -33,12 +33,12 @@ describe('Observer: Actorable', () => {
   });
 
   it('append created_by and updated_by at insert', async () => {
-    let data = {};
+    const data = {};
     let actor = 'user';
-    let manager = createManager(data, () => actor);
+    const manager = createManager(data, () => actor);
 
     await manager.runSession(async session => {
-      let { rows } = await session.factory('foo').insert({ foo: 'bar' }).save();
+      const { rows } = await session.factory('foo').insert({ foo: 'bar' }).save();
       assert.strictEqual(rows[0].created_by, 'user');
       assert.strictEqual(rows[0].updated_by, 'user');
 

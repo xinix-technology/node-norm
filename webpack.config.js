@@ -20,14 +20,14 @@ module.exports = function (env, { mode = 'development' }) {
 };
 
 function getEntries () {
-  let entries = {
-    'norm': './index.js',
+  const entries = {
+    norm: './index.js',
     'adapters/memory': './adapters/memory.js',
     'adapters/indexeddb': './adapters/indexeddb.js',
   };
 
   fs.readdirSync('./observers').forEach(file => {
-    let basename = path.basename(file, '.js');
+    const basename = path.basename(file, '.js');
     entries[`observers/${basename}`] = `./observers/${file}`;
   });
 

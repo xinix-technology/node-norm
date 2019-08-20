@@ -4,7 +4,7 @@ const { NField } = require('../../../schemas');
 describe('NField', () => {
   describe('#attach()', () => {
     it('return as is', () => {
-      let field = new NField();
+      const field = new NField();
 
       assert.strictEqual(field.attach('foo'), 'foo');
     });
@@ -12,9 +12,9 @@ describe('NField', () => {
 
   describe('#execFilter()', () => {
     it('filter value', async () => {
-      let field = new NField('foo').filter('default:zzz');
-      let session = {};
-      let row = {};
+      const field = new NField('foo').filter('default:zzz');
+      const session = {};
+      const row = {};
 
       assert.strictEqual(await field.execFilter(null, { session, row }), 'zzz');
       assert.strictEqual(await field.execFilter(undefined, { session, row }), 'zzz');

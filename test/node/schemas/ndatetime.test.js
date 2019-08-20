@@ -4,8 +4,8 @@ const { NDatetime } = require('../../../schemas');
 describe('NDatetime', () => {
   describe('#attach()', () => {
     it('return datetime', () => {
-      let field = new NDatetime();
-      let now = new Date();
+      const field = new NDatetime();
+      const now = new Date();
 
       assert.strictEqual(field.attach(''), null);
       assert.strictEqual(field.attach(now.toJSON()).toJSON(), now.toJSON());

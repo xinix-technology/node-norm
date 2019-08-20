@@ -6,15 +6,15 @@ class Filter {
       throw new Error('Cannot tokenize non-string filter signature');
     }
 
-    let [ head, ...rest ] = signature.split(':');
+    let [head, ...rest] = signature.split(':');
     rest = rest.join(':');
     rest = rest.length === 0 ? [] : rest.split(',');
 
-    return [ head, ...rest ];
+    return [head, ...rest];
   }
 
   static get (signature) {
-    let signatureType = typeof signature;
+    const signatureType = typeof signature;
 
     if (signatureType === 'function') {
       return signature;
@@ -28,7 +28,7 @@ class Filter {
       throw new Error(`Unknown filter by ${signatureType}`);
     }
 
-    let [ fn, ...args ] = signature;
+    const [fn, ...args] = signature;
 
     if (fn in filters === false) {
       try {

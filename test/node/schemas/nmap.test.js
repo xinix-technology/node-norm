@@ -5,7 +5,7 @@ const createManager = require('../_lib/create-manager');
 describe('NMap', () => {
   describe('#attach()', () => {
     it('return plain object or undefined', () => {
-      let field = new NMap();
+      const field = new NMap();
 
       assert.deepStrictEqual(field.attach({}), {});
       // assert.strictEqual(field.attach(undefined), undefined);
@@ -17,14 +17,14 @@ describe('NMap', () => {
 
   describe('respond to criteria', () => {
     it('respond to eq', async () => {
-      let data = {
+      const data = {
         foo: [
           {
             barMap: { name: 'bar1' },
           },
         ],
       };
-      let schemas = [
+      const schemas = [
         {
           name: 'foo',
           fields: [
@@ -33,9 +33,9 @@ describe('NMap', () => {
         },
       ];
 
-      let manager = createManager({ data, schemas });
+      const manager = createManager({ data, schemas });
       await manager.runSession(async session => {
-        let rows = await session.factory('foo', { barMap: { name: 'bar1' } }).all();
+        const rows = await session.factory('foo', { barMap: { name: 'bar1' } }).all();
         assert.strictEqual(rows.length, 1);
       });
     });

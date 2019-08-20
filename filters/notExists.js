@@ -4,8 +4,8 @@ module.exports = function notExists (schema) {
       return null;
     }
 
-    let criteria = { [name]: value };
-    let foundRow = await session.factory(schema, criteria).single();
+    const criteria = { [name]: value };
+    const foundRow = await session.factory(schema, criteria).single();
     if (foundRow && foundRow.id !== row.id) {
       throw new Error(`Field ${name} already exists in ${schema}`);
     }

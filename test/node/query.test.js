@@ -19,15 +19,15 @@ describe('Query', () => {
 
   describe('#save()', () => {
     it('run composed function of observers', async () => {
-      let observer = new TheObserver();
-      let data = {};
-      let schemas = [
+      const observer = new TheObserver();
+      const data = {};
+      const schemas = [
         {
           name: 'user',
-          observers: [ observer ],
+          observers: [observer],
         },
       ];
-      let manager = new Manager({
+      const manager = new Manager({
         connections: [
           {
             adapter: require('../../adapters/memory'),
@@ -38,7 +38,7 @@ describe('Query', () => {
       });
 
       await manager.runSession(async session => {
-        let { rows } = await session.factory('user')
+        const { rows } = await session.factory('user')
           .insert({ username: 'foo' })
           .save();
 
@@ -51,17 +51,17 @@ describe('Query', () => {
 
   describe('#delete()', () => {
     it('run composed function of observers', async () => {
-      let observer = new TheObserver();
-      let data = {
-        user: [ {}, {} ],
+      const observer = new TheObserver();
+      const data = {
+        user: [{}, {}],
       };
-      let schemas = [
+      const schemas = [
         {
           name: 'user',
-          observers: [ observer ],
+          observers: [observer],
         },
       ];
-      let manager = new Manager({
+      const manager = new Manager({
         connections: [
           {
             adapter: require('../../adapters/memory'),

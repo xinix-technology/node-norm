@@ -3,18 +3,18 @@ const { Manager } = require('../..');
 
 describe('criteria', () => {
   it('eq', async () => {
-    let data = {
+    const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
         { id: 2, username: 'bar', age: 14 },
         { id: 3, username: 'baz', age: 20 },
       ],
     };
-    let manager = createManager(data);
+    const manager = createManager(data);
     await manager.runSession(async session => {
-      let criteria = { 'username!eq': 'foo' };
-      let users = await session.factory('user', criteria).all();
-      let [ user ] = users;
+      const criteria = { 'username!eq': 'foo' };
+      const users = await session.factory('user', criteria).all();
+      const [user] = users;
 
       assert.strictEqual(users.length, 1);
       assert.strictEqual(user.username, 'foo');
@@ -22,17 +22,17 @@ describe('criteria', () => {
   });
 
   it('ne', async () => {
-    let data = {
+    const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
         { id: 2, username: 'bar', age: 14 },
         { id: 3, username: 'baz', age: 20 },
       ],
     };
-    let manager = createManager(data);
+    const manager = createManager(data);
     await manager.runSession(async session => {
-      let criteria = { 'username!ne': 'foo' };
-      let users = await session.factory('user', criteria).all();
+      const criteria = { 'username!ne': 'foo' };
+      const users = await session.factory('user', criteria).all();
 
       assert.strictEqual(users[0].username, 'bar');
       assert.strictEqual(users[1].username, 'baz');
@@ -40,35 +40,35 @@ describe('criteria', () => {
   });
 
   it('gt', async () => {
-    let data = {
+    const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
         { id: 2, username: 'bar', age: 14 },
         { id: 3, username: 'baz', age: 20 },
       ],
     };
-    let manager = createManager(data);
+    const manager = createManager(data);
     await manager.runSession(async session => {
-      let criteria = { 'age!gt': 15 };
-      let users = await session.factory('user', criteria).all();
-      let [ user ] = users;
+      const criteria = { 'age!gt': 15 };
+      const users = await session.factory('user', criteria).all();
+      const [user] = users;
 
       assert.strictEqual(user.username, 'baz');
     });
   });
 
   it('gte', async () => {
-    let data = {
+    const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
         { id: 2, username: 'bar', age: 14 },
         { id: 3, username: 'baz', age: 20 },
       ],
     };
-    let manager = createManager(data);
+    const manager = createManager(data);
     await manager.runSession(async session => {
-      let criteria = { 'age!gte': 15 };
-      let users = await session.factory('user', criteria).all();
+      const criteria = { 'age!gte': 15 };
+      const users = await session.factory('user', criteria).all();
 
       assert.strictEqual(users.length, 2);
       assert.strictEqual(users[0].username, 'foo');
@@ -77,35 +77,35 @@ describe('criteria', () => {
   });
 
   it('lt', async () => {
-    let data = {
+    const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
         { id: 2, username: 'bar', age: 14 },
         { id: 3, username: 'baz', age: 20 },
       ],
     };
-    let manager = createManager(data);
+    const manager = createManager(data);
     await manager.runSession(async session => {
-      let criteria = { 'age!lt': 15 };
-      let users = await session.factory('user', criteria).all();
-      let [ user ] = users;
+      const criteria = { 'age!lt': 15 };
+      const users = await session.factory('user', criteria).all();
+      const [user] = users;
 
       assert.strictEqual(user.username, 'bar');
     });
   });
 
   it('lte', async () => {
-    let data = {
+    const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
         { id: 2, username: 'bar', age: 14 },
         { id: 3, username: 'baz', age: 20 },
       ],
     };
-    let manager = createManager(data);
+    const manager = createManager(data);
     await manager.runSession(async session => {
-      let criteria = { 'age!lte': 15 };
-      let users = await session.factory('user', criteria).all();
+      const criteria = { 'age!lte': 15 };
+      const users = await session.factory('user', criteria).all();
 
       assert.strictEqual(users.length, 2);
       assert.strictEqual(users[0].username, 'foo');
@@ -114,17 +114,17 @@ describe('criteria', () => {
   });
 
   it('in', async () => {
-    let data = {
+    const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
         { id: 2, username: 'bar', age: 14 },
         { id: 3, username: 'baz', age: 20 },
       ],
     };
-    let manager = createManager(data);
+    const manager = createManager(data);
     await manager.runSession(async session => {
-      let criteria = { 'age!in': [ 14, 15 ] };
-      let users = await session.factory('user', criteria).all();
+      const criteria = { 'age!in': [14, 15] };
+      const users = await session.factory('user', criteria).all();
 
       assert.strictEqual(users.length, 2);
       assert.strictEqual(users[0].username, 'foo');
@@ -133,17 +133,17 @@ describe('criteria', () => {
   });
 
   it('nin', async () => {
-    let data = {
+    const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
         { id: 2, username: 'bar', age: 14 },
         { id: 3, username: 'baz', age: 20 },
       ],
     };
-    let manager = createManager(data);
+    const manager = createManager(data);
     await manager.runSession(async session => {
-      let criteria = { 'age!nin': [ 14, 15 ] };
-      let users = await session.factory('user', criteria).all();
+      const criteria = { 'age!nin': [14, 15] };
+      const users = await session.factory('user', criteria).all();
 
       assert.strictEqual(users.length, 1);
       assert.strictEqual(users[0].username, 'baz');
@@ -151,22 +151,22 @@ describe('criteria', () => {
   });
 
   it('or', async () => {
-    let data = {
+    const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
         { id: 2, username: 'bar', age: 14 },
         { id: 3, username: 'baz', age: 20 },
       ],
     };
-    let manager = createManager(data);
+    const manager = createManager(data);
     await manager.runSession(async session => {
-      let criteria = {
+      const criteria = {
         '!or': [
-          { 'username': 'foo' },
-          { 'username': 'baz' },
+          { username: 'foo' },
+          { username: 'baz' },
         ],
       };
-      let users = await session.factory('user', criteria).all();
+      const users = await session.factory('user', criteria).all();
 
       assert.strictEqual(users.length, 2);
       assert.strictEqual(users[0].username, 'foo');
@@ -175,7 +175,7 @@ describe('criteria', () => {
   });
 
   it('and', async () => {
-    let data = {
+    const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
         { id: 2, username: 'bar', age: 14 },
@@ -183,15 +183,15 @@ describe('criteria', () => {
         { id: 4, username: 'foo', age: 10 },
       ],
     };
-    let manager = createManager(data);
+    const manager = createManager(data);
     await manager.runSession(async session => {
-      let criteria = {
+      const criteria = {
         '!and': [
-          { 'username': 'foo' },
-          { 'age': 10 },
+          { username: 'foo' },
+          { age: 10 },
         ],
       };
-      let users = await session.factory('user', criteria).all();
+      const users = await session.factory('user', criteria).all();
 
       assert.strictEqual(users.length, 1);
       assert.strictEqual(users[0].username, 'foo');
@@ -200,17 +200,17 @@ describe('criteria', () => {
   });
 
   it('like', async () => {
-    let data = {
+    const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
         { id: 2, username: 'bar', age: 14 },
         { id: 3, username: 'baz', age: 20 },
       ],
     };
-    let manager = createManager(data);
+    const manager = createManager(data);
     await manager.runSession(async session => {
-      let criteria = { 'username!like': 'ba' };
-      let users = await session.factory('user', criteria).all();
+      const criteria = { 'username!like': 'ba' };
+      const users = await session.factory('user', criteria).all();
 
       assert.strictEqual(users.length, 2);
       assert.strictEqual(users[0].username, 'bar');
@@ -219,17 +219,17 @@ describe('criteria', () => {
   });
 
   it('regex', async () => {
-    let data = {
+    const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
         { id: 2, username: 'bar', age: 14 },
         { id: 3, username: 'baz', age: 20 },
       ],
     };
-    let manager = createManager(data);
+    const manager = createManager(data);
     await manager.runSession(async session => {
-      let criteria = { 'username!regex': /^ba/ };
-      let users = await session.factory('user', criteria).all();
+      const criteria = { 'username!regex': /^ba/ };
+      const users = await session.factory('user', criteria).all();
 
       assert.strictEqual(users.length, 2);
       assert.strictEqual(users[0].username, 'bar');
@@ -238,17 +238,17 @@ describe('criteria', () => {
   });
 
   it('where', async () => {
-    let data = {
+    const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
         { id: 2, username: 'bar', age: 14 },
         { id: 3, username: 'baz', age: 20 },
       ],
     };
-    let manager = createManager(data);
+    const manager = createManager(data);
     await manager.runSession(async session => {
-      let criteria = { 'username!where': (v, row) => v === 'bar' };
-      let users = await session.factory('user', criteria).all();
+      const criteria = { 'username!where': (v, row) => v === 'bar' };
+      const users = await session.factory('user', criteria).all();
 
       assert.strictEqual(users.length, 1);
       assert.strictEqual(users[0].username, 'bar');

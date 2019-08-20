@@ -13,12 +13,12 @@ module.exports = class NDatetime extends NField {
     }
 
     if (typeof value === 'number') {
-      let date = new Date();
+      const date = new Date();
       date.setTime(value);
       return date;
     }
 
-    let date = new Date(value);
+    const date = new Date(value);
     if (isNaN(date.getTime())) {
       throw new Error('Invalid datetime value');
     }

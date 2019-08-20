@@ -9,31 +9,31 @@ class Disk extends Memory {
   }
 
   async insert (query, callback = () => {}) {
-    let result = await super.insert(query, callback);
+    const result = await super.insert(query, callback);
     // this._write();
     return result;
   }
 
   async update (query) {
-    let result = await super.update(query);
+    const result = await super.update(query);
     // this._write();
     return result;
   }
 
   async drop (query) {
-    let result = await super.drop(query);
+    const result = await super.drop(query);
     // this._write();
     return result;
   }
 
   async truncate (query) {
-    let result = await super.truncate(query);
+    const result = await super.truncate(query);
     // this._write();
     return result;
   }
 
   async delete (query) {
-    let result = await super.delete(query);
+    const result = await super.delete(query);
     // this._write();
     return result;
   }

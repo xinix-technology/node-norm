@@ -5,7 +5,7 @@ let poolNextId = 0;
 
 class Pool {
   constructor (config) {
-    let { name, adapter = require('./adapters/memory'), schemas = [], min = 1, max = 2 } = config;
+    const { name, adapter = require('./adapters/memory'), schemas = [], min = 1, max = 2 } = config;
 
     this.name = name || `pool-${poolNextId++}`;
     this.schemas = {};
@@ -32,7 +32,7 @@ class Pool {
   }
 
   putSchema ({ name, fields, observers, modelClass }) {
-    let connection = this.name;
+    const connection = this.name;
     this.schemas[name] = new Schema({ connection, name, fields, observers, modelClass });
     return this;
   }
