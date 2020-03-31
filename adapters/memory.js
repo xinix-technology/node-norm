@@ -57,7 +57,7 @@ class Memory extends Connection {
 
     return query.rows.reduce((inserted, qRow) => {
       const row = { id: uuidv4() };
-      for (const k in qRow) { // eslint-disable-line no-unused-vars
+      for (const k in qRow) {
         row[k] = query.schema.getField(k).serialize(qRow[k]);
       }
       data.push(row);
@@ -116,8 +116,8 @@ class Memory extends Connection {
 
     await this.load(query, () => count++);
 
-    query.offset = offset; // eslint-disable-line require-atomic-updates
-    query.length = length; // eslint-disable-line require-atomic-updates
+    query.offset = offset;
+    query.length = length;
 
     return count;
   }
@@ -127,31 +127,21 @@ class Memory extends Connection {
       return true;
     }
 
-    for (const key in criteria) { // eslint-disable-line no-unused-vars
+    for (const key in criteria) {
       const critValue = criteria[key];
       const [nkey, op = 'eq'] = key.split('!');
       const field = schema.getField(nkey);
       const rowValue = row[nkey];
       switch (op) {
         case 'or': {
-          let valid = false;
-          for (const subCriteria of critValue) { // eslint-disable-line no-unused-vars
-            const match = this._matchCriteria(subCriteria, row, schema);
-            if (match) {
-              valid = true;
-              break;
-            }
-          }
-          if (!valid) {
+          if (!this._matchOrCriteria(critValue, row, schema)) {
             return false;
           }
           break;
         }
         case 'and':
-          for (const subCriteria of critValue) { // eslint-disable-line no-unused-vars
-            if (!this._matchCriteria(subCriteria, row, schema)) {
-              return false;
-            }
+          if (!this._matchAndCriteria(critValue, row, schema)) {
+            return false;
           }
           break;
         case 'eq':
@@ -219,8 +209,29 @@ class Memory extends Connection {
 
     return true;
   }
+
+  _matchAndCriteria (criteria, row, schema) {
+    for (const subCriteria of criteria) {
+      if (!this._matchCriteria(subCriteria, row, schema)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  _matchOrCriteria (criteria, row, schema) {
+    for (const subCriteria of criteria) {
+      if (this._matchCriteria(subCriteria, row, schema)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
 }
 
+/* istanbul ignore if */
 if (typeof window !== 'undefined') {
   const norm = window.norm;
   if (!norm) {

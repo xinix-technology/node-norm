@@ -1,12 +1,21 @@
-const assert = require('assert');
 const { Manager, Model } = require('../..');
+const assert = require('assert');
 // const debug = require('debug')('node-norm:test:browser:indexeddb');
-
 // localStorage.debug = 'node-norm:*';
 
+const IndexedDB = require('../../adapters/indexeddb');
+const adapter = IndexedDB;
+
 describe('IndexedDB', () => {
+  describe('constructor', () => {
+    it('has default parameters', () => {
+      const conn = new IndexedDB({ name: 'idb' });
+      assert.strictEqual(conn.dbname, 'db');
+      assert.strictEqual(conn.version, 1);
+    });
+  });
+
   describe('single database crud', () => {
-    const adapter = require('node-norm/adapters/indexeddb');
     const dbname = 'db';
     const version = 1;
     let manager;

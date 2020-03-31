@@ -18,8 +18,15 @@ const lib = {
   schemas,
 };
 
+/* istanbul ignore if */
 if (typeof window !== 'undefined') {
   window.norm = lib;
 }
 
-module.exports = lib;
+module.exports.Manager = Manager;
+module.exports.Connection = Connection;
+module.exports.Model = Model;
+module.exports.Pool = Pool;
+module.exports.Query = Query;
+module.exports.Filter = Filter;
+module.exports.Schema = Schema;

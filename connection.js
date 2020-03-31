@@ -1,35 +1,40 @@
+const kTx = Symbol('tx');
+
 class Connection {
   constructor ({ name }) {
     this.name = name;
-    this._hasTx = false;
+    this[kTx] = false;
   }
 
   async begin () {
-    if (this._hasTx) {
+    /* istanbul ignore if */
+    if (this[kTx]) {
       return;
     }
 
     await this._begin();
 
-    this._hasTx = true;
+    this[kTx] = true;
   }
 
   async commit () {
-    if (!this._hasTx) {
+    /* istanbul ignore if */
+    if (!this[kTx]) {
       return;
     }
 
     await this._commit();
-    this._hasTx = false;
+    this[kTx] = false;
   }
 
   async rollback () {
-    if (!this._hasTx) {
+    /* istanbul ignore if */
+    if (!this[kTx]) {
       return;
     }
 
     await this._rollback();
-    this._hasTx = false;
+    this[kTx] = false;
   }
 
   _begin () {

@@ -42,7 +42,7 @@ module.exports = class NMap extends NField {
       return 1;
     }
 
-    for (const key of criteriaKeys) { // eslint-disable-line no-unused-vars
+    for (const key of criteriaKeys) {
       if (!valueKeys.includes(key)) {
         return 1;
       }

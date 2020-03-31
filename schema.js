@@ -3,6 +3,10 @@ const Model = require('./model');
 const NField = require('./schemas/nfield');
 const compose = require('koa-compose');
 
+const kObservers = Symbol('observers');
+const kObserverChain = Symbol('observerChain');
+const kAttrs = Symbol('attrs');
+
 class Schema {
   constructor ({ name, fields = [], observers = [], modelClass = Model }) {
     if (!name) {
@@ -11,20 +15,21 @@ class Schema {
 
     this.name = name;
     this.fields = fields;
-    this.observers = [];
     this.modelClass = modelClass;
-    this.attributes = {};
+
+    this[kObservers] = [];
+    this[kAttrs] = {};
 
     observers.forEach(observer => this.addObserver(observer));
   }
 
   set (key, value) {
-    this.attributes[key] = value;
+    this[kAttrs][key] = value;
     return this;
   }
 
   get (key) {
-    return this.attributes[key];
+    return this[kAttrs][key];
   }
 
   getField (name) {
@@ -34,7 +39,7 @@ class Schema {
   addField (field) {
     const existingField = this.fields.find(f => f.name === field.name);
     if (existingField) {
-      return;
+      throw new Error(`Duplicate field (${field.name})`);
     }
 
     this.fields.push(field);
@@ -44,7 +49,28 @@ class Schema {
     if ('initialize' in observer) {
       observer.initialize(this);
     }
-    this.observers.push(observer);
+
+    this[kObservers].push(observer);
+
+    // reset observer chain when observer added
+    this[kObserverChain] = undefined;
+  }
+
+  removeObserver (observer) {
+    const index = this[kObservers].indexOf(observer);
+    /* istanbul ignore if */
+    if (index === -1) {
+      return;
+    }
+
+    this[kObservers].splice(index, 1);
+
+    if ('uninitialize' in observer) {
+      observer.uninitialize(this);
+    }
+
+    // reset observer chain when observer removed
+    this[kObserverChain] = undefined;
   }
 
   attach (row, partial = false) {
@@ -69,20 +95,20 @@ class Schema {
   }
 
   observe (ctx, next) {
-    if (!this._observerRunner) {
-      const units = this.observers.map(observer => {
+    if (!this[kObserverChain]) {
+      const units = this[kObservers].map(observer => {
         return (ctx, next) => {
-          if (typeof observer[ctx.query.mode] !== 'function') {
+          if (typeof observer[ctx.mode] !== 'function') {
             return next();
           }
-          return observer[ctx.query.mode](ctx, next);
+          return observer[ctx.mode](ctx, next);
         };
       });
 
-      this._observerRunner = compose(units);
+      this[kObserverChain] = compose(units);
     }
 
-    return this._observerRunner(ctx, next);
+    return this[kObserverChain](ctx, next);
   }
 
   async filter (row, { session, partial = false }) {
@@ -99,7 +125,7 @@ class Schema {
           return;
         }
 
-        row[field.name] = await field.execFilter(row[field.name], { session, row, schema: this }); // eslint-disable-line require-atomic-updates
+        row[field.name] = await field.execFilter(row[field.name], { session, row, schema: this });
       } catch (err) {
         err.field = field;
         error.add(err);

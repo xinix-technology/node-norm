@@ -4,8 +4,7 @@ class Historable {
   }
 
   async insert (ctx, next) {
-    const { query } = ctx;
-    const { session } = query;
+    const { query, session } = ctx;
     const historySchema = `${query.schema.name}${this.suffix}`;
     const now = new Date();
 
@@ -19,8 +18,7 @@ class Historable {
   }
 
   async update (ctx, next) {
-    const { query } = ctx;
-    const { session } = query;
+    const { query, session } = ctx;
     const historySchema = `${query.schema.name}${this.suffix}`;
     const now = new Date();
 
@@ -36,8 +34,7 @@ class Historable {
   }
 
   async delete (ctx, next) {
-    const { query } = ctx;
-    const { session } = query;
+    const { query, session } = ctx;
     const historySchema = `${query.schema.name}${this.suffix}`;
     const now = new Date();
 
@@ -54,6 +51,7 @@ class Historable {
 }
 
 // eslint-disable
+/* istanbul ignore if */
 if (typeof window !== 'undefined') {
   const norm = window.norm;
   if (!norm) {

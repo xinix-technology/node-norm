@@ -1,34 +1,8 @@
 const assert = require('assert');
 const { Manager } = require('../..');
-const Memory = require('../../adapters/memory');
 
 describe('Manager', () => {
-  describe('.adapter()', () => {
-    it('validate adapter', () => {
-      let Adapter;
-
-      assert.throws(() => Manager.adapter());
-
-      Adapter = Manager.adapter(Memory);
-      assert.strictEqual(Adapter, Memory);
-
-      assert.throws(() => Manager.adapter('other-adapter'));
-
-      class Foo {}
-      Adapter = Manager.adapter(Foo);
-      assert.strictEqual(Adapter, Foo);
-    });
-  });
-
   describe('contructor', () => {
-    it('create instance without connection when no arg specified', () => {
-      const manager = new Manager();
-
-      assert(manager instanceof Manager, 'manager instanceof Manager');
-
-      assert.strictEqual(Object.keys(manager.pools).length, 0);
-    });
-
     it('create instance with connection when arg connections specified', () => {
       const connections = [
         { name: 'one', adapter: require('../../adapters/memory') },
@@ -36,10 +10,8 @@ describe('Manager', () => {
 
       const manager = new Manager({ connections });
 
-      assert.strictEqual(Object.keys(manager.pools).length, 1);
-
-      const connection = manager.pools.one;
-      assert.strictEqual(connection.name, 'one');
+      assert.strictEqual(manager.getPool().name, 'one');
+      assert.strictEqual(manager.getPool('one').name, 'one');
     });
   });
 
@@ -47,22 +19,9 @@ describe('Manager', () => {
     it('add new connection', () => {
       const manager = new Manager();
 
-      assert.strictEqual(Object.keys(manager.pools).length, 0);
-
       manager.putPool({ name: 'one', adapter: require('../../adapters/memory') });
 
-      assert.strictEqual(Object.keys(manager.pools).length, 1);
-    });
-
-    it('set main connection to connection config with truthy main property', () => {
-      const manager = new Manager({
-        connections: [
-          { name: 'foo', adapter: require('../../adapters/memory') },
-          { name: 'bar', adapter: require('../../adapters/memory'), main: true },
-        ],
-      });
-
-      assert.strictEqual(manager.main, 'bar');
+      assert.strictEqual(manager.getPool().name, 'one');
     });
   });
 
@@ -71,11 +30,11 @@ describe('Manager', () => {
       const manager = new Manager({
         connections: [
           { name: 'foo', adapter: require('../../adapters/memory') },
-          { name: 'bar', adapter: require('../../adapters/memory'), main: true },
+          { name: 'bar', adapter: require('../../adapters/memory') },
         ],
       });
 
-      assert.strictEqual(manager.getPool().name, 'bar');
+      assert.strictEqual(manager.getPool().name, 'foo');
     });
 
     it('throw error when pool not exist', () => {
@@ -88,22 +47,6 @@ describe('Manager', () => {
       });
 
       assert.throws(() => manager.getPool('foo'));
-    });
-  });
-
-  describe('#main', () => {
-    it('value is the first connection when no default set', () => {
-      it('get default connection when no arg specified', () => {
-        const manager = new Manager({
-          connections: [
-            { name: 'foo' },
-            { name: 'bar' },
-          ],
-        });
-
-        assert(manager.get());
-        assert.strictEqual(manager.get().name, 'foo');
-      });
     });
   });
 

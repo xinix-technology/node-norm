@@ -1,20 +1,22 @@
 const Filter = require('../filter');
 
+const kAttrs = Symbol('attrs');
+
 class NField {
   constructor (name) {
     this.name = name;
     this.rawFilters = [];
     this.filters = [];
-    this.attributes = {};
+    this[kAttrs] = {};
   }
 
   set (key, value) {
-    this.attributes[key] = value;
+    this[kAttrs][key] = value;
     return this;
   }
 
   get (key) {
-    return this.attributes[key];
+    return this[kAttrs][key];
   }
 
   filter (...filters) {
@@ -41,7 +43,7 @@ class NField {
     const field = this;
     return this.filters.reduce(
       async (promise, filter) => filter(await promise, { session, row, schema, field }),
-      value
+      value,
     );
   }
 
