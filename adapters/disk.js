@@ -10,31 +10,26 @@ class Disk extends Memory {
 
   async insert (query, callback = () => {}) {
     const result = await super.insert(query, callback);
-    // this._write();
     return result;
   }
 
   async update (query) {
     const result = await super.update(query);
-    // this._write();
     return result;
   }
 
   async drop (query) {
     const result = await super.drop(query);
-    // this._write();
     return result;
   }
 
   async truncate (query) {
     const result = await super.truncate(query);
-    // this._write();
     return result;
   }
 
   async delete (query) {
     const result = await super.delete(query);
-    // this._write();
     return result;
   }
 
@@ -48,16 +43,8 @@ class Disk extends Memory {
   }
 
   _commit () {
-    // clearTimeout(this._writing);
     fs.writeFileSync(this.file, JSON.stringify(this.data, null, 2));
   }
-
-  // _write () {
-  //   clearTimeout(this._writing);
-  //   this._writing = setTimeout(() => {
-  //     fs.writeFile(this.file, JSON.stringify(this.data, null, 2));
-  //   }, 500);
-  // }
 }
 
 module.exports = Disk;

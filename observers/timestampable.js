@@ -30,6 +30,7 @@ class Timestampable {
 }
 
 // eslint-disable
+/* istanbul ignore if */
 if (typeof window !== 'undefined') {
   const norm = window.norm;
   if (!norm) {

@@ -1,13 +1,11 @@
-module.exports = {
-  NBoolean: require('./nboolean'),
-  NDatetime: require('./ndatetime'),
-  NDouble: require('./ndouble'),
-  NField: require('./nfield'),
-  NInteger: require('./ninteger'),
-  NReference: require('./nreference'),
-  NString: require('./nstring'),
-  NText: require('./ntext'),
-  NList: require('./nlist'),
-  NMap: require('./nmap'),
-  NBig: require('./nbig'),
-};
+module.exports.NBoolean = require('./nboolean');
+module.exports.NDatetime = require('./ndatetime');
+module.exports.NDouble = require('./ndouble');
+module.exports.NField = require('./nfield');
+module.exports.NInteger = require('./ninteger');
+module.exports.NReference = require('./nreference');
+module.exports.NString = require('./nstring');
+module.exports.NText = require('./ntext');
+module.exports.NList = require('./nlist');
+module.exports.NMap = require('./nmap');
+module.exports.NBig = require('./nbig');

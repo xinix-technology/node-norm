@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 
-module.exports = function (env, { mode = 'development' }) {
+module.exports = function (_, { mode = 'development' }) {
   return {
     mode,
     context: __dirname,
@@ -11,11 +11,6 @@ module.exports = function (env, { mode = 'development' }) {
       filename: `[name]${mode === 'development' ? '' : '.min'}.js`,
     },
     devtool: 'source-map',
-    resolve: {
-      alias: {
-        'node-norm': __dirname,
-      },
-    },
   };
 };
 
@@ -28,6 +23,10 @@ function getEntries () {
 
   fs.readdirSync('./observers').forEach(file => {
     const basename = path.basename(file, '.js');
+    if (['hashable'].includes(basename)) {
+      return;
+    }
+
     entries[`observers/${basename}`] = `./observers/${file}`;
   });
 

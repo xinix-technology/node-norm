@@ -3,6 +3,8 @@ const Schema = require('./schema');
 
 let poolNextId = 0;
 
+const kInstance = Symbol('instance');
+
 class Pool {
   constructor (config) {
     const { name, adapter = require('./adapters/memory'), schemas = [], min = 1, max = 2 } = config;
@@ -14,10 +16,7 @@ class Pool {
 
     const Adapter = adapter;
 
-    Object.defineProperty(this, '_pool', {
-      enumerable: false,
-      writable: false,
-      configurable: false,
+    Object.defineProperty(this, kInstance, {
       value: genericPool.createPool({
         create () {
           return new Adapter(config);
@@ -31,9 +30,12 @@ class Pool {
     });
   }
 
-  putSchema ({ name, fields, observers, modelClass }) {
-    const connection = this.name;
-    this.schemas[name] = new Schema({ connection, name, fields, observers, modelClass });
+  putSchema (schema) {
+    if (schema instanceof Schema === false) {
+      const { name, fields, observers, modelClass } = schema;
+      schema = new Schema({ name, fields, observers, modelClass });
+    }
+    this.schemas[schema.name] = schema;
     return this;
   }
 
@@ -50,19 +52,19 @@ class Pool {
   }
 
   acquire (...args) {
-    return this._pool.acquire(...args);
+    return this[kInstance].acquire(...args);
   }
 
   release (...args) {
-    return this._pool.release(...args);
+    return this[kInstance].release(...args);
   }
 
   drain (...args) {
-    return this._pool.drain(...args);
+    return this[kInstance].drain(...args);
   }
 
   clear (...args) {
-    return this._pool.clear(...args);
+    return this[kInstance].clear(...args);
   }
 }
 

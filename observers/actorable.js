@@ -5,7 +5,7 @@ class Actorable {
     createdKey = 'created_by',
     updatedKey = 'updated_by',
     userCallback = ctx => {
-      const { user } = ctx.query.session.state;
+      const { user } = ctx.state;
       if (user) {
         return user.sub;
       }
@@ -24,7 +24,7 @@ class Actorable {
   async insert (ctx, next) {
     const { query } = ctx;
     query.rows.forEach(row => {
-      row[this.createdKey] = row[this.updatedKey] = this.userCallback(ctx) || null;
+      row[this.createdKey] = row[this.updatedKey] = this.userCallback(ctx) || /* istanbul ignore next */ null;
     });
 
     await next();
@@ -32,13 +32,14 @@ class Actorable {
 
   async update (ctx, next) {
     const { query } = ctx;
-    query.sets[this.updatedKey] = this.userCallback(ctx) || null;
+    query.sets[this.updatedKey] = this.userCallback(ctx) || /* istanbul ignore next */ null;
 
     await next();
   }
 }
 
 // eslint-disable
+/* istanbul ignore if */
 if (typeof window !== 'undefined') {
   const norm = window.norm;
   if (!norm) {
