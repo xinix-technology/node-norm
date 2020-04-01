@@ -14,7 +14,7 @@ class Schema {
     }
 
     this.name = name;
-    this.fields = fields;
+    this.fields = [...fields];
     this.modelClass = modelClass;
 
     this[kObservers] = [];
