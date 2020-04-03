@@ -229,6 +229,18 @@ class Memory extends Connection {
 
     return false;
   }
+
+  defined ({ name }) {
+    return !!this.data[name];
+  }
+
+  define ({ name }) {
+    this.data[name] = [];
+  }
+
+  undefine ({ name }) {
+    delete this.data[name];
+  }
 }
 
 /* istanbul ignore if */

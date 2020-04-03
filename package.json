@@ -1,6 +1,6 @@
 {
   "name": "node-norm",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Norm is Not ORM though data access layer",
   "main": "index.js",
   "scripts": {
