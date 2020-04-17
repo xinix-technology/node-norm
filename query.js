@@ -90,7 +90,11 @@ class Query {
       const { session } = this;
       const { filter } = ctx;
 
-      if (this.rows.length) {
+      if (this.mode === 'insert') {
+        if (this.rows.length === 0) {
+          throw new Error('Failed to insert empty rows');
+        }
+
         if (filter) {
           await Promise.all(this.rows.map(row => this.schema.filter(row, { session })));
         }
@@ -98,7 +102,14 @@ class Query {
         const rows = [];
         this.affected = await connection.insert(this, row => rows.push(this.schema.attach(row)));
         this.rows = rows;
-      } else {
+        return;
+      }
+
+      if (this.mode === 'update') {
+        if (Object.keys(this.sets).length === 0) {
+          throw new Error('Failed to update empty set');
+        }
+
         if (filter) {
           const partial = true;
           await this.schema.filter(this.sets, { session, partial });
@@ -109,7 +120,10 @@ class Query {
         }
 
         this.affected = await connection.update(this);
+        return;
       }
+
+      throw new Error(`Invalid mode=${this.mode} to save`);
     };
 
     if (observer) {

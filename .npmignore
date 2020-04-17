@@ -1,7 +1,0 @@
-node_modules
-coverage
-.vscode
-.DS_Store
-.nyc_output
-.chrome
-stat.json
