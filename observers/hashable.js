@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 module.exports = class Hashable {
   constructor ({ rounds = 10, field = 'password' } = {}) {

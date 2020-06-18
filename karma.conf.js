@@ -81,7 +81,7 @@ module.exports = function (config) {
       },
     },
     customLaunchers: {
-      ChromeHeadlessNoSandbox: { base: 'ChromeHeadless', flags: ['--no-sandbox', '--disable-setuid-sandbox'] },
+      ChromeHeadlessNoSandbox: { base: 'ChromeCanaryHeadless', flags: ['--no-sandbox', '--disable-setuid-sandbox'] },
       ChromeTesting: { base: 'ChromeCanary', flags: ['--no-sandbox', '--disable-setuid-sandbox'] },
     },
     plugins: [
