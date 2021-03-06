@@ -1,12 +1,13 @@
 {
   "name": "node-norm",
-  "version": "1.4.5",
+  "version": "1.4.7",
   "description": "Norm is Not ORM though data access layer",
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf dist",
     "test": "npm run test:node && npm run test:browser",
     "lint": "eslint .",
+    "lint-staged": "lint-staged",
     "build": "rm -rf dist && webpack-cli --mode=development && webpack-cli --mode=production",
     "coverage:node": "nyc --check-coverage --report-dir=./coverage/node --reporter=html --reporter=text mocha test/node/**",
     "coverage:browser": "karma start --coverage",
@@ -14,7 +15,8 @@
     "test:node:watch": "mocha test/node/** -w",
     "test:browser": "karma start",
     "test:browser:watch": "karma start --auto-watch=true --single-run=false",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "prepare": "husky install"
   },
   "author": "Ganesha <reekoheek@gmail.com>",
   "license": "MIT",
@@ -43,17 +45,18 @@
   "dependencies": {
     "async-factory": "^1.0.0",
     "bcryptjs": "^2.4.3",
-    "big.js": "^5.2.2",
+    "big.js": "^6.0.3",
     "fs-extra": "^9.0.1",
     "generic-pool": "^3.7.1",
-    "koa-compose": "^4.1.0"
+    "koa-compose": "^4.1.0",
+    "uuid": "^8.1.0"
   },
   "devDependencies": {
     "eslint": "^7.2.0",
     "eslint-config-xinix": "^1.1.14",
-    "husky": "^4.2.5",
+    "husky": "^5.1.3",
     "istanbul-instrumenter-loader": "^3.0.1",
-    "karma": "^5.1.0",
+    "karma": "^6.1.1",
     "karma-chrome-launcher": "^3.1.0",
     "karma-coverage-istanbul-reporter": "^3.0.3",
     "karma-mocha": "^2.0.1",
@@ -61,17 +64,12 @@
     "karma-mocha-snapshot": "^0.2.1",
     "karma-snapshot": "^0.6.0",
     "karma-source-map-support": "^1.4.0",
-    "karma-webpack": "^4.0.2",
+    "karma-webpack": "^5.0.0",
     "lint-staged": "^10.2.11",
     "mocha": "^8.0.1",
     "nyc": "^15.1.0",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged && npm test"
-    }
+    "webpack": "^5.24.3",
+    "webpack-cli": "^4.5.0"
   },
   "lint-staged": {
     "*.js": [

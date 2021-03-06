@@ -1,5 +1,11 @@
-const assert = require('assert');
 const { Manager, Model } = require('../..');
+const assert = {
+  strictEqual (actual, expected) {
+    if (actual !== expected) {
+      throw new Error(`Actual not strict equal to expected ${actual} <> ${expected}`);
+    }
+  },
+};
 
 describe('Memory', () => {
   describe('single database crud', () => {
@@ -13,9 +19,9 @@ describe('Memory', () => {
           .save();
 
         assert.strictEqual(affected, 2);
-        assert(rows[0] instanceof Model);
+        assert.strictEqual(rows[0] instanceof Model, true);
 
-        assert(data.user);
+        assert.strictEqual(!!data.user, true);
         assert.strictEqual(data.user.length, 2);
         assert.strictEqual(data.user[0].username, 'admin');
         assert.strictEqual(data.user[1].password, 'userPassword');
@@ -35,7 +41,7 @@ describe('Memory', () => {
       await manager.runSession(async session => {
         await session.factory('foo', { name: 'foo' }).set({ value: 'fooz' }).save();
 
-        data.foo.filter(row => row.name === 'foo').map(row => {
+        data.foo.filter(row => row.name === 'foo').forEach(row => {
           assert.strictEqual(row.value, 'fooz');
         });
       });
@@ -86,7 +92,7 @@ describe('Memory', () => {
       const manager = createManager(data);
       await manager.runSession(async session => {
         await session.factory('foo').drop();
-        assert(!data.foo);
+        assert.strictEqual(!data.foo, true);
       });
     });
 

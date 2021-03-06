@@ -1,5 +1,5 @@
 const Connection = require('../connection');
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 
 class Memory extends Connection {
   constructor (options) {

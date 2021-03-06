@@ -1,5 +1,11 @@
 const { Manager, Model } = require('../..');
-const assert = require('assert');
+const assert = {
+  strictEqual (actual, expected) {
+    if (actual !== expected) {
+      throw new Error(`Actual not strict equal to expected ${actual} <> ${expected}`);
+    }
+  },
+};
 // const debug = require('debug')('node-norm:test:browser:indexeddb');
 // localStorage.debug = 'node-norm:*';
 
@@ -79,7 +85,7 @@ describe('IndexedDB', () => {
           .save();
 
         assert.strictEqual(affected, 2);
-        assert(rows[0] instanceof Model);
+        assert.strictEqual(rows[0] instanceof Model, true);
 
         rows = await getAll('foo');
         assert.strictEqual(rows.length, 2);
@@ -95,7 +101,7 @@ describe('IndexedDB', () => {
         await session.factory('foo', { name: 'foo' }).set({ value: 'fooz' }).save();
 
         const rows = await getAll('foo');
-        rows.filter(row => row.name === 'foo').map(row => {
+        rows.filter(row => row.name === 'foo').forEach(row => {
           assert.strictEqual(row.value, 'fooz');
         });
       });
