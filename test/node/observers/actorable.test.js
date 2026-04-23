@@ -3,7 +3,7 @@ const Actorable = require('../../../observers/actorable');
 const assert = require('assert');
 
 describe('Observer: Actorable', () => {
-  it('append created_by and updated_by at insert', async () => {
+  it('append created_by and updated_by at insert', async() => {
     const manager = createManager();
 
     await manager.runSession(async session => {
@@ -14,7 +14,7 @@ describe('Observer: Actorable', () => {
     });
   });
 
-  it('update updated_by at update', async () => {
+  it('update updated_by at update', async() => {
     const data = {
       foo: [
         { foo: 'bar', created_by: 'someone' },
@@ -32,7 +32,7 @@ describe('Observer: Actorable', () => {
     });
   });
 
-  function createManager (data, userCallback) {
+  function createManager(data, userCallback) {
     return new Manager({
       connections: [
         {

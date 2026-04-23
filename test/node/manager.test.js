@@ -51,7 +51,7 @@ describe('Manager', () => {
   });
 
   describe('#runSession()', () => {
-    it('throw error and dispose session when error caught', async () => {
+    it('throw error and dispose session when error caught', async() => {
       const manager = new Manager({
         connections: [
           {
@@ -62,12 +62,12 @@ describe('Manager', () => {
 
       let disposeCalled = false;
       const session = {
-        dispose () {
+        dispose() {
           disposeCalled = true;
         },
       };
 
-      manager.openSession = function () {
+      manager.openSession = function() {
         return session;
       };
 

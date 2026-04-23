@@ -2,38 +2,38 @@ const Memory = require('./memory');
 const fs = require('fs-extra');
 
 class Disk extends Memory {
-  constructor (options) {
+  constructor(options) {
     super(options);
 
     this.file = options.file || './.tmp/db.json';
   }
 
-  async insert (query, callback = () => {}) {
+  async insert(query, callback = () => {}) {
     const result = await super.insert(query, callback);
     return result;
   }
 
-  async update (query) {
+  async update(query) {
     const result = await super.update(query);
     return result;
   }
 
-  async drop (query) {
+  async drop(query) {
     const result = await super.drop(query);
     return result;
   }
 
-  async truncate (query) {
+  async truncate(query) {
     const result = await super.truncate(query);
     return result;
   }
 
-  async delete (query) {
+  async delete(query) {
     const result = await super.delete(query);
     return result;
   }
 
-  _begin () {
+  _begin() {
     try {
       fs.ensureFileSync(this.file);
       this.data = JSON.parse(fs.readFileSync(this.file));
@@ -42,7 +42,7 @@ class Disk extends Memory {
     }
   }
 
-  _commit () {
+  _commit() {
     fs.writeFileSync(this.file, JSON.stringify(this.data, null, 2));
   }
 }

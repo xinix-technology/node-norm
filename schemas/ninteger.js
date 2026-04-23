@@ -1,7 +1,7 @@
 const NField = require('./nfield');
 
 module.exports = class NInteger extends NField {
-  attach (value) {
+  attach(value) {
     if (value === undefined || value === null) {
       return null;
     }
@@ -13,7 +13,7 @@ module.exports = class NInteger extends NField {
     return this._parse(value);
   }
 
-  compare (criteria, value) {
+  compare(criteria, value) {
     if (value === undefined) {
       value = null;
     }
@@ -29,7 +29,7 @@ module.exports = class NInteger extends NField {
     return value - criteria;
   }
 
-  _parse (value) {
+  _parse(value) {
     value = parseInt(value, 10);
 
     if (isNaN(value)) {

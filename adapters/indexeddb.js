@@ -30,7 +30,7 @@ if (!window.indexedDB) {
 const EMPTY_FN = () => {};
 
 class IndexedDB extends Memory {
-  constructor ({ name, dbname = 'db', version = 1, onUpgradeNeeded = EMPTY_FN }) {
+  constructor({ name, dbname = 'db', version = 1, onUpgradeNeeded = EMPTY_FN }) {
     super({ name });
 
     this.dbname = dbname;
@@ -38,7 +38,7 @@ class IndexedDB extends Memory {
     this.onUpgradeNeeded = onUpgradeNeeded;
   }
 
-  async load (query, callback) {
+  async load(query, callback) {
     const { criteria } = query;
     const store = await this._getStore(query.schema.name);
 
@@ -62,7 +62,7 @@ class IndexedDB extends Memory {
       };
 
       /* istanbul ignore next */
-      req.onerror = function (err) {
+      req.onerror = function(err) {
         reject(err);
       };
     });
@@ -70,7 +70,7 @@ class IndexedDB extends Memory {
     rows.forEach(row => callback(row));
   }
 
-  async insert (query, callback) {
+  async insert(query, callback) {
     const store = await this._getStore(query.schema.name);
 
     let inserted = 0;
@@ -84,7 +84,7 @@ class IndexedDB extends Memory {
     return inserted;
   }
 
-  async update (query) {
+  async update(query) {
     const rows = [];
     await this.load(query, row => rows.push(row));
 
@@ -120,7 +120,7 @@ class IndexedDB extends Memory {
     return affected;
   }
 
-  async delete (query) {
+  async delete(query) {
     const rows = [];
     await this.load(query, row => rows.push(row));
 
@@ -129,35 +129,35 @@ class IndexedDB extends Memory {
     await rows.map(row => this._promised(store.delete(row.id)));
   }
 
-  async truncate (query) {
+  async truncate(query) {
     const store = await this._getStore(query.schema.name);
     await this._promised(store.clear());
   }
 
-  drop (query) {
+  drop(query) {
     return this.truncate(query);
   }
 
-  async _getDB () {
+  async _getDB() {
     const req = indexedDB.open(this.dbname, this.version);
     req.onupgradeneeded = this.onUpgradeNeeded;
     const db = await this._promised(req);
     return db;
   }
 
-  _promised (req) {
+  _promised(req) {
     return new Promise((resolve, reject) => {
       req.onsuccess = evt => resolve(evt.target.result);
       req.onerror = reject;
     });
   }
 
-  async _getTx (names) {
+  async _getTx(names) {
     const db = await this._getDB();
     return db.transaction(names, 'readwrite');
   }
 
-  async _getStore (name) {
+  async _getStore(name) {
     const tx = await this._getTx(name);
     return tx.objectStore(name);
   }

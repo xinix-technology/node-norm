@@ -1,20 +1,20 @@
 class Filter extends Error {
-  constructor () {
+  constructor() {
     super();
 
     this.status = 400;
     this.children = [];
   }
 
-  get message () {
+  get message() {
     return this.children.map(child => child.message).join(', ');
   }
 
-  add (value) {
+  add(value) {
     this.children.push(value);
   }
 
-  empty () {
+  empty() {
     return this.children.length === 0;
   }
 }

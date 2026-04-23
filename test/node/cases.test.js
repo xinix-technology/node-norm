@@ -3,7 +3,7 @@ const { Manager, Model } = require('../..');
 
 describe('cases', () => {
   describe('single database crud', () => {
-    it('insert multiple rows', async () => {
+    it('insert multiple rows', async() => {
       const data = {};
       const manager = createManager(data);
       await manager.runSession(async session => {
@@ -22,7 +22,7 @@ describe('cases', () => {
       });
     });
 
-    it('update rows', async () => {
+    it('update rows', async() => {
       const data = {
         foo: [
           { name: 'foo', value: 'foo1' },
@@ -35,13 +35,13 @@ describe('cases', () => {
       await manager.runSession(async session => {
         await session.factory('foo', { name: 'foo' }).set({ value: 'fooz' }).save();
 
-        data.foo.filter(row => row.name === 'foo').map(row => {
+        data.foo.filter(row => row.name === 'foo').forEach(row => {
           assert.strictEqual(row.value, 'fooz');
         });
       });
     });
 
-    it('delete rows', async () => {
+    it('delete rows', async() => {
       const data = {
         foo: [
           { name: 'foo', value: 'foo1' },
@@ -58,7 +58,7 @@ describe('cases', () => {
       });
     });
 
-    it('truncate collection', async () => {
+    it('truncate collection', async() => {
       const data = {
         foo: [
           { name: 'foo', value: 'foo1' },
@@ -74,7 +74,7 @@ describe('cases', () => {
       });
     });
 
-    it('drop collection', async () => {
+    it('drop collection', async() => {
       const data = {
         foo: [
           { name: 'foo', value: 'foo1' },
@@ -90,7 +90,7 @@ describe('cases', () => {
       });
     });
 
-    it('find all rows', async () => {
+    it('find all rows', async() => {
       const data = {};
       const manager = createManager(data);
       await manager.runSession(async session => {
@@ -106,7 +106,7 @@ describe('cases', () => {
       });
     });
 
-    it('find with skip and limit', async () => {
+    it('find with skip and limit', async() => {
       const data = {};
       const manager = createManager(data);
       await manager.runSession(async session => {
@@ -125,7 +125,7 @@ describe('cases', () => {
       });
     });
 
-    it('find with criteria', async () => {
+    it('find with criteria', async() => {
       const data = {};
       const manager = createManager(data);
       await manager.runSession(async session => {
@@ -144,7 +144,7 @@ describe('cases', () => {
       });
     });
 
-    it('find with sort', async () => {
+    it('find with sort', async() => {
       const data = {};
       const manager = createManager(data);
       await manager.runSession(async session => {
@@ -176,7 +176,7 @@ describe('cases', () => {
       });
     });
 
-    it('find single row', async () => {
+    it('find single row', async() => {
       const data = {};
       const manager = createManager(data);
       await manager.runSession(async session => {
@@ -192,7 +192,7 @@ describe('cases', () => {
       });
     });
 
-    it('count all rows', async () => {
+    it('count all rows', async() => {
       const data = {
         user: [
           { username: 'foo', password: '1' },
@@ -211,7 +211,7 @@ describe('cases', () => {
       });
     });
 
-    it('count respect skip and limit', async () => {
+    it('count respect skip and limit', async() => {
       const data = {
         user: [
           { username: 'foo', password: '1' },
@@ -228,7 +228,7 @@ describe('cases', () => {
     });
   });
 
-  function createManager (data) {
+  function createManager(data) {
     return new Manager({
       connections: [
         {

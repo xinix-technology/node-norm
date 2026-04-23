@@ -11,7 +11,7 @@ describe('NField', () => {
   });
 
   describe('#execFilter()', () => {
-    it('filter value', async () => {
+    it('filter value', async() => {
       const field = new NField('foo').filter('default:zzz');
       const session = {};
       const row = {};

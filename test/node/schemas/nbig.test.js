@@ -46,7 +46,7 @@ describe('NBig', () => {
       },
     ];
 
-    it('respond to eq', async () => {
+    it('respond to eq', async() => {
       const manager = createManager({ data, schemas });
       await manager.runSession(async session => {
         const rows = await session.factory('foo', { bar: 10 }).all();
@@ -54,7 +54,7 @@ describe('NBig', () => {
       });
     });
 
-    it('respond to gt', async () => {
+    it('respond to gt', async() => {
       const manager = createManager({ data, schemas });
       await manager.runSession(async session => {
         const rows = await session.factory('foo', { 'bar!gt': 10 }).all();
@@ -62,7 +62,7 @@ describe('NBig', () => {
       });
     });
 
-    it('respond to gte', async () => {
+    it('respond to gte', async() => {
       const manager = createManager({ data, schemas });
       await manager.runSession(async session => {
         const rows = await session.factory('foo', { 'bar!gte': 10 }).all();
@@ -70,7 +70,7 @@ describe('NBig', () => {
       });
     });
 
-    it('respond to lt', async () => {
+    it('respond to lt', async() => {
       const manager = createManager({ data, schemas });
       await manager.runSession(async session => {
         const rows = await session.factory('foo', { 'bar!lt': 10 }).all();
@@ -78,7 +78,7 @@ describe('NBig', () => {
       });
     });
 
-    it('respond to lte', async () => {
+    it('respond to lte', async() => {
       const manager = createManager({ data, schemas });
       await manager.runSession(async session => {
         const rows = await session.factory('foo', { 'bar!lte': 10 }).all();

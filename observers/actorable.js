@@ -1,7 +1,7 @@
 const NString = require('../schemas/nstring');
 
 class Actorable {
-  constructor ({
+  constructor({
     createdKey = 'created_by',
     updatedKey = 'updated_by',
     userCallback = ctx => {
@@ -16,12 +16,12 @@ class Actorable {
     this.userCallback = userCallback;
   }
 
-  initialize (schema) {
+  initialize(schema) {
     schema.addField(new NString(this.createdKey));
     schema.addField(new NString(this.updatedKey));
   }
 
-  async insert (ctx, next) {
+  async insert(ctx, next) {
     const { query } = ctx;
     query.rows.forEach(row => {
       row[this.createdKey] = row[this.updatedKey] = this.userCallback(ctx) || /* istanbul ignore next */ null;
@@ -30,7 +30,7 @@ class Actorable {
     await next();
   }
 
-  async update (ctx, next) {
+  async update(ctx, next) {
     const { query } = ctx;
     query.sets[this.updatedKey] = this.userCallback(ctx) || /* istanbul ignore next */ null;
 

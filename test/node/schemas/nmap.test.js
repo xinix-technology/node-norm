@@ -16,7 +16,7 @@ describe('NMap', () => {
   });
 
   describe('respond to criteria', () => {
-    it('respond to eq', async () => {
+    it('respond to eq', async() => {
       const data = {
         foo: [
           {

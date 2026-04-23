@@ -3,23 +3,23 @@ const Filter = require('../filter');
 const kAttrs = Symbol('attrs');
 
 class NField {
-  constructor (name) {
+  constructor(name) {
     this.name = name;
     this.rawFilters = [];
     this.filters = [];
     this[kAttrs] = {};
   }
 
-  set (key, value) {
+  set(key, value) {
     this[kAttrs][key] = value;
     return this;
   }
 
-  get (key) {
+  get(key) {
     return this[kAttrs][key];
   }
 
-  filter (...filters) {
+  filter(...filters) {
     filters.forEach(filter => {
       try {
         filter = Filter.tokenize(filter);
@@ -34,7 +34,7 @@ class NField {
     return this;
   }
 
-  execFilter (value, { session, row, schema }) {
+  execFilter(value, { session, row, schema }) {
     // when value is string, trim first before filtering
     if (typeof value === 'string') {
       value = value.trim();
@@ -42,12 +42,12 @@ class NField {
 
     const field = this;
     return this.filters.reduce(
-      async (promise, filter) => filter(await promise, { session, row, schema, field }),
+      async(promise, filter) => filter(await promise, { session, row, schema, field }),
       value,
     );
   }
 
-  attach (value) {
+  attach(value) {
     if (value === '' || value === undefined || value === null) {
       return null;
     }
@@ -55,11 +55,11 @@ class NField {
     return value;
   }
 
-  serialize (value) {
+  serialize(value) {
     return value;
   }
 
-  compare (criteria, value) {
+  compare(criteria, value) {
     if (value === undefined) {
       value = null;
     }
@@ -79,7 +79,7 @@ class NField {
     return 1;
   }
 
-  indexOf (criteria, value) {
+  indexOf(criteria, value) {
     return criteria.indexOf(value);
   }
 }

@@ -3,7 +3,7 @@ const Timestampable = require('../../../observers/timestampable');
 const assert = require('assert');
 
 describe('Observer: Timestampable', () => {
-  it('append created_time and updated_time at insert', async () => {
+  it('append created_time and updated_time at insert', async() => {
     const manager = createManager();
 
     await manager.runSession(async session => {
@@ -13,7 +13,7 @@ describe('Observer: Timestampable', () => {
     });
   });
 
-  it('update updated_time at update', async () => {
+  it('update updated_time at update', async() => {
     const data = {
       foo: [
         { foo: 'bar' },
@@ -30,7 +30,7 @@ describe('Observer: Timestampable', () => {
     });
   });
 
-  function createManager (data) {
+  function createManager(data) {
     return new Manager({
       connections: [
         {

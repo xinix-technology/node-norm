@@ -1,7 +1,7 @@
 const NField = require('./nfield');
 
 module.exports = class NMap extends NField {
-  attach (value) {
+  attach(value) {
     value = super.attach(value);
     if (value === null) {
       return null;
@@ -22,7 +22,7 @@ module.exports = class NMap extends NField {
     return value;
   }
 
-  compare (criteria, value) {
+  compare(criteria, value) {
     if (value === undefined) {
       value = null;
     }

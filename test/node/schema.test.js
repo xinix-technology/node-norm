@@ -28,19 +28,19 @@ describe('Schema', () => {
     assert.strictEqual(schema.get('bar'), 'baz');
   });
 
-  it('has observers', async () => {
+  it('has observers', async() => {
     const schema = new Schema({ name: 'foo' });
 
     const obs1 = {
-      initialize () {
+      initialize() {
         this.ready = true;
       },
 
-      uninitialize () {
+      uninitialize() {
         this.ready = false;
       },
 
-      async insert (ctx, next) {
+      async insert(ctx, next) {
         ctx.logs.push(1);
         await next();
         ctx.logs.push(2);
@@ -58,7 +58,7 @@ describe('Schema', () => {
     }
 
     schema.addObserver({
-      async insert (ctx, next) {
+      async insert(ctx, next) {
         ctx.logs.push(4);
         await next();
         ctx.logs.push(5);

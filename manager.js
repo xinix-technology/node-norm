@@ -2,13 +2,13 @@ const Pool = require('./pool');
 const Session = require('./session');
 
 class Manager {
-  constructor ({ connections = [] } = {}) {
+  constructor({ connections = [] } = {}) {
     this.pools = {};
 
     connections.forEach(connection => this.putPool(connection));
   }
 
-  putPool (config) {
+  putPool(config) {
     /* istanbul ignore if */
     if (typeof config.adapter !== 'function') {
       throw new Error('Adapter must be a constructor');
@@ -27,7 +27,7 @@ class Manager {
    * @param {string} name
    * @returns {Pool}
    */
-  getPool (name) {
+  getPool(name) {
     name = name || this.main;
 
     if (!this.pools[name]) {
@@ -37,7 +37,7 @@ class Manager {
     return this.pools[name];
   }
 
-  async runSession (fn, options) {
+  async runSession(fn, options) {
     const session = this.openSession(options);
     try {
       const result = await fn(session);
@@ -50,12 +50,12 @@ class Manager {
     }
   }
 
-  openSession (options) {
+  openSession(options) {
     return new Session({ manager: this, options });
   }
 
   /* istanbul ignore next */
-  async end () {
+  async end() {
     await Promise.all(Object.keys(this.pools).map(async name => {
       const pool = this.pools[name];
       await pool.drain();

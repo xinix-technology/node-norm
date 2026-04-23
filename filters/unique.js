@@ -1,5 +1,5 @@
-module.exports = function unique () {
-  return async function (value, { row, session, schema, field: { name } }) {
+module.exports = function unique() {
+  return async function(value, { row, session, schema, field: { name } }) {
     if (value === null || value === '') {
       return null;
     }

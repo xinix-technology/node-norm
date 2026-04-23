@@ -1,22 +1,22 @@
 class Context {
-  constructor ({ query, filter }) {
+  constructor({ query, filter }) {
     this.query = query;
     this.filter = filter;
   }
 
-  get session () {
+  get session() {
     return this.query.session;
   }
 
-  get mode () {
+  get mode() {
     return this.query.mode;
   }
 
-  get state () {
+  get state() {
     return this.session.state;
   }
 
-  get manager () {
+  get manager() {
     return this.session.manager;
   }
 }

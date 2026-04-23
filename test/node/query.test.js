@@ -3,14 +3,14 @@ const assert = require('assert');
 const NString = require('../../schemas/nstring');
 
 class TheObserver {
-  async insert (ctx, next) {
+  async insert(ctx, next) {
     this.beforeInvoked = true;
     ctx.query.rows.forEach(row => (row.added = true));
     await next();
     this.afterInvoked = true;
   }
 
-  async delete (ctx, next) {
+  async delete(ctx, next) {
     this.beforeInvoked = true;
     await next();
     this.afterInvoked = true;
@@ -19,7 +19,7 @@ class TheObserver {
 
 describe('Query', () => {
   describe('#save()', () => {
-    it('run composed function of observers', async () => {
+    it('run composed function of observers', async() => {
       const observer = new TheObserver();
       const data = {};
       const schemas = [
@@ -51,7 +51,7 @@ describe('Query', () => {
   });
 
   describe('#delete()', () => {
-    it('run composed function of observers', async () => {
+    it('run composed function of observers', async() => {
       const observer = new TheObserver();
       const data = {
         user: [{}, {}],
@@ -89,21 +89,21 @@ describe('Query', () => {
     beforeEach(() => {
       definitions = {};
       Foo = class Foo extends Connection {
-        defined ({ name }) {
+        defined({ name }) {
           return !!definitions[name];
         }
 
-        define (schema) {
+        define(schema) {
           definitions[schema.name] = schema;
         }
 
-        undefine (schema) {
+        undefine(schema) {
           delete definitions[schema.name];
         }
       };
     });
 
-    it('define and undefine specified schema', async () => {
+    it('define and undefine specified schema', async() => {
       const manager = new Manager({
         connections: [
           {
@@ -129,7 +129,7 @@ describe('Query', () => {
       });
     });
 
-    it('define and undefine unspecified schema', async () => {
+    it('define and undefine unspecified schema', async() => {
       const manager = new Manager({
         connections: [
           {

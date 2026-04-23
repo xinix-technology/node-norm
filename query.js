@@ -1,7 +1,7 @@
 const Context = require('./context');
 
 class Query {
-  constructor ({ session, connection, schema, criteria }) {
+  constructor({ session, connection, schema, criteria }) {
     this.session = session;
 
     this.connection = connection;
@@ -16,7 +16,7 @@ class Query {
     this.sorts = undefined;
   }
 
-  clone () {
+  clone() {
     const query = new Query(this);
     query.length = this.length;
     query.offset = this.offset;
@@ -24,48 +24,48 @@ class Query {
     return query;
   }
 
-  find (criteria = {}) {
+  find(criteria = {}) {
     this.criteria = typeof criteria === 'object' ? criteria : { id: criteria };
 
     return this;
   }
 
-  insert (row) {
+  insert(row) {
     this.mode = 'insert';
     this.rows.push(this.schema.attach(row));
 
     return this;
   }
 
-  sort (sorts) {
+  sort(sorts) {
     this.sorts = sorts;
 
     return this;
   }
 
-  limit (length) {
+  limit(length) {
     this.length = length;
 
     return this;
   }
 
-  skip (offset) {
+  skip(offset) {
     this.offset = offset;
 
     return this;
   }
 
-  set (set) {
+  set(set) {
     this.mode = 'update';
     this.sets = this.schema.attach(set, true);
 
     return this;
   }
 
-  async delete ({ observer = true } = {}) {
+  async delete({ observer = true } = {}) {
     this.mode = 'delete';
 
-    const conDelete = async () => {
+    const conDelete = async() => {
       const connection = await this.session.acquire(this.connection);
       const result = await connection.delete(this);
       return result;
@@ -82,10 +82,10 @@ class Query {
     return ctx.result;
   }
 
-  async save ({ filter = true, observer = true } = {}) {
+  async save({ filter = true, observer = true } = {}) {
     const ctx = new Context({ query: this, filter });
 
-    const conSave = async (ctx) => {
+    const conSave = async(ctx) => {
       const connection = await this.session.acquire(this.connection);
       const { session } = this;
       const { filter } = ctx;
@@ -135,26 +135,26 @@ class Query {
     return this;
   }
 
-  async drop () {
+  async drop() {
     const connection = await this.session.acquire(this.connection);
     const result = await connection.drop(this);
     return result;
   }
 
-  async truncate () {
+  async truncate() {
     const connection = await this.session.acquire(this.connection);
     const result = await connection.truncate(this);
     return result;
   }
 
-  async all () {
+  async all() {
     const rows = [];
     const connection = await this.session.acquire(this.connection);
     await connection.load(this, row => rows.push(this.schema.attach(row)));
     return rows;
   }
 
-  async count (useSkipAndLimit = false) {
+  async count(useSkipAndLimit = false) {
     const connection = await this.session.acquire(this.connection);
     if (typeof connection.count !== 'function') {
       throw new Error('Connection does not implement count()');
@@ -162,12 +162,12 @@ class Query {
     return connection.count(this, useSkipAndLimit);
   }
 
-  async single () {
+  async single() {
     const [row] = await this.limit(1).all();
     return row;
   }
 
-  async defined () {
+  async defined() {
     const connection = await this.session.acquire(this.connection);
     if (typeof connection.defined !== 'function') {
       throw new Error('Connection does not implement defined()');
@@ -175,7 +175,7 @@ class Query {
     return connection.defined(this.schema);
   }
 
-  async define () {
+  async define() {
     const connection = await this.session.acquire(this.connection);
     if (typeof connection.define !== 'function') {
       throw new Error('Connection does not implement define()');
@@ -183,7 +183,7 @@ class Query {
     return connection.define(this.schema);
   }
 
-  async undefine () {
+  async undefine() {
     const connection = await this.session.acquire(this.connection);
     if (typeof connection.undefine !== 'function') {
       throw new Error('Connection does not implement undefine()');

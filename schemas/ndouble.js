@@ -1,7 +1,7 @@
 const NInteger = require('./ninteger');
 
 module.exports = class NDouble extends NInteger {
-  _parse (value) {
+  _parse(value) {
     value = parseFloat(value);
 
     if (isNaN(value)) {

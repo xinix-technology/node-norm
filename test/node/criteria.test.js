@@ -2,7 +2,7 @@ const assert = require('assert');
 const { Manager } = require('../..');
 
 describe('criteria', () => {
-  it('eq', async () => {
+  it('eq', async() => {
     const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
@@ -21,7 +21,7 @@ describe('criteria', () => {
     });
   });
 
-  it('ne', async () => {
+  it('ne', async() => {
     const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
@@ -39,7 +39,7 @@ describe('criteria', () => {
     });
   });
 
-  it('gt', async () => {
+  it('gt', async() => {
     const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
@@ -57,7 +57,7 @@ describe('criteria', () => {
     });
   });
 
-  it('gte', async () => {
+  it('gte', async() => {
     const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
@@ -76,7 +76,7 @@ describe('criteria', () => {
     });
   });
 
-  it('lt', async () => {
+  it('lt', async() => {
     const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
@@ -94,7 +94,7 @@ describe('criteria', () => {
     });
   });
 
-  it('lte', async () => {
+  it('lte', async() => {
     const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
@@ -113,7 +113,7 @@ describe('criteria', () => {
     });
   });
 
-  it('in', async () => {
+  it('in', async() => {
     const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
@@ -132,7 +132,7 @@ describe('criteria', () => {
     });
   });
 
-  it('nin', async () => {
+  it('nin', async() => {
     const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
@@ -150,7 +150,7 @@ describe('criteria', () => {
     });
   });
 
-  it('or', async () => {
+  it('or', async() => {
     const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
@@ -174,7 +174,7 @@ describe('criteria', () => {
     });
   });
 
-  it('and', async () => {
+  it('and', async() => {
     const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
@@ -199,7 +199,7 @@ describe('criteria', () => {
     });
   });
 
-  it('like', async () => {
+  it('like', async() => {
     const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
@@ -218,7 +218,7 @@ describe('criteria', () => {
     });
   });
 
-  it('regex', async () => {
+  it('regex', async() => {
     const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
@@ -237,7 +237,7 @@ describe('criteria', () => {
     });
   });
 
-  it('where', async () => {
+  it('where', async() => {
     const data = {
       user: [
         { id: 1, username: 'foo', age: 15 },
@@ -255,7 +255,7 @@ describe('criteria', () => {
     });
   });
 
-  function createManager (data) {
+  function createManager(data) {
     return new Manager({
       connections: [
         {

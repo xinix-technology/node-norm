@@ -1,7 +1,7 @@
 const NField = require('./nfield');
 
 module.exports = class NBoolean extends NField {
-  attach (value) {
+  attach(value) {
     if (value === undefined || value === null) {
       return null;
     }

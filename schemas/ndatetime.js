@@ -1,7 +1,7 @@
 const NField = require('./nfield');
 
 module.exports = class NDatetime extends NField {
-  attach (value) {
+  attach(value) {
     value = super.attach(value);
 
     if (value === null) {

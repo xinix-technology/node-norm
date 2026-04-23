@@ -1,12 +1,12 @@
 const kTx = Symbol('tx');
 
 class Connection {
-  constructor ({ name }) {
+  constructor({ name }) {
     this.name = name;
     this[kTx] = false;
   }
 
-  async begin () {
+  async begin() {
     /* istanbul ignore if */
     if (this[kTx]) {
       return;
@@ -17,7 +17,7 @@ class Connection {
     this[kTx] = true;
   }
 
-  async commit () {
+  async commit() {
     /* istanbul ignore if */
     if (!this[kTx]) {
       return;
@@ -27,7 +27,7 @@ class Connection {
     this[kTx] = false;
   }
 
-  async rollback () {
+  async rollback() {
     /* istanbul ignore if */
     if (!this[kTx]) {
       return;
@@ -37,15 +37,15 @@ class Connection {
     this[kTx] = false;
   }
 
-  _begin () {
+  _begin() {
     // do nothing
   }
 
-  _commit () {
+  _commit() {
     // do nothing
   }
 
-  _rollback () {
+  _rollback() {
     // do nothing
   }
 }

@@ -1,5 +1,5 @@
-module.exports = function notExists (schema) {
-  return async function (value, { row, session, field: { name } }) {
+module.exports = function notExists(schema) {
+  return async function(value, { row, session, field: { name } }) {
     if (value === null || value === '') {
       return null;
     }

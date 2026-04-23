@@ -6,7 +6,7 @@ const kConnections = Symbol('connections');
 let sessionNextId = 0;
 
 class Session {
-  constructor ({ manager, options = {} }) {
+  constructor({ manager, options = {} }) {
     this.id = `session-${sessionNextId++}`;
     this.manager = manager;
     this.state = { ...options.state };
@@ -14,12 +14,12 @@ class Session {
     this[kConnections] = {};
   }
 
-  factory (name, criteria) {
+  factory(name, criteria) {
     const [connection, schema] = this.parse(name);
     return new Query({ session: this, connection, schema, criteria });
   }
 
-  async acquire (name) {
+  async acquire(name) {
     const pool = this.manager.getPool(name);
 
     if (!this[kConnections][pool.name]) {
@@ -32,7 +32,7 @@ class Session {
     return this[kConnections][pool.name];
   }
 
-  async dispose () {
+  async dispose() {
     await this.rollback();
     await Promise.all(Object.keys(this[kConnections]).map(name => {
       return this.manager.getPool(name).release(this[kConnections][name]);
@@ -41,37 +41,37 @@ class Session {
     this[kConnections] = {};
   }
 
-  close () {
+  close() {
     return this.commit();
   }
 
-  async commit () {
+  async commit() {
     await Promise.all(Object.keys(this[kConnections]).map(async name => {
       const connection = this[kConnections][name];
       await connection.commit();
     }));
   }
 
-  async rollback () {
+  async rollback() {
     await Promise.all(Object.keys(this[kConnections]).map(async name => {
       const connection = this[kConnections][name];
       await connection.rollback();
     }));
   }
 
-  async begin () {
+  async begin() {
     await Promise.all(Object.keys(this[kConnections]).map(async name => {
       const connection = this[kConnections][name];
       await connection.begin();
     }));
   }
 
-  async flush () {
+  async flush() {
     await this.commit();
     await this.begin();
   }
 
-  parse (name) {
+  parse(name) {
     let connection;
     let schema;
     if (Array.isArray(name)) {

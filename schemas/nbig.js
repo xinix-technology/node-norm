@@ -2,7 +2,7 @@ const NField = require('./nfield');
 const Big = require('big.js');
 
 module.exports = class NBig extends NField {
-  attach (value) {
+  attach(value) {
     value = super.attach(value);
 
     if (value === null) {
@@ -16,7 +16,7 @@ module.exports = class NBig extends NField {
     }
   }
 
-  compare (criteria, value) {
+  compare(criteria, value) {
     if (value === undefined) {
       value = null;
     }
@@ -32,7 +32,7 @@ module.exports = class NBig extends NField {
     return new Big(value).cmp(criteria);
   }
 
-  serialize (value) {
+  serialize(value) {
     if (value === null) {
       return value;
     }

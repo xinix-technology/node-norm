@@ -1,5 +1,5 @@
-module.exports = function (schema) {
-  return async function (value = null, { session, field: { name } }) {
+module.exports = function(schema) {
+  return async function(value = null, { session, field: { name } }) {
     if (value === null || value === '') {
       return null;
     }

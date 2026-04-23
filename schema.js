@@ -8,7 +8,7 @@ const kObserverChain = Symbol('observerChain');
 const kAttrs = Symbol('attrs');
 
 class Schema {
-  constructor ({ name, fields = [], observers = [], modelClass = Model }) {
+  constructor({ name, fields = [], observers = [], modelClass = Model }) {
     if (!name) {
       throw new Error('Schema name is required');
     }
@@ -23,20 +23,20 @@ class Schema {
     observers.forEach(observer => this.addObserver(observer));
   }
 
-  set (key, value) {
+  set(key, value) {
     this[kAttrs][key] = value;
     return this;
   }
 
-  get (key) {
+  get(key) {
     return this[kAttrs][key];
   }
 
-  getField (name) {
+  getField(name) {
     return this.fields.find(f => f.name === name) || new NField(name);
   }
 
-  addField (field) {
+  addField(field) {
     const existingField = this.fields.find(f => f.name === field.name);
     if (existingField) {
       throw new Error(`Duplicate field (${field.name})`);
@@ -45,7 +45,7 @@ class Schema {
     this.fields.push(field);
   }
 
-  addObserver (observer) {
+  addObserver(observer) {
     if ('initialize' in observer) {
       observer.initialize(this);
     }
@@ -56,7 +56,7 @@ class Schema {
     this[kObserverChain] = undefined;
   }
 
-  removeObserver (observer) {
+  removeObserver(observer) {
     const index = this[kObservers].indexOf(observer);
     /* istanbul ignore if */
     if (index === -1) {
@@ -73,7 +73,7 @@ class Schema {
     this[kObserverChain] = undefined;
   }
 
-  attach (row, partial = false) {
+  attach(row, partial = false) {
     const Model = this.modelClass;
 
     this.fields.forEach(field => {
@@ -94,7 +94,7 @@ class Schema {
     return new Model(row);
   }
 
-  observe (ctx, next) {
+  observe(ctx, next) {
     if (!this[kObserverChain]) {
       const units = this[kObservers].map(observer => {
         return (ctx, next) => {
@@ -111,7 +111,7 @@ class Schema {
     return this[kObserverChain](ctx, next);
   }
 
-  async filter (row, { session, partial = false }) {
+  async filter(row, { session, partial = false }) {
     const error = new FilterError();
 
     if (!row) {

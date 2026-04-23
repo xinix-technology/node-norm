@@ -3,7 +3,7 @@ const Historable = require('../../../observers/historable');
 const assert = require('assert');
 
 describe('Observer: Historable', () => {
-  it('append history', async () => {
+  it('append history', async() => {
     const data = {};
     const manager = createManager(data);
 
@@ -22,7 +22,7 @@ describe('Observer: Historable', () => {
     });
   });
 
-  function createManager (data) {
+  function createManager(data) {
     return new Manager({
       connections: [
         {

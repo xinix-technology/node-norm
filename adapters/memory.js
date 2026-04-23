@@ -2,13 +2,13 @@ const Connection = require('../connection');
 const { v4: uuidv4 } = require('uuid');
 
 class Memory extends Connection {
-  constructor (options) {
+  constructor(options) {
     super(options);
 
     this.data = options.data || {};
   }
 
-  load (query, callback = () => {}) {
+  load(query, callback = () => {}) {
     let data = this.data[query.schema.name] || [];
 
     const { criteria, sorts } = query;
@@ -52,7 +52,7 @@ class Memory extends Connection {
     });
   }
 
-  insert (query, callback = () => {}) {
+  insert(query, callback = () => {}) {
     const data = this.data[query.schema.name] = this.data[query.schema.name] || [];
 
     return query.rows.reduce((inserted, qRow) => {
@@ -67,7 +67,7 @@ class Memory extends Connection {
     }, 0);
   }
 
-  update (query) {
+  update(query) {
     const keys = Object.keys(query.sets);
     return this.load(query).reduce((affected, row) => {
       const fieldChanges = keys.filter(key => {
@@ -85,15 +85,15 @@ class Memory extends Connection {
     }, 0);
   }
 
-  drop (query) {
+  drop(query) {
     delete this.data[query.schema.name];
   }
 
-  truncate (query) {
+  truncate(query) {
     this.data[query.schema.name] = [];
   }
 
-  delete (query) {
+  delete(query) {
     const data = this.data[query.schema.name] = this.data[query.schema.name] || [];
 
     this.load(query).forEach(row => {
@@ -104,7 +104,7 @@ class Memory extends Connection {
     });
   }
 
-  async count (query, useSkipAndLimit) {
+  async count(query, useSkipAndLimit) {
     const { length, offset } = query;
 
     if (!useSkipAndLimit) {
@@ -122,7 +122,7 @@ class Memory extends Connection {
     return count;
   }
 
-  _matchCriteria (criteria, row, schema) {
+  _matchCriteria(criteria, row, schema) {
     if (!criteria) {
       return true;
     }
@@ -210,7 +210,7 @@ class Memory extends Connection {
     return true;
   }
 
-  _matchAndCriteria (criteria, row, schema) {
+  _matchAndCriteria(criteria, row, schema) {
     for (const subCriteria of criteria) {
       if (!this._matchCriteria(subCriteria, row, schema)) {
         return false;
@@ -220,7 +220,7 @@ class Memory extends Connection {
     return true;
   }
 
-  _matchOrCriteria (criteria, row, schema) {
+  _matchOrCriteria(criteria, row, schema) {
     for (const subCriteria of criteria) {
       if (this._matchCriteria(subCriteria, row, schema)) {
         return true;
@@ -230,15 +230,15 @@ class Memory extends Connection {
     return false;
   }
 
-  defined ({ name }) {
+  defined({ name }) {
     return !!this.data[name];
   }
 
-  define ({ name }) {
+  define({ name }) {
     this.data[name] = [];
   }
 
-  undefine ({ name }) {
+  undefine({ name }) {
     delete this.data[name];
   }
 }

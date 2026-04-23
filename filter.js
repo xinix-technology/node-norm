@@ -1,7 +1,7 @@
 let filters = {};
 
 class Filter {
-  static tokenize (signature) {
+  static tokenize(signature) {
     if (typeof signature !== 'string') {
       throw new Error('Cannot tokenize non-string filter signature');
     }
@@ -13,7 +13,7 @@ class Filter {
     return [head, ...rest];
   }
 
-  static get (signature) {
+  static get(signature) {
     const signatureType = typeof signature;
 
     if (signatureType === 'function') {
@@ -51,11 +51,11 @@ class Filter {
     return filters[fn](...args);
   }
 
-  static put (name, filter) {
+  static put(name, filter) {
     filters[name] = filter;
   }
 
-  static reset () {
+  static reset() {
     filters = {};
   }
 }

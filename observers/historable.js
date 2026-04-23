@@ -1,9 +1,9 @@
 class Historable {
-  constructor ({ suffix = '_history' } = {}) {
+  constructor({ suffix = '_history' } = {}) {
     this.suffix = suffix;
   }
 
-  async insert (ctx, next) {
+  async insert(ctx, next) {
     const { query, session } = ctx;
     const historySchema = `${query.schema.name}${this.suffix}`;
     const now = new Date();
@@ -17,7 +17,7 @@ class Historable {
     await historyQuery.save();
   }
 
-  async update (ctx, next) {
+  async update(ctx, next) {
     const { query, session } = ctx;
     const historySchema = `${query.schema.name}${this.suffix}`;
     const now = new Date();
@@ -33,7 +33,7 @@ class Historable {
     await historyQuery.save();
   }
 
-  async delete (ctx, next) {
+  async delete(ctx, next) {
     const { query, session } = ctx;
     const historySchema = `${query.schema.name}${this.suffix}`;
     const now = new Date();

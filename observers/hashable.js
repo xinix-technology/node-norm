@@ -1,12 +1,12 @@
 const bcrypt = require('bcryptjs');
 
 module.exports = class Hashable {
-  constructor ({ rounds = 10, field = 'password' } = {}) {
+  constructor({ rounds = 10, field = 'password' } = {}) {
     this.field = field;
     this.rounds = rounds;
   }
 
-  async insert ({ query }, next) {
+  async insert({ query }, next) {
     await Promise.all(query.rows.map(async row => {
       if (row[this.field]) {
         row[this.field] = await bcrypt.hash(row[this.field], this.rounds);
@@ -16,7 +16,7 @@ module.exports = class Hashable {
     await next();
   }
 
-  async update ({ query }, next) {
+  async update({ query }, next) {
     const { session, sets } = query;
 
     if (sets[this.field] === undefined) {
